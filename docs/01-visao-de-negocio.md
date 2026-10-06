@@ -113,6 +113,5 @@ Aplicativo que **sugere rotas acessíveis para pessoas com deficiência de mobil
 ## 9. Pendências do documento
 
 - [ ] Inserir dados e fontes de apoio na seção 2
-- [ ] Definir personas (seção 5)
 - [ ] Revisar os riscos com o grupo (seção 7)
 - [ ] Definir critérios de sucesso (seção 8)
