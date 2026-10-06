@@ -1,7 +1,7 @@
 # Regras de Negócio – Mão na Roda
 
-> **Versão do documento:** 0.1 (modelo base)
-> **Data:** 06/10/2026
+> **Versão do documento:** 0.1 (modelo base) <br>
+> **Data:** 06/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
 ---
