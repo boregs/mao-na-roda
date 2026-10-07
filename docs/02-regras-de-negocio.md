@@ -1,6 +1,6 @@
 # Regras de Negócio – Mão na Roda
 
-> **Versão do documento:** 0.1 (modelo base) <br>
+> **Versão do documento:** 0.1 (modelo base) <br> 
 > **Data:** 06/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
@@ -78,6 +78,15 @@ Os identificadores são **fixos**: se uma regra for removida, o número não é 
 | RN10 | Rota é sugestão informativa | O app deve informar que a rota é uma **sugestão baseada nos dados disponíveis** e que as condições reais podem ser diferentes. | Os dados podem estar incompletos ou desatualizados, e a decisão final é do usuário. | V1 | Proposta | RF04 |
 | RN11 | Consentimento para localização | A localização do usuário só pode ser coletada após consentimento explícito e usada apenas para o funcionamento do app. | LGPD e confiança do usuário. | V1 | Proposta | RNF04 |
 
+### 3.5 Contas de usuário
+
+| ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
+|---|---|---|---|---|---|---|
+| RN12 | Criação de conta e acesso | O usuário pode criar uma conta e fazer login nela. Na V1, o uso do app exige conta. | Permite guardar as preferências do usuário e associar seus relatos a uma identidade (reputação, validação e consentimento). | V1 | Proposta | RF07, RF08 |
+| RN13 | Exclusão de conta | O usuário pode excluir a própria conta a qualquer momento. Os dados pessoais associados à conta são removidos. **[Definir o tratamento de relatos e fotos já enviados.]** | Direito do titular de dados previsto na LGPD. | V1 | Proposta | RF09 |
+| RN14 | Uso sem conta | O app pode ser usado sem conta. | Reduz a barreira de entrada para quem só quer uma rota. | V2 | Proposta | RF10 |
+| RN15 | Limitação do cálculo sem conta | Sem conta, o cálculo de rota é menos refinado do que com conta, pois o sistema não tem os dados do usuário, como a idade, que ajudam a definir a melhor rota. | A conta fornece informações que permitem personalizar a rota. | V2 | Proposta | RF03, RF10 |
+
 ---
 
 ## 4. Matriz de barreiras por perfil
@@ -119,11 +128,13 @@ Apoia as regras RN01 e RN02. Cada combinação de barreira e perfil é classific
 
 ## 6. Pendências
 
-- [ ] Revisar as regras com o grupo (RN01 a RN11)
+- [ ] Revisar as regras com o grupo (RN01 a RN15)
 - [ ] Validar a matriz de barreiras por perfil (seção 4)
 - [ ] Definir os valores entre colchetes (prazo de dado desatualizado, critério de validação de relatos)
 - [ ] Definir a origem dos dados de acessibilidade (dados oficiais, relatos ou ambos)
 - [ ] Definir consentimento para uso das fotos no treinamento do modelo e o tratamento de privacidade das imagens (LGPD)
+- [ ] Definir quais dados da conta, além da idade, influenciam o cálculo de rota (RN15, V2)
+- [ ] Definir o que acontece com relatos e fotos já enviados quando a conta é excluída (RN13)
 - [ ] Voltar ao `03-requisitos.md` e ligar cada RF às regras daqui
 - [ ] Atualizar versão e data ao aprovar o documento
 
