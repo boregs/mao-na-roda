@@ -1,7 +1,7 @@
 # Guia de Contribuição – Mão na Roda
 
-> **Versão do documento:** 0.1 (inicial, em revisão)
-> **Data:** 06/10/2026
+> **Versão do documento:** 0.1 (inicial, em revisão) <br>
+> **Data de Criação:** 06/10/2026
 > **Última atualização:** 06/10/2026
 
 Este guia define como a equipe trabalha no repositório: como escrever mensagens de commit, como nomear branches e como abrir Pull Requests (PRs). O objetivo é manter o histórico legível e a revisão de código rápida.
