@@ -1,7 +1,7 @@
 # Requisitos – Mão na Roda
 
-> **Versão do documento:** 0.1 (modelo base) <br>
-> **Data:** 06/10/2026 <br>
+> **Versão do documento:** 0.2 (modelo base) <br>
+> **Data:** 07/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
 ---
@@ -12,8 +12,6 @@ Este documento lista os requisitos do **Mão na Roda**, separados em:
 
 - **Requisitos funcionais (RF):** o que o sistema **faz**, ou seja, as funcionalidades que o usuário ou outros sistemas podem usar.
 - **Requisitos não funcionais (RNF):** **como** o sistema deve se comportar, ou seja, qualidades e restrições como desempenho, segurança, usabilidade e acessibilidade.
-
-> **Nota:** as linhas marcadas com *(exemplo)* servem apenas para mostrar o formato. Devem ser substituídas pelos requisitos reais do grupo.
 
 ---
 
@@ -62,36 +60,39 @@ Agrupados por módulo, para facilitar a leitura.
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF01 | *(exemplo)* Exibir mapa e localização | O sistema deve exibir o mapa com a localização atual do usuário. | Essencial | V1 | Proposto | UC01 |
-| RF02 | *(exemplo)* Buscar destino | O sistema deve permitir que o usuário informe um destino por texto. | Essencial | V1 | Proposto | UC02 |
+| RF01 | Exibir mapa e localização | O sistema deve exibir o mapa com a localização atual do usuário. | Essencial | V1 | Proposto | - |
+| RF02 | Buscar destino | O sistema deve permitir que o usuário informe um destino por texto. | Essencial | V1 | Proposto | - |
 
 ### 3.2 Rotas acessíveis
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF03 | *(exemplo)* Calcular rota acessível | O sistema deve calcular rotas considerando o perfil de mobilidade escolhido pelo usuário. | Essencial | V1 | Proposto | RN01, UC03 |
-| RF04 | *(exemplo)* Exibir resumo de barreiras | O sistema deve exibir, para cada rota, distância, tempo estimado e resumo das barreiras do trajeto. | Essencial | V1 | Proposto | RN02, UC03 |
+| RF03 | Calcular rota acessível | O sistema deve calcular rotas considerando o perfil de mobilidade escolhido pelo usuário. | Essencial | V1 | Proposto | RN01, RN03, RN04 |
+| RF04 | Exibir resumo de barreiras | O sistema deve exibir, para cada rota, distância, tempo estimado e resumo das barreiras do trajeto. | Essencial | V1 | Proposto | RN02 |
+| RF05 | Exibir ultima verificação da rota  | O sistema deve exibir a data da última verificação, de cada parte da rota, sinalizando se está desatualizada | Importante | V1 | Proposto | RN06, RN07 | 
+| RF06 | Alertar que a rota é uma sugestão | O sistema deve alertar o usuário que a rota apresentada é baseada nos dados disponíveis, e que a situação verdadeira pode ser diferente | Importante | V1 | Proposto | RN10 |
+| RF07 | Re-Routing opcional | Em caso de uma rota com relatos sem validação, o sistema deve permitir a opção de re-fazer a rota, evitando o relato | Importante | V1 | Proposto | RN10, RN11 |
 
 ### 3.3 Preferências do usuário
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF05 | *(exemplo)* Selecionar perfil de mobilidade | O sistema deve permitir que o usuário escolha seu perfil de mobilidade para personalizar as rotas. | Essencial | V1 | Proposto | RN01, UC04 |
+| RF05 | Selecionar perfil de mobilidade | O sistema deve permitir que o usuário escolha seu perfil de mobilidade para personalizar as rotas. | Essencial | V1 | Proposto | RN01 |
 
 ### 3.4 Relato de problemas
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF06 | *(exemplo)* Relatar problema no trajeto | O sistema deve permitir que o usuário registre um problema de acessibilidade em um local, com descrição em texto. | Importante | V1 | Proposto | RN03, UC05 |
+| RF06 | Relatar problema no trajeto | O sistema deve permitir que o usuário registre um problema de acessibilidade em um local, com descrição em texto. | Importante | V1 | Proposto | RN08, RN09 |
 
 ### 3.5 Conta de usuário
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF07 | Criar conta | O usuário deve poder criar uma conta no sistema. | Essencial | V1 | Proposto | RN12 |
-| RF08 | Fazer login | O usuário deve poder acessar o sistema com a sua conta. | Essencial | V1 | Proposto | RN12 |
-| RF09 | Excluir conta | O usuário deve poder excluir a própria conta, com a remoção de seus dados pessoais. | Essencial | V1 | Proposto | RN13 |
-| RF10 | Usar sem conta | O sistema deve permitir o uso do app sem conta, com limitações no cálculo de rotas em relação ao uso com conta. | Futuro | V2 | Proposto | RN14, RN15, RF03 |
+| RF07 | Criar conta | O usuário deve poder criar uma conta no sistema. | Essencial | V1 | Proposto | RN15 |
+| RF08 | Fazer login | O usuário deve poder acessar o sistema com a sua conta. | Essencial | V1 | Proposto | RN15 |
+| RF09 | Excluir conta | O usuário deve poder excluir a própria conta, com a remoção de seus dados pessoais. | Essencial | V1 | Proposto | RN16 |
+| RF10 | Usar sem conta | O sistema deve permitir o uso do app sem conta, sem o armazenamento dos dados da rota | Essencial | V1 | Proposto | RN16, RN17, RN18, RF03 |
 
 > **Dica de redação:** descreva cada RF começando com "O sistema deve..." ou "O usuário deve poder...", com **um comportamento por requisito**. Se a descrição precisar de "e", considere dividir.
 
@@ -105,40 +106,38 @@ Agrupados por categoria de qualidade.
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Status |
 |---|---|---|---|---|---|
-| RNF01 | *(exemplo)* Interface acessível | A interface deve seguir boas práticas de acessibilidade: contraste adequado, fontes legíveis e botões de tamanho adequado ao toque. | Revisão de telas e testes com usuários | Essencial | Proposto |
-| RNF02 | *(exemplo)* Uso com uma mão | As ações principais devem ser alcançáveis com uma mão só. | Teste em dispositivos reais | Importante | Proposto |
+| RNF01 | Interface acessível | A interface deve seguir boas práticas de acessibilidade: contraste adequado, fontes legíveis e botões de tamanho adequado ao toque. | Revisão de telas e testes com usuários | Essencial | Proposto |
+| RNF02 | Uso com uma mão | As ações principais devem ser alcançáveis com uma mão só. | Teste em dispositivos reais | Importante | Proposto |
 
 ### 4.2 Desempenho
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Status |
 |---|---|---|---|---|---|
-| RNF03 | *(exemplo)* Tempo de resposta da rota | O cálculo de uma rota deve ser concluído em até **[X] segundos** em condições normais de rede. | Teste de desempenho | Importante | Proposto |
+| RNF03 | Tempo de resposta da rota | O cálculo de uma rota deve ser concluído em até **1 segundo** em condições normais de rede. | Teste de desempenho | Importante | Proposto |
 
 ### 4.3 Segurança e privacidade
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Status |
 |---|---|---|---|---|---|
-| RNF04 | *(exemplo)* Proteção da localização | A localização do usuário só deve ser coletada com consentimento explícito e usada apenas para o funcionamento do app, conforme a LGPD. | Revisão de fluxo de consentimento | Essencial | Proposto |
+| RNF04 | Proteção da localização | A localização do usuário só deve ser coletada com consentimento explícito e usada apenas para o funcionamento do app, conforme a LGPD. | Revisão de fluxo de consentimento | Essencial | Proposto |
 
 ### 4.4 Disponibilidade e confiabilidade
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Status |
 |---|---|---|---|---|---|
-| RNF05 | *(exemplo)* Comportamento sem conexão | O app deve informar de forma clara quando estiver sem conexão com a internet, em vez de falhar silenciosamente. | Teste manual | Importante | Proposto |
+| RNF05 | Comportamento sem conexão | O app deve informar de forma clara quando estiver sem conexão com a internet, em vez de falhar silenciosamente. | Teste manual | Importante | Proposto |
 
 ### 4.5 Compatibilidade
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Status |
 |---|---|---|---|---|---|
-| RNF06 | *(exemplo)* Plataformas suportadas | O app deve funcionar em **[Android / iOS / versões mínimas]**. | Testes em dispositivos | Essencial | Proposto |
+| RNF06 | Plataformas suportadas | O app deve funcionar no Android 24 e versões posteriores. | Testes em dispositivos | Essencial | Proposto |
 
 ### 4.6 Manutenibilidade
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Status |
 |---|---|---|---|---|---|
-| RNF07 | *(exemplo)* Padrão de código e versionamento | O código deve seguir o padrão do [guia de contribuição](../CONTRIBUTING.md). | Revisão de PR | Importante | Proposto |
-
-> **Dica de redação:** um bom RNF é **mensurável**. Em vez de "o app deve ser rápido", escreva "a rota deve ser calculada em até X segundos". A coluna *Como verificar* ajuda a garantir isso.
+| RNF07 | Padrão de código e versionamento | O versionamento do código deve seguir o padrão do [guia de contribuição](../CONTRIBUTING.md). | PRs abertos, mensagens de commit | Importante | Proposto |
 
 ---
 
@@ -178,3 +177,4 @@ Relaciona os requisitos aos casos de uso e às regras de negócio.
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 06/10/2026 | Modelo base |
+| 0.2 | 07/10/2026 | Modelo base |
