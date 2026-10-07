@@ -1,7 +1,7 @@
 # Visão de Negócio – Mão na Roda
 
 > **Projeto:** Mão na Roda – Acessibilidade para Todos <br>
-> **Versão do documento:** 1.0 | **Data:** [06/10/2026] <br>
+> **Versão do documento:** 1.0 | **Data:** 06/10/2026 <br>
 > **Documentos relacionados:** [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
 ---
