@@ -1,7 +1,7 @@
 # Regras de Negócio – Mão na Roda
 
-> **Versão do documento:** 0.1 (modelo base) <br> 
-> **Data:** 06/10/2026 <br>
+> **Versão do documento:** 0.2 (modelo base) <br> 
+> **Data:** 07/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
 ---
@@ -51,7 +51,7 @@ Os identificadores são **fixos**: se uma regra for removida, o número não é 
 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RN01 | Perfil define as barreiras impeditivas | Cada perfil de mobilidade tem uma lista própria de barreiras **impeditivas**. Uma rota que contenha barreira impeditiva para o perfil escolhido não deve ser indicada como acessível. | Uma barreira que não afeta uma pessoa pode impedir outra (por exemplo, escada para cadeirante). | V1 | Proposta | RF03, RF05 |
+| RN01 | Perfil define as barreiras impeditivas | Cada perfil de mobilidade tem uma lista própria de barreiras **impeditivas**. Uma rota que contenha barreira impeditiva para o perfil escolhido não deve ser indicada como acessível. | Uma barreira que não afeta uma pessoa pode impedir outra (por exemplo, escada para cadeirante). | V1 | Proposta | RF03, RF08 |
 | RN02 | Classificação das barreiras | Toda barreira é classificada como **impeditiva**, **de atenção** ou **irrelevante** para cada perfil (veja a matriz da seção 4). | Permite mostrar ao usuário o que bloqueia a rota e o que apenas exige cuidado. | V1 | Proposta | RF04 |
 | RN03 | Rota sem opção totalmente acessível | Se não existir rota sem barreiras impeditivas, o sistema deve informar isso ao usuário e mostrar a rota com **menos** barreiras, destacando as que restam. | Evitar que o usuário fique sem resposta e deixar a decisão com ele. | V1 | Proposta | RF03 |
 | RN04 | Rota mais curta não é o único critério | A escolha da rota deve priorizar a acessibilidade antes de tempo e distância. | É a proposta de valor do produto. | V1 | Proposta | RF03 |
@@ -68,8 +68,8 @@ Os identificadores são **fixos**: se uma regra for removida, o número não é 
 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RN08 | Conteúdo mínimo de um relato | Um relato pode ser aceito sem foto, mas deve possuir descrição. | A descrição é obrigatória pois evita relatos falsos e inverificáveis, a foto se torna opcional, servindo como provas do relato | V1 | Proposta | RF06 |
-| RN09 | Validação dos relatos | Um relato só altera a classificação de um trecho depois de **[confirmado por X outros usuários / aprovado por moderação]**. | Evita relatos falsos ou equivocados afetando as rotas. | V2 | Proposta | RF06 |
+| RN08 | Conteúdo mínimo de um relato | Um relato pode ser aceito sem foto, mas deve possuir descrição. | A descrição é obrigatória pois evita relatos falsos e inverificáveis, a foto se torna opcional, servindo como provas do relato | V1 | Proposta | RF09 |
+| RN09 | Validação dos relatos | Um relato só altera a classificação de um trecho depois de **[confirmado por X outros usuários / aprovado por moderação]**. | Evita relatos falsos ou equivocados afetando as rotas. | V2 | Proposta | RF09 |
 | RN10 | Relatos sem validação | Relatos sem validação podem ser apresentados como possíveis obstáculos na rota | Evita não relatar um problema na rota por falta de verificação | V1 | Proposta | - |
 | RN11 | Relatos com e sem fotos | Relatos que possuem apenas descrição devem ser classificados diferentemente daqueles que possuem foto de comprovação | Ajuda o usuário a decidir se continua na mesma rota | V1 | Proposta | - |
 | RN12 | Rotas com relatos sem validação | A existência de relatos sem validação não pode alterar a rota estabelecida | Devido a não confirmação do relato, a rota estabelecia continua sendo a melhor | V1 | Proposta | - |
@@ -86,10 +86,10 @@ Os identificadores são **fixos**: se uma regra for removida, o número não é 
 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RN15 | Criação de conta e acesso | O usuário pode criar uma conta e fazer login nela. | Permite guardar as preferências do usuário e associar seus relatos a uma identidade (reputação, validação e consentimento). | V1 | Proposta | RF07, RF08 |
-| RN16 | Exclusão de conta | O usuário pode excluir a própria conta a qualquer momento. Os dados pessoais associados à conta são removidos. **[Definir o tratamento de relatos e fotos já enviados.]** | Direito do titular de dados previsto na LGPD. | V1 | Proposta | RF09 |
-| RN17 | Uso sem conta | O app pode ser usado sem conta. | Reduz a barreira de entrada para quem só quer uma rota. | V2 | Proposta | RF10 |
-| RN18 | Armazenamento da rota sem conta | Sem conta, a rota estipulada pelo algoritmo, juntamente com o tipo de limitação que o usuário possui não serão armazenadas | O usuário não deu o consentimento do armazenamento, devido que não criou uma conta | V2 | Proposta | RF03, RF10 |
+| RN15 | Criação de conta e acesso | O usuário pode criar uma conta e fazer login nela. | Permite guardar as preferências do usuário e associar seus relatos a uma identidade (reputação, validação e consentimento). | V1 | Proposta | RF10, RF11 |
+| RN16 | Exclusão de conta | O usuário pode excluir a própria conta a qualquer momento. Os dados pessoais associados à conta são removidos. **[Definir o tratamento de relatos e fotos já enviados.]** | Direito do titular de dados previsto na LGPD. | V1 | Proposta | RF12 |
+| RN17 | Uso sem conta | O app pode ser usado sem conta. | Reduz a barreira de entrada para quem só quer uma rota. | V1 | Proposta | RF13 |
+| RN18 | Armazenamento da rota sem conta | Sem conta, a rota estipulada pelo algoritmo, juntamente com o tipo de limitação que o usuário possui não serão armazenadas | O usuário não deu o consentimento do armazenamento, devido que não criou uma conta | V1 | Proposta | RF03, RF13 |
 
 ---
 
@@ -149,3 +149,4 @@ Apoia as regras RN01 e RN02. Cada combinação de barreira e perfil é classific
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 06/10/2026 | Modelo base |
+| 0.2 | 07/10/2026 | Modelo base
