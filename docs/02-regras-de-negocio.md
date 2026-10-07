@@ -68,24 +68,28 @@ Os identificadores são **fixos**: se uma regra for removida, o número não é 
 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RN08 | Conteúdo mínimo de um relato | Um relato só é aceito se tiver **localização**, **descrição do problema** e **foto** do local. | A foto permite analisar e verificar o relato e pode ser usada para treinar o modelo que classifica as barreiras e define as rotas. Sem local, descrição e foto, o relato não serve para atualizar rotas. | V1 | Proposta | RF06 |
+| RN08 | Conteúdo mínimo de um relato | Um relato pode ser aceito sem foto, mas deve possuir descrição. | A descrição é obrigatória pois evita relatos falsos e inverificáveis, a foto se torna opcional, servindo como provas do relato | V1 | Proposta | RF06 |
 | RN09 | Validação dos relatos | Um relato só altera a classificação de um trecho depois de **[confirmado por X outros usuários / aprovado por moderação]**. | Evita relatos falsos ou equivocados afetando as rotas. | V2 | Proposta | RF06 |
+| RN10 | Relatos sem validação | Relatos sem validação podem ser apresentados como possíveis obstáculos na rota | Evita não relatar um problema na rota por falta de verificação | V1 | Proposta | - |
+| RN11 | Relatos com e sem fotos | Relatos que possuem apenas descrição devem ser classificados diferentemente daqueles que possuem foto de comprovação | Ajuda o usuário a decidir se continua na mesma rota | V1 | Proposta | - |
+| RN12 | Rotas com relatos sem validação | A existência de relatos sem validação não pode alterar a rota estabelecida | Devido a não confirmação do relato, a rota estabelecia continua sendo a melhor | V1 | Proposta | - |
+
 
 ### 3.4 Responsabilidade e privacidade
 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RN10 | Rota é sugestão informativa | O app deve informar que a rota é uma **sugestão baseada nos dados disponíveis** e que as condições reais podem ser diferentes. | Os dados podem estar incompletos ou desatualizados, e a decisão final é do usuário. | V1 | Proposta | RF04 |
-| RN11 | Consentimento para localização | A localização do usuário só pode ser coletada após consentimento explícito e usada apenas para o funcionamento do app. | LGPD e confiança do usuário. | V1 | Proposta | RNF04 |
+| RN13 | Rota é sugestão informativa | O app deve informar que a rota é uma **sugestão baseada nos dados disponíveis** e que as condições reais podem ser diferentes. | Os dados podem estar incompletos ou desatualizados, e a decisão final é do usuário. | V1 | Proposta | RF04 |
+| RN14 | Consentimento para localização | A localização do usuário só pode ser coletada após consentimento explícito e usada apenas para o funcionamento do app. | LGPD e confiança do usuário. | V1 | Proposta | RNF04 |
 
 ### 3.5 Contas de usuário
 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RN12 | Criação de conta e acesso | O usuário pode criar uma conta e fazer login nela. Na V1, o uso do app exige conta. | Permite guardar as preferências do usuário e associar seus relatos a uma identidade (reputação, validação e consentimento). | V1 | Proposta | RF07, RF08 |
-| RN13 | Exclusão de conta | O usuário pode excluir a própria conta a qualquer momento. Os dados pessoais associados à conta são removidos. **[Definir o tratamento de relatos e fotos já enviados.]** | Direito do titular de dados previsto na LGPD. | V1 | Proposta | RF09 |
-| RN14 | Uso sem conta | O app pode ser usado sem conta. | Reduz a barreira de entrada para quem só quer uma rota. | V2 | Proposta | RF10 |
-| RN15 | Limitação do cálculo sem conta | Sem conta, o cálculo de rota é menos refinado do que com conta, pois o sistema não tem os dados do usuário, como a idade, que ajudam a definir a melhor rota. | A conta fornece informações que permitem personalizar a rota. | V2 | Proposta | RF03, RF10 |
+| RN15 | Criação de conta e acesso | O usuário pode criar uma conta e fazer login nela. | Permite guardar as preferências do usuário e associar seus relatos a uma identidade (reputação, validação e consentimento). | V1 | Proposta | RF07, RF08 |
+| RN16 | Exclusão de conta | O usuário pode excluir a própria conta a qualquer momento. Os dados pessoais associados à conta são removidos. **[Definir o tratamento de relatos e fotos já enviados.]** | Direito do titular de dados previsto na LGPD. | V1 | Proposta | RF09 |
+| RN17 | Uso sem conta | O app pode ser usado sem conta. | Reduz a barreira de entrada para quem só quer uma rota. | V2 | Proposta | RF10 |
+| RN18 | Armazenamento da rota sem conta | Sem conta, a rota estipulada pelo algoritmo, juntamente com o tipo de limitação que o usuário possui não serão armazenadas | O usuário não deu o consentimento do armazenamento, devido que não criou uma conta | V2 | Proposta | RF03, RF10 |
 
 ---
 
