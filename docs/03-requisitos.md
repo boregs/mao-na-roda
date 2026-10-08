@@ -91,7 +91,7 @@ Agrupados por módulo, para facilitar a leitura.
 |---|---|---|---|---|---|---|
 | RF09 | Relatar problema no trajeto | O sistema deve permitir que o usuário registre um problema de acessibilidade em um local, com descrição em texto. | Importante | V1 | Proposto | RN08 |
 | RF14 | Classificar relatos | O sistema deve diferenciar relatos com foto e descrição e apenas com descrição | Importante | V1 | Proposto | RN08, RN11 |
-| RF15 | Confirmar relato | O sistema deve permitir que um usuário confirme a existência de um problema relatado por outro usuário. | Futuro | V2 | Proposto | RN09 |
+| RF15 | Confirmar relato | O sistema deve permitir que um usuário confirme a existência de um problema relatado por outro usuário. | Essencial | V2 | Proposto | RN09 |
 | RF16 | Impedir confirmação do próprio relato | O sistema deve impedir que o autor confirme o próprio relato. | Essencial | V2 | Proposto | RN09 |
 | RF17 | Impedir confirmações duplicadas | O sistema deve permitir que cada usuário confirme o mesmo relato apenas uma vez. | Essencial | V2 | Proposto | RN09 |
 
