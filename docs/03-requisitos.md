@@ -70,8 +70,8 @@ Agrupados por módulo, para facilitar a leitura.
 | RF03 | Calcular rota acessível | O sistema deve calcular rotas considerando o perfil de mobilidade escolhido pelo usuário. | Essencial | V1 | Proposto | RN01, RN03, RN04 |
 | RF04 | Exibir resumo de barreiras | O sistema deve exibir, para cada rota, distância, tempo estimado e resumo das barreiras do trajeto. | Essencial | V1 | Proposto | RN02 |
 | RF05 | Exibir ultima verificação da rota  | O sistema deve exibir a data da última verificação, de cada parte da rota, sinalizando se está desatualizada | Importante | V1 | Proposto | RN06, RN07 | 
-| RF06 | Alertar que a rota é uma sugestão | O sistema deve alertar o usuário que a rota apresentada é baseada nos dados disponíveis, e que a situação verdadeira pode ser diferente | Importante | V1 | Proposto | RN10 |
-| RF07 | Re-Routing opcional | Em caso de uma rota com relatos sem validação, o sistema deve permitir a opção de re-fazer a rota, evitando o relato | Importante | V1 | Proposto | RN10, RN11 |
+| RF06 | Alertar que a rota é uma sugestão | O sistema deve alertar o usuário que a rota apresentada é baseada nos dados disponíveis, e que a situação verdadeira pode ser diferente | Importante | V1 | Proposto | RN13 |
+| RF07 | Re-Routing opcional | Em caso de uma rota com relatos sem validação, o sistema deve permitir a opção de re-fazer a rota, evitando o relato | Importante | V1 | Proposto | RN10, RN11, RN12 |
 
 ### 3.3 Preferências do usuário
 
@@ -92,7 +92,7 @@ Agrupados por módulo, para facilitar a leitura.
 | RF10 | Criar conta | O usuário deve poder criar uma conta no sistema. | Essencial | V1 | Proposto | RN15 |
 | RF11 | Fazer login | O usuário deve poder acessar o sistema com a sua conta. | Essencial | V1 | Proposto | RN15 |
 | RF12 | Excluir conta | O usuário deve poder excluir a própria conta, com a remoção de seus dados pessoais. | Essencial | V1 | Proposto | RN16 |
-| RF13 | Usar sem conta | O sistema deve permitir o uso do app sem conta, sem o armazenamento dos dados da rota | Essencial | V1 | Proposto | RN16, RN17, RN18, RF03 |
+| RF13 | Usar sem conta | O sistema deve permitir o uso do app sem conta, sem o armazenamento dos dados da rota | Essencial | V1 | Proposto | RN17, RN18, RF03 |
 
 > **Dica de redação:** descreva cada RF começando com "O sistema deve..." ou "O usuário deve poder...", com **um comportamento por requisito**. Se a descrição precisar de "e", considere dividir.
 
