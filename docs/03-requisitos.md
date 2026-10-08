@@ -130,6 +130,13 @@ Agrupados por categoria de qualidade.
 | ID | Nome | Descrição | Como verificar | Prioridade | Status |
 |---|---|---|---|---|---|
 | RNF04 | Proteção da localização | A localização do usuário só deve ser coletada com consentimento explícito e usada apenas para o funcionamento do app, conforme a LGPD. | Revisão de fluxo de consentimento | Essencial | Proposto |
+| RNF08 | Proteção das senhas | As senhas dos usuários devem ser armazenadas utilizando um algoritmo seguro de hash com salt e nunca devem ser persistidas ou registradas em texto legível. | Criar uma conta com uma senha conhecida, consultar diretamente o registro persistido e verificar que o valor armazenado não corresponde à senha original. Revisar o algoritmo utilizado e testar a autenticação com senha correta e incorreta. | Essencial | Proposto |
+| RNF09 | Controle de acesso ao banco de dados | O banco de dados deve aceitar conexões somente de serviços e usuários autorizados, utilizando contas com o menor conjunto de permissões necessário para cada operação. | Revisão dos usuários, papéis, permissões e regras de acesso ao banco de dados | Essencial | Proposto |
+| RNF10 | Proteção das credenciais | As credenciais de acesso ao banco de dados não devem ser armazenadas no código-fonte nem versionadas no repositório. | Inspeção do repositório, das configurações da aplicação e do mecanismo utilizado para armazenar segredos | Essencial | Proposto |
+| RNF11 | Criptografia da conexão com o banco | Toda comunicação entre a aplicação e o banco de dados deve utilizar uma conexão criptografada. | Inspeção das configurações de conexão e teste de conexão sem criptografia, que deve ser recusada | Essencial | Proposto |
+| RNF12 | Proteção contra injeção de SQL | Toda consulta que utilize dados fornecidos pelo usuário deve empregar parâmetros ou mecanismos equivalentes que impeçam a composição insegura de comandos SQL. | Revisão do código e testes de segurança com entradas maliciosas representativas | Essencial | Proposto |
+| RNF13 | Criptografia de dados sensíveis | Os dados pessoais definidos pelo projeto como sensíveis e que precisem ser recuperados pela aplicação devem ser criptografados antes da persistência. As chaves de criptografia devem ser armazenadas separadamente do banco de dados. | Persistir valores conhecidos, consultar diretamente os registros e verificar que os campos protegidos não estejam legíveis. Revisar a configuração da criptografia, a localização das chaves e testar se apenas a aplicação autorizada consegue recuperar os valores originais. | Essencial | Proposto |
+
 
 ### 4.4 Disponibilidade e confiabilidade
 
