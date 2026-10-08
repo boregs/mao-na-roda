@@ -61,8 +61,8 @@ Os identificadores são **fixos**: se uma regra for removida, o número não é 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
 | RN05 | Tipos de barreira reconhecidos | O sistema considera, no mínimo: escadas, ausência ou inclinação inadequada de rampas, calçadas estreitas ou danificadas, obstáculos, elevadores indisponíveis, ausência de piso tátil, banheiros não acessíveis e entradas inadequadas. | Lista de barreiras definida pela equipe com base no problema identificado. | V1 | Proposta | RF04 |
-| RN06 | Dado de acessibilidade com data | Toda informação de acessibilidade de um trecho ou local deve ter **data da última verificação** e **origem** (dado oficial ou relato de usuário). | Condições mudam, e o usuário precisa saber o quão confiável é a informação. | V1 | Proposta | RF04 |
-| RN07 | Dados desatualizados | Informações com mais de **[X meses]** sem verificação devem ser sinalizadas como desatualizadas. | Reduz o risco de o usuário confiar em dado antigo. | V1 | Proposta | RF04 |
+| RN06 | Dado de acessibilidade com data | Toda informação de acessibilidade de um trecho ou local deve ter **data da última verificação** e **origem** (dado oficial ou relato de usuário). | Condições mudam, e o usuário precisa saber o quão confiável é a informação. | V1 | Proposta | RF04, RF05 |
+| RN07 | Dados desatualizados | Informações com mais de **[X meses]** sem verificação devem ser sinalizadas como desatualizadas. | Reduz o risco de o usuário confiar em dado antigo. | V1 | Proposta | RF04, RF05 |
 
 ### 3.3 Relatos de usuários
 
@@ -72,14 +72,14 @@ Os identificadores são **fixos**: se uma regra for removida, o número não é 
 | RN09 | Validação dos relatos | Um relato só altera a classificação de um trecho depois de **[confirmado por X outros usuários / aprovado por moderação]**. | Evita relatos falsos ou equivocados afetando as rotas. | V2 | Proposta | RF09 |
 | RN10 | Relatos sem validação | Relatos sem validação podem ser apresentados como possíveis obstáculos na rota | Evita não relatar um problema na rota por falta de verificação | V1 | Proposta | - |
 | RN11 | Relatos com e sem fotos | Relatos que possuem apenas descrição devem ser classificados diferentemente daqueles que possuem foto de comprovação | Ajuda o usuário a decidir se continua na mesma rota | V1 | Proposta | - |
-| RN12 | Rotas com relatos sem validação | A existência de relatos sem validação não pode alterar a rota estabelecida | Devido a não confirmação do relato, a rota estabelecia continua sendo a melhor | V1 | Proposta | - |
+| RN12 | Rotas com relatos sem validação | Relatos não validados não alteram automaticamente a rota calculada. O usuário pode solicitar uma alternativa que evite os trechos associados aos relatos selecionados. | A informação ainda não foi confirmada, portanto não modifica automaticamente os critérios de cálculo. | V1 | Proposta | - |
 
 
 ### 3.4 Responsabilidade e privacidade
 
 | ID | Nome | Descrição | Justificativa | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RN13 | Rota é sugestão informativa | O app deve informar que a rota é uma **sugestão baseada nos dados disponíveis** e que as condições reais podem ser diferentes. | Os dados podem estar incompletos ou desatualizados, e a decisão final é do usuário. | V1 | Proposta | RF04 |
+| RN13 | Rota é sugestão informativa | O app deve informar que a rota é uma **sugestão baseada nos dados disponíveis** e que as condições reais podem ser diferentes. | Os dados podem estar incompletos ou desatualizados, e a decisão final é do usuário. | V1 | Proposta | RF04, RF06 |
 | RN14 | Consentimento para localização | A localização do usuário só pode ser coletada após consentimento explícito e usada apenas para o funcionamento do app. | LGPD e confiança do usuário. | V1 | Proposta | RNF04 |
 
 ### 3.5 Contas de usuário
@@ -132,7 +132,7 @@ Apoia as regras RN01 e RN02. Cada combinação de barreira e perfil é classific
 
 ## 6. Pendências
 
-- [ ] Revisar as regras com o grupo (RN01 a RN15)
+- [ ] Revisar as regras com o grupo (RN01 a RN18)
 - [ ] Validar a matriz de barreiras por perfil (seção 4)
 - [ ] Definir os valores entre colchetes (prazo de dado desatualizado, critério de validação de relatos)
 - [ ] Definir a origem dos dados de acessibilidade (dados oficiais, relatos ou ambos)
