@@ -1,7 +1,7 @@
 # Regras de Negócio – Mão na Roda
 
-> **Versão do documento:** 0.2 (modelo base) <br> 
-> **Data:** 07/10/2026 <br>
+> **Versão do documento:** 0.3  <br> 
+> **Data:** 08/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
 ---
@@ -149,4 +149,5 @@ Apoia as regras RN01 e RN02. Cada combinação de barreira e perfil é classific
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 06/10/2026 | Modelo base |
-| 0.2 | 07/10/2026 | Modelo base
+| 0.2 | 07/10/2026 | Modelo base |
+| 0.3 | 08/10/2026 | Modelo base |
