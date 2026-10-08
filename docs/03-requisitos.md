@@ -42,6 +42,11 @@ Os identificadores são **fixos**: se um requisito for removido, o número não 
 | `V1` | Escopo inicial (rotas acessíveis para deficiência de mobilidade) |
 | `V2` | Evolução prevista (por exemplo, auxílio por voz para pessoas sem visão) |
 
+> Requisitos e regras de versões diferentes podem estar relacionados. Essa
+> relação indica dependência conceitual ou evolução de uma funcionalidade, e
+> não que ambos precisem ser implementados na mesma versão. Por exemplo, a
+> RN09 da V2 depende dos relatos enviados pela RF09 desde a V1.
+
 ### 2.4 Status
 
 `Proposto` · `Aprovado` · `Em desenvolvimento` · `Implementado` · `Cancelado`
