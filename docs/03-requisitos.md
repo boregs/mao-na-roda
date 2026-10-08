@@ -76,9 +76,8 @@ Agrupados por módulo, para facilitar a leitura.
 | RF04 | Exibir resumo de barreiras | O sistema deve exibir, para cada rota, distância, tempo estimado e resumo das barreiras do trajeto. | Essencial | V1 | Proposto | RN02 |
 | RF05 | Exibir ultima verificação da rota  | O sistema deve exibir a data da última verificação, de cada parte da rota, sinalizando se está desatualizada | Importante | V1 | Proposto | RN06, RN07 | 
 | RF06 | Alertar que a rota é uma sugestão | O sistema deve alertar o usuário que a rota apresentada é baseada nos dados disponíveis, e que a situação verdadeira pode ser diferente | Importante | V1 | Proposto | RN13 |
-| RF07 | Re-Routing opcional | Quando uma rota possuir relatos não validados, o sistema deve permitir que o usuário solicite uma alternativa que evite os trechos associados aos relatos selecionados. | Importante | V1 | Proposto | RN10, RN11, RN12 |
-| RF14 | Classificar relatos | O sistema deve diferenciar relatos com foto e descrição e apenas com descrição | Importante | V1 | Proposto | RN08, RN11 |
-| RF15 | Confirmar relato | O sistema deve permitir que um usuário confirme a existência de um problema relatado por outro usuário. | Futuro | V2 | Proposto | RN09 |
+| RF07 | Re-Routing opcional | Quando uma rota possuir relatos não validados, o sistema deve permitir que o usuário solicite uma alternativa que evite os trechos associados aos relatos selecionados. | Importante | V1 | Proposto | RN10, RN12 |
+
 
 ### 3.3 Preferências do usuário
 
@@ -90,7 +89,9 @@ Agrupados por módulo, para facilitar a leitura.
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF09 | Relatar problema no trajeto | O sistema deve permitir que o usuário registre um problema de acessibilidade em um local, com descrição em texto. | Importante | V1 | Proposto | RN08, RN09 |
+| RF09 | Relatar problema no trajeto | O sistema deve permitir que o usuário registre um problema de acessibilidade em um local, com descrição em texto. | Importante | V1 | Proposto | RN08 |
+| RF14 | Classificar relatos | O sistema deve diferenciar relatos com foto e descrição e apenas com descrição | Importante | V1 | Proposto | RN08, RN11 |
+| RF15 | Confirmar relato | O sistema deve permitir que um usuário confirme a existência de um problema relatado por outro usuário. | Futuro | V2 | Proposto | RN09 |
 
 ### 3.5 Conta de usuário
 
