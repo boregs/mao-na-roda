@@ -65,8 +65,8 @@ Agrupados por módulo, para facilitar a leitura.
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF01 | Exibir mapa e localização | O sistema deve exibir o mapa com a localização atual do usuário. | Essencial | V1 | Proposto | - |
-| RF02 | Buscar destino | O sistema deve permitir que o usuário informe um destino por texto. | Essencial | V1 | Proposto | - |
+| RF01 | Exibir mapa e localização | O sistema deve exibir o mapa com a localização atual do usuário. | Essencial | V1 | Aprovado | - |
+| RF02 | Buscar destino | O sistema deve permitir que o usuário informe um destino por texto. | Essencial | V1 | Aprovado | - |
 
 ### 3.2 Rotas acessíveis
 
@@ -83,7 +83,7 @@ Agrupados por módulo, para facilitar a leitura.
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF08 | Selecionar perfil de mobilidade | O sistema deve permitir que o usuário escolha seu perfil de mobilidade para personalizar as rotas. | Essencial | V1 | Proposto | RN01 |
+| RF08 | Selecionar perfil de mobilidade | O sistema deve permitir que o usuário escolha seu perfil de mobilidade para personalizar as rotas. | Essencial | V1 | Aprovado | RN01 |
 
 ### 3.4 Relato de problemas
 
@@ -99,10 +99,10 @@ Agrupados por módulo, para facilitar a leitura.
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF10 | Criar conta | O usuário deve poder criar uma conta no sistema. | Essencial | V1 | Proposto | RN15 |
-| RF11 | Fazer login | O usuário deve poder acessar o sistema com a sua conta. | Essencial | V1 | Proposto | RN15 |
-| RF12 | Excluir conta | O usuário deve poder excluir a própria conta, com a remoção de seus dados pessoais. | Essencial | V1 | Proposto | RN16 |
-| RF13 | Usar sem conta | O sistema deve permitir o uso do app sem conta, sem o armazenamento dos dados da rota | Essencial | V1 | Proposto | RN17, RN18, RF03 |
+| RF10 | Criar conta | O usuário deve poder criar uma conta no sistema. | Essencial | V1 | Aprovado | RN15 |
+| RF11 | Fazer login | O usuário deve poder acessar o sistema com a sua conta. | Essencial | V1 | Aprovado | RN15 |
+| RF12 | Excluir conta | O usuário deve poder excluir a própria conta, com a remoção de seus dados pessoais. | Essencial | V1 | Aprovado | RN16 |
+| RF13 | Usar sem conta | O sistema deve permitir o uso do app sem conta, sem o armazenamento dos dados da rota | Essencial | V1 | Aprovado | RN17, RN18, RF03 |
 
 > **Dica de redação:** descreva cada RF começando com "O sistema deve..." ou "O usuário deve poder...", com **um comportamento por requisito**. Se a descrição precisar de "e", considere dividir.
 
