@@ -18,17 +18,11 @@ Usamos o padrão **Conventional Commits**, adaptado para português.
 
 ```
 tipo(escopo): descrição curta
-
-corpo opcional, explicando o que mudou e por quê
-
-rodapé opcional (referências, avisos)
 ```
 
 - **tipo:** obrigatório. Diz que tipo de mudança é.
 - **escopo:** opcional, entre parênteses. Indica a parte do sistema afetada.
 - **descrição curta:** obrigatória. Resume a mudança em uma linha.
-- **corpo:** opcional. Use quando só a descrição não explicar o motivo da mudança.
-- **rodapé:** opcional. Use para referenciar requisitos, regras ou issues.
 
 ### 1.2 Tipos (prefixos) e quando usar
 
