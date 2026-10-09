@@ -116,14 +116,14 @@ Agrupados por categoria de qualidade.
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF01 | Interface acessível | A interface deve seguir boas práticas de acessibilidade: contraste adequado, fontes legíveis e botões de tamanho adequado ao toque. | Revisão de telas e testes com usuários. | Essencial | V1 | Proposto | RF01–RF15 |
-| RNF02 | Uso com uma mão | As ações principais devem ser alcançáveis com uma mão só. | Teste em dispositivos reais. | Importante | V1 | Proposto | RF02, RF04, RF07, RF08, RF09 |
+| RNF01 | Interface acessível | A interface deve seguir boas práticas de acessibilidade: contraste adequado, fontes legíveis e botões de tamanho adequado ao toque. | Revisão de telas e testes com usuários. | Essencial | V1 | Aprovado | RF01–RF15 |
+| RNF02 | Uso com uma mão | As ações principais devem ser alcançáveis com uma mão só. | Teste em dispositivos reais. | Importante | V1 | Aprovado | RF02, RF04, RF07, RF08, RF09 |
 
 ### 4.2 Desempenho
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF03 | Tempo de resposta da rota | O cálculo de uma rota deve ser concluído em até **1 segundo** em condições normais de rede. | Teste de desempenho. | Importante | V1 | Proposto | RN04, RF03, RF07 |
+| RNF03 | Tempo de resposta da rota | O cálculo de uma rota deve ser concluído em até **1 segundo** em condições normais de rede. | Teste de desempenho. | Importante | V1 | Aprovado | RN04, RF03, RF07 |
 
 ### 4.3 Segurança e privacidade
 
@@ -131,59 +131,59 @@ Agrupados por categoria de qualidade.
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF08 | Proteção das senhas | As senhas devem ser armazenadas com uma função adaptativa própria para senhas, utilizando salt único por senha e parâmetros definidos pela referência de segurança adotada pelo projeto. As senhas nunca devem ser persistidas nem registradas em texto legível. | Criar contas com senhas iguais, inspecionar diretamente os registros e verificar o algoritmo, o salt e os parâmetros utilizados. Confirmar que senhas iguais produzam valores armazenados diferentes e testar a autenticação com senhas correta e incorreta. | Essencial | V1 | Proposto | RN15, RF10, RF11 |
-| RNF10 | Proteção dos segredos da aplicação | Senhas, chaves de API, tokens e demais segredos da aplicação não devem ser armazenados no código-fonte nem versionados no repositório. | Inspecionar o repositório, os artefatos de build e as configurações da aplicação. Verificar que os segredos sejam obtidos pelo mecanismo de configuração segura adotado pelo projeto. | Essencial | V1 | Proposto | RF01, RF02, RF03, RF10, RF11 |
-| RNF13 | Criptografia de dados sensíveis armazenados | Os dados definidos pelo projeto como sensíveis e que precisem ser recuperados pela aplicação devem ser armazenados de forma criptografada. | Persistir valores conhecidos, consultar diretamente os registros e verificar que os valores originais não estejam legíveis. Testar se somente a aplicação autorizada consegue recuperá-los. | Essencial | V1 | Proposto | RN14, RN16, RN18, RF01, RF08, RF09, RF10, RF12, RF13 |
-| RNF14 | Gestão das chaves criptográficas | As chaves utilizadas para criptografar dados sensíveis devem ser armazenadas separadamente do banco de dados e do código-fonte, com acesso limitado aos serviços autorizados. | Inspecionar a configuração, a localização das chaves e suas permissões. Verificar que o acesso isolado ao banco de dados ou ao repositório não permita obter as chaves. | Essencial | V1 | Proposto | RNF13 |
-| RNF19 | Proteção de dados no dispositivo e em registros | Dados sensíveis, tokens, localização e conteúdo privado não devem ser armazenados em texto legível no dispositivo nem incluídos em logs de produção. | Inspecionar armazenamento local, cache, logs, backups do aplicativo e artefatos de depuração após executar os fluxos principais. | Essencial | V1 | Proposto | RN14, RN18, RF01, RF08, RF09, RF11, RF13 |
-| RNF20 | Segurança das fotos enviadas | O envio de fotos deve aceitar somente os formatos e tamanhos definidos pelo projeto, validar o conteúdo no servidor e remover metadados que não sejam necessários. | Enviar arquivos com formato inválido, extensão manipulada, tamanho excessivo e metadados de localização; verificar a rejeição ou o tratamento conforme a política definida. | Essencial | V1 | Proposto | RN08, RN11, RF09, RF14 |
+| RNF08 | Proteção das senhas | As senhas devem ser armazenadas com uma função adaptativa própria para senhas, utilizando salt único por senha e parâmetros definidos pela referência de segurança adotada pelo projeto. As senhas nunca devem ser persistidas nem registradas em texto legível. | Criar contas com senhas iguais, inspecionar diretamente os registros e verificar o algoritmo, o salt e os parâmetros utilizados. Confirmar que senhas iguais produzam valores armazenados diferentes e testar a autenticação com senhas correta e incorreta. | Essencial | V1 | Aprovado | RN15, RF10, RF11 |
+| RNF10 | Proteção dos segredos da aplicação | Senhas, chaves de API, tokens e demais segredos da aplicação não devem ser armazenados no código-fonte nem versionados no repositório. | Inspecionar o repositório, os artefatos de build e as configurações da aplicação. Verificar que os segredos sejam obtidos pelo mecanismo de configuração segura adotado pelo projeto. | Essencial | V1 | Aprovado | RF01, RF02, RF03, RF10, RF11 |
+| RNF13 | Criptografia de dados sensíveis armazenados | Os dados definidos pelo projeto como sensíveis e que precisem ser recuperados pela aplicação devem ser armazenados de forma criptografada. | Persistir valores conhecidos, consultar diretamente os registros e verificar que os valores originais não estejam legíveis. Testar se somente a aplicação autorizada consegue recuperá-los. | Essencial | V1 | Aprovado | RN14, RN16, RN18, RF01, RF08, RF09, RF10, RF12, RF13 |
+| RNF14 | Gestão das chaves criptográficas | As chaves utilizadas para criptografar dados sensíveis devem ser armazenadas separadamente do banco de dados e do código-fonte, com acesso limitado aos serviços autorizados. | Inspecionar a configuração, a localização das chaves e suas permissões. Verificar que o acesso isolado ao banco de dados ou ao repositório não permita obter as chaves. | Essencial | V1 | Aprovado | RNF13 |
+| RNF19 | Proteção de dados no dispositivo e em registros | Dados sensíveis, tokens, localização e conteúdo privado não devem ser armazenados em texto legível no dispositivo nem incluídos em logs de produção. | Inspecionar armazenamento local, cache, logs, backups do aplicativo e artefatos de depuração após executar os fluxos principais. | Essencial | V1 | Aprovado | RN14, RN18, RF01, RF08, RF09, RF11, RF13 |
+| RNF20 | Segurança das fotos enviadas | O envio de fotos deve aceitar somente os formatos e tamanhos definidos pelo projeto, validar o conteúdo no servidor e remover metadados que não sejam necessários. | Enviar arquivos com formato inválido, extensão manipulada, tamanho excessivo e metadados de localização; verificar a rejeição ou o tratamento conforme a política definida. | Essencial | V1 | Aprovado | RN08, RN11, RF09, RF14 |
 
 #### 4.3.2 Banco de dados e consultas
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF09 | Controle de acesso ao banco de dados | O banco de dados deve aceitar conexões somente de serviços e usuários autorizados, utilizando contas com o menor conjunto de permissões necessário para cada operação. | Revisar usuários, papéis e permissões. Tentar acessar e executar operações com uma conta não autorizada ou sem a permissão necessária e verificar que as operações sejam recusadas. | Essencial | V1 | Proposto | RF09, RF10, RF11, RF12, RF14, RF15, RF16, RF17 |
-| RNF11 | Criptografia da conexão com o banco | Toda comunicação entre a aplicação e o banco de dados deve utilizar TLS com validação do certificado do servidor. Conexões não criptografadas devem ser recusadas. | Inspecionar a configuração da conexão e tentar conectar sem TLS ou com certificado inválido, verificando que ambas as conexões sejam recusadas. | Essencial | V1 | Proposto | RF09, RF10, RF11, RF12, RF14, RF15, RF16, RF17 |
-| RNF12 | Proteção contra injeção de SQL | Consultas que utilizem dados provenientes de usuários ou fontes externas devem empregar parâmetros ou mecanismos equivalentes. Dados externos não devem ser concatenados diretamente em comandos SQL. | Revisar o código e executar testes com entradas maliciosas representativas, verificando que sejam tratadas como valores e não alterem a estrutura das consultas. | Essencial | V1 | Proposto | RF02, RF09, RF10, RF11, RF15 |
+| RNF09 | Controle de acesso ao banco de dados | O banco de dados deve aceitar conexões somente de serviços e usuários autorizados, utilizando contas com o menor conjunto de permissões necessário para cada operação. | Revisar usuários, papéis e permissões. Tentar acessar e executar operações com uma conta não autorizada ou sem a permissão necessária e verificar que as operações sejam recusadas. | Essencial | V1 | Aprovado | RF09, RF10, RF11, RF12, RF14, RF15, RF16, RF17 |
+| RNF11 | Criptografia da conexão com o banco | Toda comunicação entre a aplicação e o banco de dados deve utilizar TLS com validação do certificado do servidor. Conexões não criptografadas devem ser recusadas. | Inspecionar a configuração da conexão e tentar conectar sem TLS ou com certificado inválido, verificando que ambas as conexões sejam recusadas. | Essencial | V1 | Aprovado | RF09, RF10, RF11, RF12, RF14, RF15, RF16, RF17 |
+| RNF12 | Proteção contra injeção de SQL | Consultas que utilizem dados provenientes de usuários ou fontes externas devem empregar parâmetros ou mecanismos equivalentes. Dados externos não devem ser concatenados diretamente em comandos SQL. | Revisar o código e executar testes com entradas maliciosas representativas, verificando que sejam tratadas como valores e não alterem a estrutura das consultas. | Essencial | V1 | Aprovado | RF02, RF09, RF10, RF11, RF15 |
 
 #### 4.3.3 Autenticação e autorização
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF16 | Proteção das sessões | Tokens de autenticação devem possuir expiração, ser armazenados utilizando os mecanismos seguros da plataforma e ser invalidados quando a conta for excluída ou a sessão for encerrada. | Inspecionar o armazenamento local, testar expiração, encerramento de sessão e exclusão da conta e verificar que tokens antigos não autorizem novas requisições. | Essencial | V1 | Proposto | RN15, RN16, RF11, RF12, RF15, RF16, RF17 |
-| RNF17 | Autorização no servidor | Toda operação protegida deve verificar no servidor se o usuário autenticado possui permissão para executá-la, independentemente das restrições exibidas pelo aplicativo. | Tentar excluir dados de outra conta, confirmar o próprio relato e repetir uma confirmação por meio de requisições manipuladas, verificando que as operações sejam recusadas. | Essencial | V1 | Proposto | RN09, RN15, RN16, RF12, RF15, RF16, RF17 |
-| RNF18 | Proteção contra abuso | Operações de autenticação, criação de relatos e confirmação de relatos devem possuir limites de requisições compatíveis com o uso normal. | Enviar requisições repetidas acima dos limites definidos e verificar o bloqueio temporário ou a limitação sem impedir o uso normal. | Essencial | V1 | Proposto | RN09, RF09, RF10, RF11, RF15, RF16, RF17 |
+| RNF16 | Proteção das sessões | Tokens de autenticação devem possuir expiração, ser armazenados utilizando os mecanismos seguros da plataforma e ser invalidados quando a conta for excluída ou a sessão for encerrada. | Inspecionar o armazenamento local, testar expiração, encerramento de sessão e exclusão da conta e verificar que tokens antigos não autorizem novas requisições. | Essencial | V1 | Aprovado | RN15, RN16, RF11, RF12, RF15, RF16, RF17 |
+| RNF17 | Autorização no servidor | Toda operação protegida deve verificar no servidor se o usuário autenticado possui permissão para executá-la, independentemente das restrições exibidas pelo aplicativo. | Tentar excluir dados de outra conta, confirmar o próprio relato e repetir uma confirmação por meio de requisições manipuladas, verificando que as operações sejam recusadas. | Essencial | V1 | Aprovado | RN09, RN15, RN16, RF12, RF15, RF16, RF17 |
+| RNF18 | Proteção contra abuso | Operações de autenticação, criação de relatos e confirmação de relatos devem possuir limites de requisições compatíveis com o uso normal. | Enviar requisições repetidas acima dos limites definidos e verificar o bloqueio temporário ou a limitação sem impedir o uso normal. | Essencial | V1 | Aprovado | RN09, RF09, RF10, RF11, RF15, RF16, RF17 |
 
 #### 4.3.4 Privacidade e localização
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF04 | Proteção da localização | A localização só deve ser coletada após consentimento explícito, para as finalidades informadas ao usuário, e sua coleta deve cessar quando a permissão for negada ou revogada. | Testar concessão, negação e revogação da permissão. Inspecionar requisições, registros e armazenamento para confirmar que a localização não seja coletada após a negação ou revogação. | Essencial | V1 | Proposto | RN14, RF01, RF03 |
+| RNF04 | Proteção da localização | A localização só deve ser coletada após consentimento explícito, para as finalidades informadas ao usuário, e sua coleta deve cessar quando a permissão for negada ou revogada. | Testar concessão, negação e revogação da permissão. Inspecionar requisições, registros e armazenamento para confirmar que a localização não seja coletada após a negação ou revogação. | Essencial | V1 | Aprovado | RN14, RF01, RF03 |
 
 #### 4.3.5 Comunicação de rede
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF15 | Proteção das comunicações da API | Toda comunicação entre o aplicativo e os serviços remotos deve utilizar TLS com validação do certificado do servidor. | Interceptar o tráfego em ambiente de teste e verificar que não existam requisições em texto legível. Tentar conexão com certificado inválido e confirmar que seja recusada. | Essencial | V1 | Proposto | RF01–RF17 |
+| RNF15 | Proteção das comunicações da API | Toda comunicação entre o aplicativo e os serviços remotos deve utilizar TLS com validação do certificado do servidor. | Interceptar o tráfego em ambiente de teste e verificar que não existam requisições em texto legível. Tentar conexão com certificado inválido e confirmar que seja recusada. | Essencial | V1 | Aprovado | RF01–RF17 |
 
 
 ### 4.4 Disponibilidade e confiabilidade
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF05 | Comportamento sem conexão | O app deve informar de forma clara quando estiver sem conexão com a internet, em vez de falhar silenciosamente. | Teste manual. | Importante | V1 | Proposto | RF01–RF09 |
+| RNF05 | Comportamento sem conexão | O app deve informar de forma clara quando estiver sem conexão com a internet, em vez de falhar silenciosamente. | Teste manual. | Importante | V1 | Aprovado | RF01–RF09 |
 
 ### 4.5 Compatibilidade
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF06 | Plataformas suportadas | O app deve funcionar no Android 24 e versões posteriores. | Testes em dispositivos. | Essencial | V1 | Proposto | RF01–RF17 |
+| RNF06 | Plataformas suportadas | O app deve funcionar no Android 24 e versões posteriores. | Testes em dispositivos. | Essencial | V1 | Aprovado | RF01–RF17 |
 
 ### 4.6 Manutenibilidade
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF07 | Padrão de código e versionamento | O versionamento do código deve seguir o padrão do [guia de contribuição](../CONTRIBUTING.md). | Revisão de Pull Requests e mensagens de commit. | Importante | V1 | Proposto | [Guia de contribuição](../CONTRIBUTING.md) |
+| RNF07 | Padrão de código e versionamento | O versionamento do código deve seguir o padrão do [guia de contribuição](../CONTRIBUTING.md). | Revisão de Pull Requests e mensagens de commit. | Importante | V1 | Aprovado | [Guia de contribuição](../CONTRIBUTING.md) |
 
 ---
 
