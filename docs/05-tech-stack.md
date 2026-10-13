@@ -1,6 +1,6 @@
 # Tech Stack – Mão na Roda
 
-> **Versão do documento:** 0.1 <br>
+> **Versão do documento:** 0.2 <br>
 > **Data:** 13/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md)
 
@@ -8,7 +8,7 @@
 
 ## 1. Objetivo
 
-Este documento registra as tecnologias previstas para a V1 do **Mão na Roda**, a responsabilidade de cada uma e as decisões que ainda precisam de validação.
+Este documento registra as tecnologias previstas para a V1 do Mão na Roda, a responsabilidade de cada uma e as decisões que ainda precisam de validação.
 
 A arquitetura da V1 prioriza uma implementação viável para uma equipe pequena: o aplicativo concentra a experiência da pessoa usuária; a API em Java concentra as regras de negócio; e o Supabase reduz o trabalho de infraestrutura ao oferecer banco PostgreSQL, autenticação e armazenamento de arquivos.
 
@@ -42,17 +42,17 @@ flowchart LR
 | Camada | Tecnologia | Papel no projeto | Status |
 |---|---|---|---|
 | Aplicativo móvel | Flutter e Dart | Desenvolver o aplicativo exclusivamente para Android, com interface acessível e suporte a localização. | Aprovado para V1 |
-| Backend | Java com Spring Boot | Expor a API REST e centralizar as regras de rotas, relatos, contas e autorização. | Aprovado para V1 |
-| API | REST com JSON | Permitir a comunicação entre o aplicativo e o backend. | Aprovado para V1 |
-| Banco de dados | PostgreSQL, gerenciado pelo Supabase | Armazenar contas, perfis de mobilidade, relatos, confirmações futuras e dados de acessibilidade. | Aprovado para V1 |
-| Autenticação | Supabase Auth | Criar contas, iniciar sessões e emitir tokens para acesso às operações autenticadas. | Aprovado para V1 |
-| Armazenamento de fotos | Supabase Storage | Armazenar imagens anexadas aos relatos. | Aprovado para V1 |
+| Backend | Java com Spring Boot | Expor a API REST e centralizar as regras de rotas, relatos, contas e autorização. | Aprovado |
+| API | REST com JSON | Permitir a comunicação entre o aplicativo e o backend. | Aprovado |
+| Banco de dados | PostgreSQL, gerenciado pelo Supabase | Armazenar contas, perfis de mobilidade, relatos, confirmações futuras e dados de acessibilidade. | Aprovado |
+| Autenticação | Supabase Auth | Criar contas, iniciar sessões e emitir tokens para acesso às operações autenticadas. | Aprovado |
+| Armazenamento de fotos | Supabase Storage | Armazenar imagens anexadas aos relatos. | Aprovado |
 | Mapas, busca e rotas-base | Provedor a definir | Exibir mapa, localizar endereços e obter rotas entre dois pontos. | Pendente de validação |
-| Localização | Recursos do dispositivo via pacote Flutter | Obter a localização atual somente após consentimento. | Aprovado para V1 |
-| Documentação da API | OpenAPI/Swagger | Descrever e testar os endpoints da API. | Proposto para V1 |
-| Testes de backend | JUnit e Spring Boot Test | Validar regras de negócio, autenticação e endpoints. | Proposto para V1 |
-| Testes do aplicativo | Flutter Test | Validar componentes e fluxos essenciais do aplicativo. | Proposto para V1 |
-| Versionamento e CI | GitHub e GitHub Actions | Versionar o código e executar verificações automatizadas em Pull Requests. | Proposto para V1 |
+| Localização | Recursos do dispositivo via pacote Flutter | Obter a localização atual somente após consentimento. | Aprovado |
+| Documentação da API | OpenAPI/Swagger | Descrever e testar os endpoints da API. | Aprovado |
+| Testes de backend | JUnit e Spring Boot Test | Validar regras de negócio, autenticação e endpoints. | Aprovado |
+| Testes do aplicativo | Flutter Test | Validar componentes e fluxos essenciais do aplicativo. | Aprovado |
+| Versionamento e CI | GitHub e GitHub Actions | Versionar o código e executar verificações automatizadas em Pull Requests. | Parcialmente aprovado |
 | Monitoramento de falhas | Logs estruturados; ferramenta a definir | Identificar erros da API e do aplicativo em ambiente de teste ou produção. | Futuro / a definir |
 
 ---
@@ -154,3 +154,4 @@ Para a V1, a infraestrutura será composta por:
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 13/10/2026 | Versão inicial da stack para a V1: Flutter, Java/Spring Boot e Supabase. |
+| 0.2 | 13/10/2026 | Aprovação da stack proposta |
