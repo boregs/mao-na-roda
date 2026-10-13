@@ -37,11 +37,11 @@ flowchart LR
 
 ---
 
-## 3. Tecnologias da V1
+## 3. Tecnologias
 
 | Camada | Tecnologia | Papel no projeto | Status |
 |---|---|---|---|
-| Aplicativo móvel | Flutter e Dart | Desenvolver o aplicativo exclusivamente para Android, com interface acessível e suporte a localização. | Aprovado para V1 |
+| Aplicativo móvel | Flutter e Dart | Desenvolver o aplicativo exclusivamente para Android, com interface acessível e suporte a localização. | Aprovado |
 | Backend | Java com Spring Boot | Expor a API REST e centralizar as regras de rotas, relatos, contas e autorização. | Aprovado |
 | API | REST com JSON | Permitir a comunicação entre o aplicativo e o backend. | Aprovado |
 | Banco de dados | PostgreSQL, gerenciado pelo Supabase | Armazenar contas, perfis de mobilidade, relatos, confirmações futuras e dados de acessibilidade. | Aprovado |
