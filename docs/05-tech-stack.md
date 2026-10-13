@@ -41,7 +41,7 @@ flowchart LR
 
 | Camada | Tecnologia | Papel no projeto | Status |
 |---|---|---|---|
-| Aplicativo móvel | Flutter e Dart | Desenvolver um único aplicativo para Android, com interface acessível e suporte a localização. | Aprovado para V1 |
+| Aplicativo móvel | Flutter e Dart | Desenvolver o aplicativo exclusivamente para Android, com interface acessível e suporte a localização. | Aprovado para V1 |
 | Backend | Java com Spring Boot | Expor a API REST e centralizar as regras de rotas, relatos, contas e autorização. | Aprovado para V1 |
 | API | REST com JSON | Permitir a comunicação entre o aplicativo e o backend. | Aprovado para V1 |
 | Banco de dados | PostgreSQL, gerenciado pelo Supabase | Armazenar contas, perfis de mobilidade, relatos, confirmações futuras e dados de acessibilidade. | Aprovado para V1 |
@@ -59,9 +59,9 @@ flowchart LR
 
 ## 4. Decisões de arquitetura
 
-### 4.1 Flutter no aplicativo móvel
+### 4.1 Flutter no aplicativo Android
 
-O Flutter será usado para construir o aplicativo Android da V1. Ele permite desenvolver a interface, acessar a localização do dispositivo, integrar mapas e manter uma base de código única caso o projeto seja ampliado para outras plataformas no futuro.
+O Flutter será usado para construir exclusivamente o aplicativo Android da V1. Ele permite desenvolver a interface, acessar a localização do dispositivo e integrar mapas.
 
 O aplicativo não deve guardar segredos, chaves privadas ou dados sensíveis em texto legível. Tokens de sessão devem utilizar o mecanismo seguro disponível na plataforma, conforme os RNF08, RNF10, RNF16 e RNF19.
 
@@ -129,7 +129,7 @@ Para a V1, a infraestrutura será composta por:
 
 | Item | Destino previsto | Observação |
 |---|---|---|
-| Aplicativo | Distribuição Android de teste | A forma de distribuição será definida pela equipe durante o desenvolvimento. |
+| Aplicativo | Distribuição Android de teste | O aplicativo será desenvolvido e distribuído somente para Android na V1. A forma de distribuição será definida pela equipe durante o desenvolvimento. |
 | API Java | Serviço de hospedagem compatível com aplicações Java | Provedor a escolher conforme custo, facilidade de configuração e suporte a HTTPS. |
 | Banco, autenticação e fotos | Supabase | Ambiente separado para desenvolvimento e produção, quando houver publicação. |
 
