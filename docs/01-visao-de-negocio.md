@@ -1,7 +1,7 @@
 # Visão de Negócio – Mão na Roda
 
 > **Projeto:** Mão na Roda – Acessibilidade para Todos <br>
-> **Versão do documento:** 1.0 | **Data:** 06/10/2026 <br>
+> **Versão do documento:** 1.1 | **Data:** 13/10/2026 <br>
 > **Documentos relacionados:** [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
 ---
@@ -101,17 +101,23 @@ Aplicativo que **sugere rotas acessíveis para pessoas com deficiência de mobil
 | R7 | **Escopo maior que o prazo da equipe** | Média | Médio | Manter a V1 enxuta (só mobilidade); deixar voz e filtros avançados para a V2 |
 | R8 | **O próprio app não ser acessível** | Baixa | Alto | Seguir diretrizes de acessibilidade (contraste, fontes, leitor de tela); testar com usuários reais |
 | R9 | **Responsabilidade por uma rota indicada incorretamente** | Baixa | Alto | Termos de uso e avisos claros de que a rota é uma sugestão informativa |
+| R10 | **A rota-base do provedor de mapas não permitir aplicar corretamente as barreiras e os perfis de mobilidade** | Média | Alto | Fazer um protótipo técnico antes de fechar o provedor de mapas e rotas; limitar a V1 a uma região piloto. |
+| R11 | **Indisponibilidade ou mudança nos limites de uso do Supabase ou do serviço de mapas** | Média | Médio | Monitorar consumo e disponibilidade; documentar alternativas e um plano de contingência para os serviços externos. |
+| R12 | **Configuração inadequada de autenticação, banco de dados ou armazenamento de fotos expor dados pessoais** | Média | Alto | Validar tokens na API, aplicar permissões mínimas no Supabase, configurar regras de acesso e revisar o envio de arquivos. |
+| R13 | **Pendências de negócio gerarem retrabalho durante a implementação** | Alta | Médio | Definir antes da implementação se o relato exige conta e como relatos e fotos serão tratados após a exclusão da conta. |
 
 ---
 
-## 8. Critérios de sucesso
+## 8. Critérios de aceite da V1
 
-[Definir como o grupo vai medir o resultado da V1. Exemplos: percentual de rotas validadas por usuários reais, número de relatos recebidos, satisfação em testes com usuários, regiões cobertas.]
+Os critérios abaixo definem as condições mínimas para considerar os fluxos principais de rotas acessíveis aceitos na V1. Cada critério deve ser verificado em um dispositivo Android ou emulador com acesso aos serviços necessários.
+
+| ID | Critério de aceite | Como verificar |
+|---|---|---|
+| CA01 | Com a permissão de localização concedida, o aplicativo deve exibir o mapa e indicar a localização atual ou aproximada da pessoa usuária. | Abrir o aplicativo em um dispositivo ou emulador com localização simulada, conceder a permissão e verificar a exibição do mapa e do marcador de localização. |
+| CA02 | Após a pessoa informar origem, destino e perfil de mobilidade, o aplicativo deve retornar uma rota que considere as barreiras definidas para o perfil escolhido. | Consultar uma rota usando ao menos dois perfis de mobilidade e verificar que o cálculo e as barreiras apresentadas seguem a classificação definida para cada perfil. |
+| CA03 | Quando existirem relatos de outros usuários associados ao percurso, o aplicativo deve exibi-los como possíveis obstáculos na rota. | Usar uma rota com relatos não validados previamente cadastrados e verificar sua exibição na tela de detalhes da rota. |
+| CA04 | Quando a rota atual contiver relatos não validados, o aplicativo deve oferecer a opção de solicitar uma rota alternativa. | Consultar uma rota com ao menos um relato não validado e verificar que a ação de solicitar alternativa é apresentada. |
+| CA05 | Quando a pessoa selecionar um ou mais relatos e solicitar a alternativa, o aplicativo deve recalcular a rota evitando os trechos associados aos relatos selecionados, quando houver alternativa disponível. | Selecionar relatos em uma rota e solicitar alternativa; verificar que a rota resultante não utiliza os trechos selecionados ou, se isso não for possível, que o aplicativo informe a inexistência de alternativa. |
 
 ---
-
-## 9. Pendências do documento
-
-- [ ] Inserir dados e fontes de apoio na seção 2
-- [ ] Revisar os riscos com o grupo (seção 7)
-- [ ] Definir critérios de sucesso (seção 8)

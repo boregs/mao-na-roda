@@ -1,7 +1,7 @@
 # Requisitos – Mão na Roda
 
-> **Versão do documento:** 0.5 <br>
-> **Data:** 08/10/2026 <br>
+> **Versão do documento:** 1.0 <br>
+> **Data:** 13/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Casos de uso](04-casos-de-uso.md) · [Tech stack](05-tech-stack.md)
 
 ---
@@ -72,11 +72,11 @@ Agrupados por módulo, para facilitar a leitura.
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF03 | Calcular rota acessível | O sistema deve calcular rotas considerando o perfil de mobilidade escolhido pelo usuário. | Essencial | V1 | Proposto | RN01, RN03, RN04 |
-| RF04 | Exibir resumo de barreiras | O sistema deve exibir, para cada rota, distância, tempo estimado e resumo das barreiras do trajeto. | Essencial | V1 | Proposto | RN02 |
-| RF05 | Exibir ultima verificação da rota  | O sistema deve exibir a data da última verificação, de cada parte da rota, sinalizando se está desatualizada | Importante | V1 | Proposto | RN06, RN07 | 
-| RF06 | Alertar que a rota é uma sugestão | O sistema deve alertar o usuário que a rota apresentada é baseada nos dados disponíveis, e que a situação verdadeira pode ser diferente | Importante | V1 | Proposto | RN13 |
-| RF07 | Re-Routing opcional | Quando uma rota possuir relatos não validados, o sistema deve permitir que o usuário solicite uma alternativa que evite os trechos associados aos relatos selecionados. | Importante | V1 | Proposto | RN10, RN12 |
+| RF03 | Calcular rota acessível | O sistema deve calcular rotas considerando o perfil de mobilidade escolhido pelo usuário. | Essencial | V1 | Aprovado | RN01, RN03, RN04 |
+| RF04 | Exibir resumo de barreiras | O sistema deve exibir, para cada rota, distância, tempo estimado e resumo das barreiras do trajeto. | Essencial | V1 | Aprovado | RN02 |
+| RF05 | Exibir ultima verificação da rota | O sistema deve exibir a data da última verificação, de cada parte da rota, sinalizando se está desatualizada | Importante | V1 | Aprovado | RN06, RN07 |
+| RF06 | Alertar que a rota é uma sugestão | O sistema deve alertar o usuário que a rota apresentada é baseada nos dados disponíveis, e que a situação verdadeira pode ser diferente | Importante | V1 | Aprovado | RN13 |
+| RF07 | Re-Routing opcional | Quando uma rota possuir relatos não validados, o sistema deve permitir que o usuário solicite uma alternativa que evite os trechos associados aos relatos selecionados. | Importante | V1 | Aprovado | RN10, RN12 |
 
 
 ### 3.3 Preferências do usuário
@@ -89,17 +89,18 @@ Agrupados por módulo, para facilitar a leitura.
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF09 | Relatar problema no trajeto | O sistema deve permitir que o usuário registre um problema de acessibilidade em um local, com descrição em texto. | Importante | V1 | Proposto | RN08 |
-| RF14 | Classificar relatos | O sistema deve diferenciar relatos com foto e descrição e apenas com descrição | Importante | V1 | Proposto | RN08, RN11 |
-| RF15 | Confirmar relato | O sistema deve permitir que um usuário confirme a existência de um problema relatado por outro usuário. | Essencial | V2 | Proposto | RN09 |
-| RF16 | Impedir confirmação do próprio relato | O sistema deve impedir que o autor confirme o próprio relato. | Essencial | V2 | Proposto | RN09 |
-| RF17 | Impedir confirmações duplicadas | O sistema deve permitir que cada usuário confirme o mesmo relato apenas uma vez. | Essencial | V2 | Proposto | RN09 |
+| RF09 | Relatar problema no trajeto | O sistema deve permitir que o usuário registre um problema de acessibilidade em um local, com descrição em texto. | Importante | V1 | Aprovado | RN08 |
+| RF14 | Classificar relatos | O sistema deve diferenciar relatos com foto e descrição e relatos apenas com descrição. | Importante | V1 | Aprovado | RN08, RN11 |
+| RF18 | Anexar fotos ao relato | O sistema deve permitir que o usuário autenticado anexe até três fotos a cada relato. | Importante | V1 | Aprovado | RN08, RN11, RNF20 |
+| RF15 | Confirmar relato | O sistema deve permitir que um usuário confirme a existência de um problema relatado por outro usuário. | Essencial | V2 | Aprovado | RN09 |
+| RF16 | Impedir confirmação do próprio relato | O sistema deve impedir que o autor confirme o próprio relato. | Essencial | V2 | Aprovado | RN09 |
+| RF17 | Impedir confirmações duplicadas | O sistema deve permitir que cada usuário confirme o mesmo relato apenas uma vez. | Essencial | V2 | Aprovado | RN09 |
 
 ### 3.5 Conta de usuário
 
 | ID | Nome | Descrição | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|
-| RF10 | Criar conta | O usuário deve poder criar uma conta no sistema. | Essencial | V1 | Aprovado | RN15 |
+| RF10 | Criar conta | O usuário deve poder criar uma conta informando nome, sobrenome, e-mail e senha. | Essencial | V1 | Aprovado | RN15 |
 | RF11 | Fazer login | O usuário deve poder acessar o sistema com a sua conta. | Essencial | V1 | Aprovado | RN15 |
 | RF12 | Excluir conta | O usuário deve poder excluir a própria conta, com a remoção de seus dados pessoais. | Essencial | V1 | Aprovado | RN16 |
 | RF13 | Usar sem conta | O sistema deve permitir o uso do app sem conta, sem o armazenamento dos dados da rota | Essencial | V1 | Aprovado | RN17, RN18, RF03 |
@@ -116,14 +117,14 @@ Agrupados por categoria de qualidade.
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF01 | Interface acessível | A interface deve seguir boas práticas de acessibilidade: contraste adequado, fontes legíveis e botões de tamanho adequado ao toque. | Revisão de telas e testes com usuários. | Essencial | V1 | Aprovado | RF01–RF15 |
-| RNF02 | Uso com uma mão | As ações principais devem ser alcançáveis com uma mão só. | Teste em dispositivos reais. | Importante | V1 | Aprovado | RF02, RF04, RF07, RF08, RF09 |
+| RNF01 | Interface acessível | A interface deve seguir a WCAG 2.2 no nível AA: contraste mínimo de 4,5:1 para texto normal e 3:1 para texto grande e componentes essenciais; áreas de toque de pelo menos 48 × 48 dp; respeito à escala de fonte do Android e rótulos compatíveis com TalkBack. | Revisar telas, medir contraste e áreas de toque, alterar a escala de fonte e testar os controles principais com TalkBack. | Essencial | V1 | Aprovado | RF01–RF18 |
+| RNF02 | Uso com uma mão | As ações principais de busca de destino, seleção de perfil, consulta de rota, solicitação de alternativa e envio de relato devem poder ser concluídas com uma mão, em modo retrato, em dispositivo Android de referência de aproximadamente 6,5 polegadas, sem gestos simultâneos ou arrasto prolongado. | Executar os fluxos definidos com uma mão em dispositivo ou emulador de referência. | Importante | V1 | Aprovado | RF02, RF04, RF07, RF08, RF09 |
 
 ### 4.2 Desempenho
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF03 | Tempo de resposta da rota | O cálculo de uma rota deve ser concluído em até **1 segundo** em condições normais de rede. | Teste de desempenho. | Importante | V1 | Aprovado | RN04, RF03, RF07 |
+| RNF03 | Tempo de resposta da rota | Em conexão estável por Wi-Fi ou 4G, 95% das solicitações de rota devem apresentar resultado em até 3 segundos, contados após a confirmação de origem, destino e perfil de mobilidade. Após 3 segundos, o app deve manter indicador de carregamento; após 10 segundos sem resposta, deve informar a falha e permitir nova tentativa. | Medir o tempo entre a confirmação da consulta e a apresentação da rota em testes de desempenho; verificar o indicador de carregamento e o tratamento após 10 segundos. | Importante | V1 | Aprovado | RN04, RF03, RF07 |
 
 ### 4.3 Segurança e privacidade
 
@@ -136,7 +137,7 @@ Agrupados por categoria de qualidade.
 | RNF13 | Criptografia de dados sensíveis armazenados | Os dados definidos pelo projeto como sensíveis e que precisem ser recuperados pela aplicação devem ser armazenados de forma criptografada. | Persistir valores conhecidos, consultar diretamente os registros e verificar que os valores originais não estejam legíveis. Testar se somente a aplicação autorizada consegue recuperá-los. | Essencial | V1 | Aprovado | RN14, RN16, RN18, RF01, RF08, RF09, RF10, RF12, RF13 |
 | RNF14 | Gestão das chaves criptográficas | As chaves utilizadas para criptografar dados sensíveis devem ser armazenadas separadamente do banco de dados e do código-fonte, com acesso limitado aos serviços autorizados. | Inspecionar a configuração, a localização das chaves e suas permissões. Verificar que o acesso isolado ao banco de dados ou ao repositório não permita obter as chaves. | Essencial | V1 | Aprovado | RNF13 |
 | RNF19 | Proteção de dados no dispositivo e em registros | Dados sensíveis, tokens, localização e conteúdo privado não devem ser armazenados em texto legível no dispositivo nem incluídos em logs de produção. | Inspecionar armazenamento local, cache, logs, backups do aplicativo e artefatos de depuração após executar os fluxos principais. | Essencial | V1 | Aprovado | RN14, RN18, RF01, RF08, RF09, RF11, RF13 |
-| RNF20 | Segurança das fotos enviadas | O envio de fotos deve aceitar somente os formatos e tamanhos definidos pelo projeto, validar o conteúdo no servidor e remover metadados que não sejam necessários. | Enviar arquivos com formato inválido, extensão manipulada, tamanho excessivo e metadados de localização; verificar a rejeição ou o tratamento conforme a política definida. | Essencial | V1 | Aprovado | RN08, RN11, RF09, RF14 |
+| RNF20 | Segurança das fotos enviadas | O envio de fotos deve aceitar somente os formatos JPG, JPEG e PNG, com até 5 MB por arquivo; validar o conteúdo no servidor e remover metadados que não sejam necessários, incluindo localização EXIF. | Enviar arquivos em formato inválido, extensão manipulada, tamanho superior a 5 MB e metadados de localização; verificar a rejeição ou a remoção dos metadados. | Essencial | V1 | Aprovado | RN08, RN11, RF09, RF14, RF18 |
 
 #### 4.3.2 Banco de dados e consultas
 
@@ -150,9 +151,11 @@ Agrupados por categoria de qualidade.
 
 | ID | Nome | Descrição | Como verificar | Prioridade | Versão | Status | Relacionado |
 |---|---|---|---|---|---|---|---|
-| RNF16 | Proteção das sessões | Tokens de autenticação devem possuir expiração, ser armazenados utilizando os mecanismos seguros da plataforma e ser invalidados quando a conta for excluída ou a sessão for encerrada. | Inspecionar o armazenamento local, testar expiração, encerramento de sessão e exclusão da conta e verificar que tokens antigos não autorizem novas requisições. | Essencial | V1 | Aprovado | RN15, RN16, RF11, RF12, RF15, RF16, RF17 |
+| RNF16 | Proteção das sessões | Tokens de autenticação devem expirar após 15 minutos, ser armazenados utilizando os mecanismos seguros da plataforma e ser invalidados quando a conta for excluída ou a sessão for encerrada. Após a expiração, o app pode exibir a última conta usada apenas como identificação visual, mas deve exigir novo login para ações protegidas. | Inspecionar o armazenamento local; testar expiração, encerramento de sessão e exclusão da conta; confirmar que tokens antigos não autorizem requisições e que ações protegidas exijam novo login. | Essencial | V1 | Aprovado | RN15, RN16, RF11, RF12, RF15, RF16, RF17 |
 | RNF17 | Autorização no servidor | Toda operação protegida deve verificar no servidor se o usuário autenticado possui permissão para executá-la, independentemente das restrições exibidas pelo aplicativo. | Tentar excluir dados de outra conta, confirmar o próprio relato e repetir uma confirmação por meio de requisições manipuladas, verificando que as operações sejam recusadas. | Essencial | V1 | Aprovado | RN09, RN15, RN16, RF12, RF15, RF16, RF17 |
-| RNF18 | Proteção contra abuso | Operações de autenticação, criação de relatos e confirmação de relatos devem possuir limites de requisições compatíveis com o uso normal. | Enviar requisições repetidas acima dos limites definidos e verificar o bloqueio temporário ou a limitação sem impedir o uso normal. | Essencial | V1 | Aprovado | RN09, RF09, RF10, RF11, RF15, RF16, RF17 |
+| RNF18 | Limite de tentativas de login | Cinco tentativas de login falhas em 15 minutos para o mesmo e-mail devem bloquear novas tentativas por 15 minutos. | Realizar cinco tentativas de acesso inválidas para o mesmo e-mail dentro de 15 minutos e verificar o bloqueio; confirmar que o acesso volta a ser permitido após o período. | Essencial | V1 | Aprovado | RN15, RF10, RF11 |
+| RNF21 | Limite de envio de relatos | Cada usuário autenticado pode enviar no máximo cinco relatos por hora. | Enviar relatos até atingir o limite e verificar que a próxima tentativa seja recusada até o início de uma nova janela de uma hora. | Essencial | V1 | Aprovado | RN08, RN15, RF09 |
+| RNF22 | Limite de confirmações de relatos | Cada usuário autenticado pode confirmar no máximo 30 relatos por hora. | Confirmar relatos até atingir o limite e verificar que a próxima tentativa seja recusada até o início de uma nova janela de uma hora. | Essencial | V2 | Aprovado | RN09, RN15, RF15, RF16, RF17 |
 
 #### 4.3.4 Privacidade e localização
 
@@ -193,9 +196,46 @@ Relaciona os requisitos aos casos de uso e às regras de negócio.
 
 | Requisito | Caso de uso | Regra de negócio | Versão |
 |---|---|---|---|
-| RF01 | UC01 | n/a | V1 |
-| RF03 | UC03 | RN01 | V1 |
-| [RF/RNF] | [UC] | [RN] | [V1/V2] |
+| RF01 | UC01 | RN14 | V1 |
+| RF02 | UC02 | — | V1 |
+| RF03 | UC04 | RN01, RN03, RN04, RN14 | V1 |
+| RF04 | UC04 | RN02, RN05, RN06, RN07, RN10 | V1 |
+| RF05 | UC04 | RN06, RN07 | V1 |
+| RF06 | UC04 | RN13 | V1 |
+| RF07 | UC05 | RN10, RN12 | V1 |
+| RF08 | UC03 | RN01, RN02 | V1 |
+| RF09 | UC09 | RN08, RN15 | V1 |
+| RF10 | UC06 | RN15 | V1 |
+| RF11 | UC07 | RN15 | V1 |
+| RF12 | UC10 | RN16 | V1 |
+| RF13 | UC08 | RN17, RN18 | V1 |
+| RF14 | UC09 | RN08, RN11 | V1 |
+| RF15 | UC11 | RN09 | V2 |
+| RF16 | UC11 | RN09 | V2 |
+| RF17 | UC11 | RN09 | V2 |
+| RF18 | UC09 | RN08, RN11 | V1 |
+| RNF01 | UC01–UC10 | — | V1 |
+| RNF02 | UC02–UC05, UC09 | — | V1 |
+| RNF03 | UC04, UC05 | RN04, RN12 | V1 |
+| RNF04 | UC01, UC04, UC09 | RN14 | V1 |
+| RNF05 | UC01–UC09 | — | V1 |
+| RNF06 | UC01–UC10 | — | V1 |
+| RNF07 | — | — | V1 |
+| RNF08 | UC06, UC07 | RN15 | V1 |
+| RNF09 | UC06, UC07, UC09, UC10, UC11 | RN08, RN09, RN15, RN16 | V1 |
+| RNF10 | UC01, UC02, UC04, UC06, UC07 | RN14, RN15 | V1 |
+| RNF11 | UC06, UC07, UC09, UC10, UC11 | RN08, RN09, RN15, RN16 | V1 |
+| RNF12 | UC02, UC06, UC07, UC09, UC11 | RN08, RN09, RN15 | V1 |
+| RNF13 | UC01, UC03, UC06, UC08, UC09, UC10 | RN14, RN15, RN16, RN18 | V1 |
+| RNF14 | — | RNF13 | V1 |
+| RNF15 | UC01–UC10 | RN14, RN15 | V1 |
+| RNF16 | UC07, UC10, UC11 | RN15, RN16 | V1 |
+| RNF17 | UC09, UC10, UC11 | RN08, RN09, RN15, RN16 | V1 |
+| RNF18 | UC06, UC07 | RN15 | V1 |
+| RNF19 | UC01, UC03, UC07, UC08, UC09, UC10 | RN14, RN15, RN16, RN18 | V1 |
+| RNF20 | UC09 | RN08, RN11 | V1 |
+| RNF21 | UC09 | RN08, RN15 | V1 |
+| RNF22 | UC11 | RN09, RN15 | V2 |
 
 ---
 
@@ -203,18 +243,8 @@ Relaciona os requisitos aos casos de uso e às regras de negócio.
 
 | Tipo | Total | Essencial | Importante | Desejável | Futuro |
 |---|---|---|---|---|---|
-| Funcionais (RF) | [n] | [n] | [n] | [n] | [n] |
-| Não funcionais (RNF) | 20 | 16 | 4 | 0 | 0 |
-
----
-
-## 7. Pendências
-
-- [ ] Substituir os exemplos pelos requisitos reais do grupo
-- [ ] Revisar as prioridades com a equipe
-- [ ] Ligar cada RF aos casos de uso (`04-casos-de-uso.md`) e às regras (`02-regras-de-negocio.md`)
-- [ ] Definir valores numéricos dos RNF (tempos, plataformas, versões)
-- [ ] Atualizar versão e data ao aprovar o documento
+| Funcionais (RF) | 18 | 12 | 6 | 0 | 0 |
+| Não funcionais (RNF) | 22 | 18 | 4 | 0 | 0 |
 
 ---
 
@@ -227,3 +257,11 @@ Relaciona os requisitos aos casos de uso e às regras de negócio.
 | 0.3 | 08/10/2026 | Modelo base |
 | 0.4 | 08/10/2026 | Reorganização e ampliação dos requisitos não funcionais de segurança e privacidade |
 | 0.5 | 09/10/2026 | Aprovação parcial de requisitos funcionais e não funcionais |
+| 0.6 | 13/10/2026 | Atualização da estrutura após mover os critérios de aceite para a visão de negócio. |
+| 0.7 | 13/10/2026 | Inclusão da idade como dado opcional no cadastro. |
+| 0.8 | 13/10/2026 | Definição dos campos obrigatórios do cadastro e remoção da idade opcional. |
+| 0.9 | 13/10/2026 | Preenchimento da matriz de rastreabilidade entre requisitos, regras e casos de uso. |
+| 0.10 | 13/10/2026 | Remoção da pendência de revisão de prioridades. |
+| 0.11 | 13/10/2026 | Definição dos critérios de acessibilidade, desempenho, sessões, limites e fotos; inclusão dos requisitos RF18, RNF21 e RNF22. |
+| 0.12 | 13/10/2026 | Conclusão das pendências de parâmetros objetivos dos requisitos não funcionais. |
+| 1.0 | 13/10/2026 | Aprovação da especificação inicial de requisitos para a V1. |

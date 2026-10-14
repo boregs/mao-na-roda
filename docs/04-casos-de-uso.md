@@ -1,7 +1,7 @@
 # Casos de Uso – Mão na Roda
 
-> **Versão do documento:** 0.1 <br>
-> **Data:** 12/10/2026 <br>
+> **Versão do documento:** 1.0 <br>
+> **Data:** 13/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Tech stack](05-tech-stack.md)
 
 ---
@@ -48,17 +48,17 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 
 | ID | Caso de uso | Ator principal | Versão | Status | Requisitos relacionados |
 |---|---|---|---|---|---|
-| UC01 | Visualizar mapa e localização atual | Usuário visitante | V1 | Proposto | RF01 |
-| UC02 | Buscar destino | Usuário visitante | V1 | Proposto | RF02 |
-| UC03 | Selecionar perfil de mobilidade | Usuário visitante | V1 | Proposto | RF08 |
-| UC04 | Consultar rota acessível | Usuário visitante | V1 | Proposto | RF03, RF04, RF05, RF06 |
-| UC05 | Solicitar alternativa para relatos não validados | Usuário visitante | V1 | Proposto | RF07 |
-| UC06 | Criar conta | Usuário visitante | V1 | Proposto | RF10 |
-| UC07 | Fazer login | Usuário visitante | V1 | Proposto | RF11 |
-| UC08 | Usar o aplicativo sem conta | Usuário visitante | V1 | Proposto | RF13 |
-| UC09 | Enviar relato de problema de acessibilidade | Usuário autenticado | V1 | Proposto | RF09, RF14 |
-| UC10 | Excluir conta | Usuário autenticado | V1 | Proposto | RF12 |
-| UC11 | Confirmar relato de outro usuário | Usuário autenticado | V2 | Proposto | RF15, RF16, RF17 |
+| UC01 | Visualizar mapa e localização atual | Usuário visitante | V1 | Aprovado | RF01 |
+| UC02 | Buscar destino | Usuário visitante | V1 | Aprovado | RF02 |
+| UC03 | Selecionar perfil de mobilidade | Usuário visitante | V1 | Aprovado | RF08 |
+| UC04 | Consultar rota acessível | Usuário visitante | V1 | Aprovado | RF03, RF04, RF05, RF06 |
+| UC05 | Solicitar alternativa para relatos não validados | Usuário visitante | V1 | Aprovado | RF07 |
+| UC06 | Criar conta | Usuário visitante | V1 | Aprovado | RF10 |
+| UC07 | Fazer login | Usuário visitante | V1 | Aprovado | RF11 |
+| UC08 | Usar o aplicativo sem conta | Usuário visitante | V1 | Aprovado | RF13 |
+| UC09 | Enviar relato de problema de acessibilidade | Usuário autenticado | V1 | Aprovado | RF09, RF14, RF18 |
+| UC10 | Excluir conta | Usuário autenticado | V1 | Aprovado | RF12 |
+| UC11 | Confirmar relato de outro usuário | Usuário autenticado | V2 | Aprovado | RF15, RF16, RF17 |
 
 ---
 
@@ -172,7 +172,8 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 - **A1 — Não existe rota sem barreiras impeditivas:** o sistema informa essa condição e apresenta a rota com menos barreiras impeditivas, destacando-as.
 - **A2 — Há relatos não validados no percurso:** o sistema mostra os relatos como possíveis obstáculos e disponibiliza a ação descrita no UC05.
 - **A3 — Não foi possível obter a localização:** o sistema solicita que a pessoa informe ou escolha uma origem no mapa.
-- **A4 — Falha de conexão ou do serviço externo:** o sistema informa que não foi possível calcular a rota e permite nova tentativa.
+- **A4 — Resposta demorada:** após 3 segundos sem resultado, o sistema mantém um indicador de carregamento.
+- **A5 — Falha de conexão, serviço externo ou tempo excedido:** após 10 segundos sem resposta, o sistema informa que não foi possível calcular a rota e permite nova tentativa.
 
 **Pós-condições**
 
@@ -220,7 +221,7 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 **Fluxo principal**
 
 1. O sistema apresenta o formulário de cadastro.
-2. A pessoa informa os dados obrigatórios definidos pelo projeto.
+2. A pessoa informa nome, sobrenome, e-mail e senha.
 3. O sistema valida os dados recebidos.
 4. O sistema cria a conta e inicia a sessão da pessoa.
 
@@ -256,6 +257,7 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 
 - **A1 — Credenciais inválidas:** o sistema informa que não foi possível realizar o acesso, sem expor qual dado está incorreto.
 - **A2 — Limite de tentativas atingido:** o sistema aplica a proteção definida e informa quando uma nova tentativa poderá ser feita.
+- **A3 — Sessão expirada:** o sistema pode mostrar a última conta usada como identificação visual, mas solicita novo login para continuar ações protegidas.
 
 **Pós-condições**
 
@@ -293,13 +295,13 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 | **Ator principal** | Usuário autenticado. |
 | **Pré-condições** | A pessoa está autenticada e possui uma localização para associar ao relato. |
 | **Gatilho** | A pessoa seleciona a ação de relatar problema. |
-| **Relacionado** | RF09, RF14, RN08, RN10, RN11, RNF13, RNF15, RNF17–RNF20. |
+| **Relacionado** | RF09, RF14, RF18, RN08, RN10, RN11, RNF13, RNF15, RNF17–RNF21. |
 
 **Fluxo principal**
 
 1. O sistema apresenta o formulário de relato.
 2. A pessoa informa uma descrição do problema e confirma ou indica sua localização.
-3. Opcionalmente, a pessoa anexa uma foto.
+3. Opcionalmente, a pessoa anexa até três fotos.
 4. O sistema valida os dados e o arquivo enviado, quando houver foto.
 5. O sistema registra o relato como não validado.
 6. O sistema informa que o relato foi enviado e indica se há evidência visual complementar.
@@ -307,14 +309,13 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 **Fluxos alternativos**
 
 - **A1 — Descrição ou localização ausente:** o sistema informa os dados obrigatórios que precisam ser preenchidos.
-- **A2 — Foto inválida:** o sistema recusa o arquivo e informa os formatos ou limites aceitos.
+- **A2 — Foto inválida:** o sistema recusa arquivo em formato diferente de JPG, JPEG ou PNG, com mais de 5 MB, ou acima do limite de três fotos, e informa os limites aceitos.
 - **A3 — Falha no envio:** o sistema informa que o relato não foi registrado e permite nova tentativa.
+- **A4 — Limite de relatos atingido:** o sistema informa que a pessoa atingiu o limite de cinco relatos na hora atual e indica quando poderá enviar novamente.
 
 **Pós-condições**
 
 - Um relato não validado foi armazenado e associado à localização informada.
-
-> **Pendente de validação:** confirmar se o envio de relato exigirá conta na V1. Este caso de uso adota a conta como premissa porque o documento de regras relaciona os relatos à identidade da pessoa usuária.
 
 ---
 
@@ -332,7 +333,7 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 
 1. O sistema explica os efeitos da exclusão e solicita confirmação.
 2. A pessoa confirma a exclusão.
-3. O sistema remove os dados pessoais conforme a política definida pelo projeto.
+3. O sistema remove os dados pessoais, anonimiza a autoria dos relatos e mantém os relatos e fotos por até um mês como enviados por "usuário excluído".
 4. O sistema invalida a sessão ativa e confirma a conclusão da solicitação.
 
 **Fluxos alternativos**
@@ -344,8 +345,6 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 
 - A conta e os dados pessoais associados foram excluídos; as sessões ativas foram invalidadas.
 
-> **Pendente de validação:** definir o tratamento dos relatos e fotos já enviados quando a conta for excluída.
-
 ---
 
 ### UC11 — Confirmar relato de outro usuário (V2)
@@ -356,7 +355,7 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 | **Ator principal** | Usuário autenticado. |
 | **Pré-condições** | A pessoa está autenticada e o relato foi criado por outra pessoa. |
 | **Gatilho** | A pessoa seleciona a ação de confirmar relato. |
-| **Relacionado** | RF15, RF16, RF17, RN09, RNF17, RNF18. |
+| **Relacionado** | RF15, RF16, RF17, RN09, RNF17, RNF22. |
 
 **Fluxo principal**
 
@@ -378,7 +377,7 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 
 ---
 
-## 6. Matriz de rastreabilidade inicial
+## 6. Matriz de rastreabilidade
 
 | Caso de uso | Requisitos funcionais | Regras de negócio |
 |---|---|---|
@@ -390,21 +389,9 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 | UC06 | RF10 | RN15 |
 | UC07 | RF11 | RN15 |
 | UC08 | RF13 | RN17, RN18 |
-| UC09 | RF09, RF14 | RN08, RN10, RN11 |
+| UC09 | RF09, RF14, RF18 | RN08, RN10, RN11 |
 | UC10 | RF12 | RN16 |
 | UC11 | RF15, RF16, RF17 | RN09 |
-
----
-
-## 7. Pendências
-
-- [ ] Revisar o catálogo e os fluxos com a equipe.
-- [ ] Aprovar os casos de uso da V1 e atualizar seus status.
-- [ ] Confirmar se o envio de relatos exige uma conta na V1.
-- [ ] Definir os dados obrigatórios de criação de conta.
-- [ ] Definir o destino dos relatos e fotos após exclusão da conta.
-- [ ] Definir o valor de **X meses** da RN07 e o critério final de validação da RN09.
-- [ ] Atualizar a matriz de rastreabilidade do `03-requisitos.md` com os UC aprovados.
 
 ---
 
@@ -413,3 +400,6 @@ Os identificadores são fixos. Se um caso de uso deixar de existir, seu número 
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 12/10/2026 | Versão inicial baseada nos requisitos e regras de negócio existentes. |
+| 0.2 | 13/10/2026 | Definição dos campos obrigatórios para criação de conta. |
+| 0.3 | 13/10/2026 | Inclusão de limites de fotos, sessão expirada e proteção contra abuso. |
+| 1.0 | 13/10/2026 | Aprovação dos casos de uso, alinhamento com o desempenho das rotas e conclusão das pendências. |
