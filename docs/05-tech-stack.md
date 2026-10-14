@@ -1,6 +1,6 @@
 # Tech Stack – Mão na Roda
 
-> **Versão do documento:** 0.2 <br>
+> **Versão do documento:** 0.3 <br>
 > **Data:** 13/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md)
 
@@ -46,7 +46,7 @@ flowchart LR
 | API | REST com JSON | Permitir a comunicação entre o aplicativo e o backend. | Aprovado |
 | Banco de dados | PostgreSQL, gerenciado pelo Supabase | Armazenar contas, perfis de mobilidade, relatos, confirmações futuras e dados de acessibilidade. | Aprovado |
 | Autenticação | Supabase Auth | Criar contas, iniciar sessões e emitir tokens para acesso às operações autenticadas. | Aprovado |
-| Armazenamento de fotos | Supabase Storage | Armazenar imagens anexadas aos relatos. | Aprovado |
+| Armazenamento de fotos | Supabase Storage | Armazenar imagens anexadas aos relatos e removê-las após o prazo definido para contas excluídas. | Aprovado |
 | Mapas, busca e rotas-base | Provedor a definir | Exibir mapa, localizar endereços e obter rotas entre dois pontos. | Pendente de validação |
 | Localização | Recursos do dispositivo via pacote Flutter | Obter a localização atual somente após consentimento. | Aprovado |
 | Documentação da API | OpenAPI/Swagger | Descrever e testar os endpoints da API. | Aprovado |
@@ -75,6 +75,7 @@ O backend será uma API REST desenvolvida em Java com Spring Boot. Ele será res
 - validar arquivos enviados antes de armazená-los;
 - integrar o aplicativo ao Supabase e ao serviço de mapas e rotas;
 - impedir que relatos não validados alterem automaticamente o cálculo da rota, conforme RN12.
+- executar diariamente a rotina de descarte dos relatos e fotos de contas excluídas cujo prazo de retenção tenha expirado.
 
 O backend é a fonte de verdade para regras de negócio e autorização. Restrições exibidas somente no aplicativo não são suficientes para proteger operações ou dados.
 
@@ -86,9 +87,13 @@ O Supabase será usado para simplificar a infraestrutura da V1. Ele oferece Post
 |---|---|
 | PostgreSQL | Dados de domínio do aplicativo, como perfis, relatos, localização associada ao relato, barreiras e metadados de verificação. |
 | Auth | Criação de conta, login e emissão de tokens de sessão. A API Java deve validar esses tokens antes de executar operações protegidas. |
-| Storage | Fotos anexadas aos relatos, após validação de formato, tamanho e remoção de metadados desnecessários. |
+| Storage | Fotos anexadas aos relatos, após validação de formato, tamanho e remoção de metadados desnecessários. As imagens permanecem no Supabase e são removidas quando expira o prazo de retenção da RN16. |
 
 O Supabase utiliza PostgreSQL; portanto, ele não é uma alternativa independente ao banco de dados, mas a plataforma que hospedará e administrará o PostgreSQL na V1.
+
+#### Descarte automático após exclusão de conta
+
+O backend Java executará diariamente uma rotina para identificar relatos de contas excluídas há mais de um mês. Para cada relato elegível, a rotina deve remover primeiro as fotos pela API do Supabase Storage e, em seguida, excluir o relato e seus metadados do PostgreSQL. Não será utilizado armazenamento externo, como Amazon S3 Glacier, na V1.
 
 ### 4.4 Mapas, destinos e rotas
 
@@ -118,7 +123,7 @@ As escolhas técnicas devem atender aos requisitos não funcionais já aprovados
 | Senhas | Delegar o armazenamento e o tratamento de senhas ao Supabase Auth; a API não deve persistir senhas. | RNF08 |
 | Sessões | Validar tokens no backend, armazená-los com segurança no dispositivo e invalidá-los quando necessário. | RNF16, RNF17, RNF19 |
 | Banco | Aplicar acesso com o menor privilégio necessário e consultas parametrizadas. | RNF09, RNF12 |
-| Fotos | Validar conteúdo, formato e tamanho; remover metadados que não sejam necessários antes do armazenamento. | RNF20 |
+| Fotos | Validar conteúdo, formato e tamanho; remover metadados que não sejam necessários antes do armazenamento. Manter as fotos no Supabase Storage e removê-las pela rotina automática após o prazo da RN16. | RN16, RNF20 |
 | Segredos | Guardar chaves e tokens em variáveis de ambiente ou serviço seguro; nunca versioná-los. | RNF10, RNF14 |
 
 ---
@@ -140,8 +145,7 @@ Para a V1, a infraestrutura será composta por:
 - [ ] Escolher e validar o provedor de mapas, busca de destinos e rotas-base.
 - [ ] Fazer um protótipo que calcule uma rota-base e aplique as barreiras do perfil de mobilidade.
 - [ ] Definir o modelo de dados inicial para perfis, barreiras, relatos e fotos.
-- [ ] Definir os dados obrigatórios para criação de conta.
-- [ ] Definir limites de tamanho, formatos aceitos e política de retenção das fotos.
+- [ ] Definir limites de tamanho e formatos aceitos para as fotos.
 - [ ] Escolher o serviço de hospedagem da API Java.
 - [ ] Definir ambientes, variáveis de configuração e responsáveis pelos acessos ao Supabase.
 - [ ] Configurar CI para executar testes e verificações em Pull Requests.
@@ -154,4 +158,5 @@ Para a V1, a infraestrutura será composta por:
 | Versão | Data | Descrição |
 |---|---|---|
 | 0.1 | 13/10/2026 | Versão inicial da stack para a V1: Flutter, Java/Spring Boot e Supabase. |
-| 0.2 | 13/10/2026 | Aprovação da stack proposta |
+| 0.2 | 13/10/2026 | Aprovação da stack proposta. |
+| 0.3 | 13/10/2026 | Definição da retenção e do descarte automático de fotos no Supabase. |
