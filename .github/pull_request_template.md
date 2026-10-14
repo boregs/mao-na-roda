@@ -14,9 +14,6 @@
 - [ ] `test`: testes
 - [ ] `chore` / `build` / `ci`: manutenção
 
-## Documentação relacionada
-<!-- Cite os requisitos, regras ou casos de uso. Ex.: RF04, RN02, UC03 -->
-
 
 ## Como testar
 <!-- Passo a passo para quem for revisar reproduzir e validar. -->
@@ -34,3 +31,6 @@
 - [ ] O código segue os padrões do projeto
 - [ ] Atualizei a documentação, se necessário
 - [ ] Não há senhas, chaves de API ou dados sensíveis no código
+- [ ] Não existe código temporário
+
+```
