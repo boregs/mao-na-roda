@@ -32,5 +32,3 @@
 - [ ] Atualizei a documentação, se necessário
 - [ ] Não há senhas, chaves de API ou dados sensíveis no código
 - [ ] Não existe código temporário
-
-```
