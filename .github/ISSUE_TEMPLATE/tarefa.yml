@@ -1,0 +1,154 @@
+name: Tarefa de desenvolvimento
+description: Criar uma tarefa vinculada à documentação do Mão na Roda
+title: "[TAREFA]: "
+labels:
+  - tarefa
+  - triagem
+  
+projects:
+  - "boregs/2"
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Preencha as informações abaixo para criar uma tarefa clara,
+        verificável e relacionada à documentação do projeto.
+
+  - type: dropdown
+    id: modulo
+    attributes:
+      label: Módulo
+      description: Qual parte do sistema será alterada?
+      options:
+        - Mapa e localização
+        - Rotas acessíveis
+        - Perfis de mobilidade
+        - Relatos
+        - Contas e autenticação
+        - Aplicativo Flutter
+        - API Java
+        - Banco de dados
+        - Infraestrutura
+        - Documentação
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo da tarefa
+      options:
+        - Nova funcionalidade
+        - Correção
+        - Refatoração
+        - Testes
+        - Segurança
+        - Documentação
+        - Infraestrutura
+    validations:
+      required: true
+
+  - type: dropdown
+    id: versao
+    attributes:
+      label: Versão do produto
+      options:
+        - V1
+        - V2
+    validations:
+      required: true
+
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Qual resultado esta tarefa deve produzir?
+      placeholder: |
+        Implementar o cálculo de rota considerando o perfil de
+        mobilidade selecionado pela pessoa usuária.
+    validations:
+      required: true
+
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto
+      description: Por que esta tarefa é necessária?
+      placeholder: |
+        Atualmente a rota-base não considera as barreiras impeditivas
+        definidas para cada perfil.
+    validations:
+      required: true
+
+  - type: textarea
+    id: documentacao
+    attributes:
+      label: Documentação relacionada
+      description: Informe os RF, RN, RNF e UC relacionados.
+      placeholder: |
+        RF: RF03
+        RN: RN01, RN03, RN04
+        RNF: RNF03
+        UC: UC04
+    validations:
+      required: true
+
+  - type: textarea
+    id: escopo
+    attributes:
+      label: Escopo
+      description: Liste o que deve ser desenvolvido nesta tarefa.
+      placeholder: |
+        - Receber origem, destino e perfil de mobilidade
+        - Identificar barreiras impeditivas
+        - Descartar rotas incompatíveis com o perfil
+        - Retornar uma alternativa quando disponível
+    validations:
+      required: true
+
+  - type: textarea
+    id: fora_do_escopo
+    attributes:
+      label: Fora do escopo
+      description: O que não deve ser tratado nesta tarefa?
+      placeholder: |
+        - Navegação por voz
+        - Confirmação colaborativa de relatos
+        - Suporte para iOS
+
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      description: Escreva condições objetivas para considerar a tarefa concluída.
+      placeholder: |
+        - [ ] A rota considera o perfil selecionado
+        - [ ] Trechos com barreiras impeditivas são descartados
+        - [ ] A ausência de rota acessível é informada
+        - [ ] Os testes automatizados passam
+    validations:
+      required: true
+
+  - type: textarea
+    id: verificacao
+    attributes:
+      label: Como verificar
+      description: Explique como o resultado deverá ser testado.
+      placeholder: |
+        Consultar o mesmo trajeto com dois perfis e verificar que
+        as rotas respeitam as barreiras definidas para cada perfil.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Verifiquei que não existe outra issue para a mesma tarefa
+          required: true
+        - label: Consultei os documentos relacionados
+          required: true
+        - label: A tarefa possui critérios de aceite verificáveis
+          required: true
