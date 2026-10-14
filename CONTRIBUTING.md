@@ -1,8 +1,8 @@
 # Guia de Contribuição – Mão na Roda
 
-> **Versão do documento:** 0.2 <br>
+> **Versão do documento:** 1.0 <br>
 > **Data de Criação:** 06/10/2026
-> **Última atualização:** 09/10/2026
+> **Última atualização:** 14/10/2026
 
 Este guia define como a equipe trabalha no repositório: como escrever mensagens de commit, como nomear branches e como abrir Pull Requests (PRs). O objetivo é manter o histórico legível e a revisão de código rápida.
 
@@ -67,7 +67,6 @@ A equipe pode adicionar novos escopos conforme o projeto crescer. Se a mudança 
 
 - Escreva em **português**, em letras minúsculas (exceto nomes próprios e siglas).
 - Use o **verbo na 3ª pessoa do presente**, como se completasse a frase "este commit...": `adiciona`, `corrige`, `remove`, `atualiza`.
-- Máximo de **72 caracteres** na primeira linha.
 - **Sem ponto final.**
 - Seja específico: diga **o que** mudou, não o que você fez ("ajustes" não diz nada).
 
@@ -126,7 +125,6 @@ Formato: `tipo/descricao-curta-em-kebab-case`, usando os mesmos tipos dos commit
 ```
 feat/resumo-barreiras-rota
 fix/marcador-fora-posicao
-docs/regras-de-negocio
 refactor/calculo-distancia
 ```
 
@@ -141,9 +139,6 @@ refactor/calculo-distancia
 3. Faça commits seguindo o padrão da seção 1.
 4. Envie a branch: `git push -u origin feat/resumo-barreiras-rota`
 5. Abra um Pull Request para a `main`.
-6. Após aprovação e merge, **apague a branch**.
-
-Mantenha as branches **curtas** (idealmente alguns dias). Branches longas acumulam conflitos.
 
 ---
 
@@ -159,60 +154,6 @@ Mantenha as branches **curtas** (idealmente alguns dias). Branches longas acumul
 - Prefira **Squash and merge** para manter a `main` limpa, com um commit por PR. O título do PR vira a mensagem do commit, por isso ele deve seguir o padrão.
 - Referencie os requisitos e regras da documentação (RF, RN, UC) que o PR implementa.
 
-### 3.2 Template de PR
-
-> Para o GitHub preencher este modelo automaticamente em todo PR, salve o conteúdo abaixo em `.github/pull_request_template.md`.
-
-```markdown
-## Descrição
-<!-- O que este PR faz? Explique de forma breve. -->
-
-
-## Motivação
-<!-- Por que esta mudança é necessária? Qual problema resolve? -->
-
-
-## Tipo de mudança
-- [ ] `feat`: nova funcionalidade
-- [ ] `fix`: correção de bug
-- [ ] `docs`: documentação
-- [ ] `refactor`: refatoração
-- [ ] `test`: testes
-- [ ] `chore` / `build` / `ci`: manutenção
-
-## Documentação relacionada
-<!-- Cite os requisitos, regras ou casos de uso. Ex.: RF04, RN02, UC03 -->
-
-
-## Como testar
-<!-- Passo a passo para quem for revisar reproduzir e validar. -->
-1.
-2.
-3.
-
-## Capturas de tela (se houver mudança visual)
-<!-- Cole imagens ou prints das telas alteradas. -->
-
-
-## Checklist
-- [ ] O título do PR segue o padrão `tipo(escopo): descrição`
-- [ ] Testei as mudanças localmente
-- [ ] O código segue os padrões do projeto
-- [ ] Atualizei a documentação, se necessário
-- [ ] Não há senhas, chaves de API ou dados sensíveis no código
-```
-
----
-
-## 4. Pendências deste documento
-
-- [ ] Revisão do grupo (versão 0.1)
-- [ ] Confirmar se a equipe quer exigir mais de 1 aprovação por PR
-- [ ] Definir o padrão de testes, caso o projeto adote integração contínua
-- [x] Salvar o template de PR em `.github/pull_request_template.md`
-- [ ] Atualizar versão e data ao aprovar o documento
-
----
 
 ## Histórico de versões
 
@@ -220,3 +161,4 @@ Mantenha as branches **curtas** (idealmente alguns dias). Branches longas acumul
 |---|---|---|
 | 0.1 | 06/10/2026 | Versão inicial |
 | 0.2 | 09/10/2026 | Formatos de commits alterados |
+| 1.0 | 14/10/2026 | Aprovação do documento |
