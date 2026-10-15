@@ -79,7 +79,7 @@ body:
         Atualmente a rota-base não considera as barreiras impeditivas
         definidas para cada perfil.
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: documentacao
@@ -92,7 +92,7 @@ body:
         RNF: RNF03
         UC: UC04
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: escopo
@@ -105,7 +105,7 @@ body:
         - Descartar rotas incompatíveis com o perfil
         - Retornar uma alternativa quando disponível
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: fora_do_escopo
@@ -128,7 +128,7 @@ body:
         - [ ] A ausência de rota acessível é informada
         - [ ] Os testes automatizados passam
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: verificacao
@@ -139,7 +139,7 @@ body:
         Consultar o mesmo trajeto com dois perfis e verificar que
         as rotas respeitam as barreiras definidas para cada perfil.
     validations:
-      required: true
+      required: false
 
   - type: checkboxes
     id: checklist
