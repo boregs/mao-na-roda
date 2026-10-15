@@ -52,7 +52,7 @@ flowchart LR
 | Documentação da API | OpenAPI/Swagger | Descrever e testar os endpoints da API. | Aprovado |
 | Testes de backend | JUnit e Spring Boot Test | Validar regras de negócio, autenticação e endpoints. | Aprovado |
 | Testes do aplicativo | Flutter Test | Validar componentes e fluxos essenciais do aplicativo. | Aprovado |
-| Versionamento e CI | GitHub e GitHub Actions | Versionar o código e executar verificações automatizadas em Pull Requests. | Parcialmente aprovado |
+| Versionamento e CI | GitHub e GitHub Actions | Versionar o código e executar verificações automatizadas em Pull Requests. | Aprovado |
 | Monitoramento de falhas | Logs estruturados; ferramenta a definir | Identificar erros da API e do aplicativo em ambiente de teste ou produção. | Futuro / a definir |
 
 ---
@@ -160,3 +160,4 @@ Para a V1, a infraestrutura será composta por:
 | 0.1 | 13/10/2026 | Versão inicial da stack para a V1: Flutter, Java/Spring Boot e Supabase. |
 | 0.2 | 13/10/2026 | Aprovação da stack proposta. |
 | 0.3 | 13/10/2026 | Definição da retenção e do descarte automático de fotos no Supabase. |
+| 0.4 | 15/10/2026 | Aprovação da tech do CI/CD |
