@@ -3,7 +3,6 @@
 > **Versão do documento:** 0.4  
 > **Data:** 20/10/2026  
 > **Status:** Rascunho para validação  
-> **Base analisada:** repositório `boregs/mao-na-roda`, revisão `ce74c88`  
 > **Documentos relacionados:** [Regras de negócio](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/02-regras-de-negocio.md) · [Requisitos](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/03-requisitos.md) · [Tech stack](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/05-tech-stack.md)
 
 ## 1. Objetivo e limites do documento
