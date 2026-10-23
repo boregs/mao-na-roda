@@ -1,0 +1,39 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.suo
+*.user
+*.userossc
+*.sln.docstates
+
+# Generic credentials and signing material
+*.p12
+*.key
+*.pem
+*.mobileprovision
+
+# Environment files and local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Generic test and tooling output
+test-results/
+reports/
