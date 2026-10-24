@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../onboarding/how_it_works_sheet.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -27,13 +29,13 @@ class HomeScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Comece sua busca',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 12),
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Text(
+                       'Comece sua busca',
+                       style: Theme.of(context).textTheme.titleLarge,
+                     ),
+                     const SizedBox(height: 12),
                     const Text(
                       'A consulta de rotas estará disponível nesta etapa do desenvolvimento.',
                     ),
@@ -46,8 +48,14 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
+             ),
+             const SizedBox(height: 12),
+             TextButton.icon(
+               onPressed: () => showHowItWorks(context),
+               icon: const Icon(Icons.info_outline_rounded),
+               label: const Text('Sobre o Mão na Roda'),
+             ),
+             const SizedBox(height: 24),
             Text(
               'Versão inicial em desenvolvimento',
               textAlign: TextAlign.center,
