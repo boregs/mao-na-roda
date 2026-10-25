@@ -29,15 +29,11 @@ class OnboardingScreen extends StatelessWidget {
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Row(children: [BrandMark(), SizedBox(width: 10), Text('Mão na Roda')]),
+                Row(children: [const BrandMark(), const SizedBox(width: 10), Text('Mão na Roda', style: theme.textTheme.titleLarge)]),
                 const SizedBox(height: 64),
                 Text(
                   'Seu caminho,\nsuas condições.',
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    fontFamily: 'Source Serif 4',
-                    fontWeight: FontWeight.w600,
-                    height: 1.1,
-                  ),
+                  style: theme.textTheme.displaySmall,
                 ),
                 const SizedBox(height: 16),
                 Text('Rotas considerando suas necessidades de mobilidade e as condições do caminho.', style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant, height: 1.4)),
