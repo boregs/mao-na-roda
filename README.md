@@ -24,49 +24,53 @@ Desde então, a proposta evoluiu e passou a investigar como informações sobre 
 | **Pablo** | https://www.linkedin.com/in/pablo-calegari-997a40234/ | Desenvolvedor das funcionalidades do aplicativo |
 | **Rafael** | https://www.linkedin.com/in/rafaelboregs/ | Líder e auxílio geral |
 
-## Estrutura do repositório
+## Estrutura atual do repositório
 
-A árvore abaixo combina a documentação já conhecida com uma estrutura proposta para organizar o desenvolvimento. As pastas de implementação podem ser criadas conforme os respectivos componentes forem iniciados.
+A árvore abaixo representa a estrutura atual do repositório.
 
 ```text
 .
 ├── .github/
-│   ├── ISSUE_TEMPLATE/                  # Modelos de issues, quando definidos
+│   ├── ISSUE_TEMPLATE/                  # Modelos de issues
 │   └── pull_request_template.md         # Modelo de pull request
 ├── apps/
 │   ├── mobile/                          # Aplicativo Flutter
+│   │   ├── android/                      # Projeto Android
+│   │   ├── assets/                       # Fontes e recursos
 │   │   ├── lib/                         # Código-fonte do aplicativo
-│   │   └── test/                        # Testes do aplicativo
+│   │   └── test/                         # Testes do aplicativo
 │   └── api/                             # API Java com Spring Boot
+│       ├── database/                    # Documentação e testes do banco
 │       ├── src/
 │       │   ├── main/
 │       │   │   ├── java/                # Código-fonte da API
-│       │   │   └── resources/           # Configurações e recursos
+│       │   │   └── resources/
+│       │   │       ├── application.properties
+│       │   │       └── db/migration/    # Migrations Flyway V1–V5
 │       │   └── test/
 │       │       └── java/                # Testes da API
-├── database/
-│   ├── migrations/                      # Evoluções versionadas do banco
-│   └── seeds/                           # Dados iniciais de catálogos
+│       ├── pom.xml
+│       └── README.md
 ├── docs/
 │   ├── 01-visao-de-negocio.md
 │   ├── 02-regras-de-negocio.md
 │   ├── 03-requisitos.md
+│   ├── 04-casos-de-uso.md
 │   ├── 05-tech-stack.md
-│   ├── 06-banco-de-dados-rascunho.md
-│   └── diagrams/                        # Diagramas do projeto
+│   └── 06-banco-de-dados.md
 ├── CONTRIBUTING.md
 └── README.md
 ```
 
 ### Responsabilidade de cada área
 
-- `apps/mobile/`: interface e funcionalidades executadas no aplicativo.
+- `apps/mobile/`: interface e funcionalidades executadas no aplicativo Android.
 - `apps/api/`: endpoints, autenticação/autorização, regras de negócio e integração com o banco e serviços externos.
-- `database/`: scripts de migração e dados iniciais do banco, quando a estratégia de migrations for definida.
-- `docs/`: visão, regras, requisitos, decisões técnicas e diagramas.
+- `apps/api/src/main/resources/db/migration/`: migrations Flyway para PostgreSQL/PostGIS e carga inicial da matriz de barreiras.
+- `apps/api/database/`: documentação operacional do banco e testes SQL locais.
+- `docs/`: visão, regras, requisitos, casos de uso, decisões técnicas e modelo de dados.
 - `.github/`: modelos e automações relacionados a issues e pull requests.
 
-A localização definitiva das migrations deve acompanhar a ferramenta escolhida pela equipe. Se elas forem gerenciadas pela aplicação, por exemplo, podem ficar dentro de `apps/api/`; o importante é manter uma única fonte versionada para as alterações do banco.
 
 ## Tecnologias
 
@@ -74,15 +78,21 @@ As tecnologias documentadas atualmente incluem:
 
 - **Aplicativo:** Flutter.
 - **API:** Java com Spring Boot.
-- **Banco de dados e autenticação:** Supabase.
+- **Banco de dados:** PostgreSQL com PostGIS, hospedado no Supabase.
+- **Autenticação e armazenamento:** Supabase Auth e Supabase Storage.
+- **Migrations:** Flyway Maven Plugin, executado a partir de `apps/api/`.
 
-Consulte [`docs/05-tech-stack.md`](docs/05-tech-stack.md) para decisões e pendências técnicas. A ferramenta de migrations e outras escolhas ainda pendentes devem ser confirmadas antes de serem tratadas como padrão do projeto.
+Consulte [`docs/05-tech-stack.md`](docs/05-tech-stack.md) para decisões e pendências técnicas. Para o banco, consulte também [`apps/api/database/README.md`](apps/api/database/README.md).
 
 ## Documentação
 
+- [Aplicativo mobile](apps/mobile/README.md)
+- [API](apps/api/README.md)
+- [Banco de dados e migrations](apps/api/database/README.md)
 - [Visão de negócio](docs/01-visao-de-negocio.md)
 - [Regras de negócio](docs/02-regras-de-negocio.md)
 - [Requisitos](docs/03-requisitos.md)
+- [Casos de uso](docs/04-casos-de-uso.md)
 - [Tech stack](docs/05-tech-stack.md)
 - [Banco de dados](docs/06-banco-de-dados.md)
 
