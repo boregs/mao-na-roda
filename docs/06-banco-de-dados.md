@@ -1,17 +1,17 @@
 # Banco de Dados — Mão na Roda
 
-> **Versão do documento:** 0.4  
-> **Data:** 20/10/2026  
-> **Status:** Rascunho para validação  
+> **Versão do documento:** 0.5 <br>
+> **Data:** 25/10/2026 <br>
+> **Status:** Modelo lógico com migrations V1 versionadas; implantação remota não verificada <br>
 > **Documentos relacionados:** [Regras de negócio](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/02-regras-de-negocio.md) · [Requisitos](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/03-requisitos.md) · [Tech stack](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/05-tech-stack.md)
 
 ## 1. Objetivo e limites do documento
 
 Propor a organização dos dados do Mão na Roda no Supabase, documentando entidades, relacionamentos, regras de integridade, acesso e descarte.
 
-Este documento não descreve um banco inspecionado. Não houve acesso ao projeto Supabase nem a um esquema SQL existente. Todas as tabelas próprias, colunas, índices e estratégias aqui apresentados são propostas; não foram criados ou testados no banco.
+Este documento não descreve um banco remoto inspecionado. Não houve acesso ao projeto Supabase. A implementação SQL inicial da V1 está versionada em [`apps/api/src/main/resources/db/migration`](../apps/api/src/main/resources/db/migration), com análise do provedor, dependências, decisões físicas e instruções em [`apps/api/database/README.md`](../apps/api/database/README.md).
 
-Os tipos abaixo representam o modelo lógico inicial. A implementação física, especialmente dos campos que exigirem criptografia, deverá ser definida antes das migrations. As regras já aprovadas continuam sendo a referência; decisões ainda abertas estão na seção 12.
+Os tipos abaixo representam o modelo lógico inicial. Para as migrations V1, o solicitante escolheu manter nome/sobrenome em texto e a FK da preferência; a criptografia de campos permanece pendente. Foram adotados PostGIS em `extensions`, verificação obrigatória, fotos de até 5.000.000 bytes e retenção limitada a um mês de calendário em UTC. As diferenças e os limites estão detalhados no guia SQL, sem representar implantação no Supabase ou conclusão de todos os requisitos. As regras já aprovadas continuam sendo a referência; decisões de produto ainda abertas estão na seção 12.
 
 ## 2. Responsabilidades e escopo
 
@@ -46,7 +46,7 @@ A estratégia definida é que a API Java acesse o banco por conexão JDBC e que 
 - Datas e horários em `timestamptz`, normalizados para UTC pela aplicação; exibição conforme o fuso do usuário.
 - `criado_em` e `atualizado_em` representam eventos técnicos. Não substituem a data de verificação de uma condição de acessibilidade.
 - Valores de classificação e estado devem ser limitados por `CHECK`, enum ou tabela de domínio, conforme a migration aprovada.
-- PostGIS é uma extensão proposta, ainda sujeita a aprovação. Usar SRID 4326 e ordem longitude/latitude em GeoJSON.
+- As migrations V1 adotam PostGIS no schema `extensions`, com SRID 4326 e ordem longitude/latitude em GeoJSON.
 - Catálogos referenciados devem ser desativados, quando necessário, em vez de apagados indiscriminadamente.
 
 Estão confirmados nesta versão os nomes das tabelas apresentados no documento, o uso do schema `app`, o acesso ao banco pela API Java via JDBC e o uso de `bigserial` nas chaves primárias internas.
@@ -148,12 +148,12 @@ O provedor do identificador não é necessariamente a fonte da condição de ace
 | `condicao` | `text` | Sim | Proposta: `presente`, `ausente` ou `desconhecida`. |
 | `origem` | `text` | Sim | `dados_publicos`, `openstreetmap` ou `relato_usuario`. |
 | `referencia_fonte` | `text` | Não | URL, conjunto de dados ou identificador da evidência. |
-| `verificado_em` | `timestamptz` | Não* | Data efetiva de verificação da condição. |
+| `verificado_em` | `timestamptz` | Sim | Data efetiva de verificação da condição, obrigatória nas migrations V1. |
 | `importado_em` | `timestamptz` | Sim | Momento de entrada no sistema. |
 | `relato_origem_id` | `bigint` | Não | FK para `relatos(id)`; obrigatório para origem de relato, somente na V2. |
 | `ativa` | `boolean` | Sim | Indica se a observação ainda participa da avaliação. |
 
-*A RN06 exige data de verificação. A nulabilidade é uma proposta para representar fontes incompletas honestamente: dados sem essa data devem ser identificados como não verificados e ter tratamento aprovado pela equipe. Não inventar uma verificação usando a data de importação. Se a RN06 for mantida com exigência absoluta, rejeitar ou manter fora do conjunto operacional registros sem data, tornando a coluna obrigatória.*
+As migrations V1 seguem a RN06 e exigem data de verificação: registros sem essa data devem ser rejeitados pelo importador ou permanecer fora do conjunto operacional. Não inventar uma verificação usando a data de importação. Uma área de preparação para fontes incompletas exigiria desenho próprio.
 
 Não confundir ausência de observações com ausência de barreiras. Para RF05, a API deve avaliar a cobertura das informações por parte do percurso e mostrar quando não há verificação conhecida.
 
@@ -238,7 +238,7 @@ PostgreSQL, Auth e Storage não formam uma única transação da aplicação. Re
 
 Nome sugerido: `relato-fotos`. Visibilidade proposta: **privada**, com leitura autorizada pela API e URLs temporárias ou resposta intermediada. O uso sem conta exige que a API tenha um caminho de leitura pública controlada para fotos de relatos exibíveis, sem expor o bucket inteiro.
 
-Aceitar JPG/JPEG/PNG, até 5 MB por arquivo (RNF20). JPEG e JPG usam o mesmo MIME `image/jpeg`. A equipe deve definir se 5 MB significa 5.000.000 ou 5.242.880 bytes e aplicar a mesma convenção em todas as camadas. A extensão do nome do arquivo não basta para validar seu conteúdo.
+Aceitar JPG/JPEG/PNG, até 5 MB por arquivo (RNF20). JPEG e JPG usam o mesmo MIME `image/jpeg`. As migrations V1 adotam 5 MB = 5.000.000 bytes; aplicar a mesma convenção na API, no aplicativo e no bucket. A extensão do nome do arquivo não basta para validar seu conteúdo.
 
 Proposta: o backend envia os arquivos após validá-los, usando credencial de servidor. Confirmar no protótipo a propriedade dos objetos: o Supabase impede a exclusão de um usuário Auth que ainda seja proprietário de objetos Storage. Objetos criados com service key não recebem automaticamente a propriedade do usuário final. A proteção continua dependendo das permissões e da autorização, não da ausência de proprietário.
 
@@ -253,7 +253,7 @@ Proposta: o backend envia os arquivos após validá-los, usando credencial de se
 
 Remover a FK de autoria não garante, sozinho, anonimização: descrição e fotos podem conter nomes, rostos ou outras informações identificáveis. Definir o tratamento desse conteúdo antes de afirmar que a RN16 está integralmente atendida.
 
-**Decisão pendente de prazo:** a RN16 estabelece "até um mês", enquanto a stack prevê rotina diária. Uma limpeza somente depois do vencimento pode ultrapassar esse teto em quase 24 horas, além de falhas. Definir o significado de mês e uma programação que respeite o prazo, ou revisar expressamente a tolerância na RN. Ocultar dados vencidos não substitui sua exclusão física.
+**Pendência de execução do descarte:** as migrations V1 adotam um mês de calendário em UTC como teto da RN16, enquanto a stack prevê rotina diária. Uma limpeza somente depois do vencimento pode ultrapassar esse teto em quase 24 horas, além de falhas. Definir uma programação que respeite o prazo, ou revisar expressamente a tolerância na RN. Ocultar dados vencidos não substitui sua exclusão física.
 
 ## 9. Segurança e dados sensíveis
 
@@ -271,7 +271,9 @@ Se tabelas forem expostas via Data API, aplicar grants mínimos e RLS a cada tab
 
 Na conexão JDBC com papel compartilhado, o contexto do usuário Auth não é propagado automaticamente para `auth.uid()`. Não presumir que políticas com essa função protegerão consultas JDBC sem uma estratégia de contexto e privilégios validada.
 
-### 9.2 Criptografia: decisão necessária antes do esquema físico
+### 9.2 Criptografia: pendência da implementação
+
+Para esta entrega SQL, o solicitante escolheu manter os campos lógicos de conta em texto e a FK de preferência. Isso não conclui RNF13/RNF14; a classificação e a representação criptografada exigirão uma evolução do schema antes do armazenamento dos dados classificados como sensíveis.
 
 O RNF13 exige que dados classificados como sensíveis não apareçam legíveis numa consulta direta aos registros. Criptografia de disco, isoladamente, não produz esse resultado. Definir um inventário de campos e a criptografia na aplicação, com chaves separadas conforme RNF14.
 
@@ -305,7 +307,7 @@ Para RNF18 (login), RNF21 (relatos) e RNF22 (confirmações), definir contadores
 
 Medir consultas reais com `EXPLAIN ANALYZE` em ambiente de testes. `geometry` em SRID 4326 usa graus; para distâncias em metros, usar `geography` ou projeção adequada e garantir que o índice corresponda à expressão consultada. Índices não garantem sozinhos o RNF03, que inclui o provedor de rotas e a rede.
 
-Versionar migrations e cargas iniciais no Git; escolher uma única ferramenta responsável pela evolução do schema (por exemplo, Flyway ou Supabase CLI). Não depender de mudanças manuais não registradas no painel. Manter ambientes separados e dados de teste fictícios.
+Migrations e cargas iniciais estão versionadas no Git, sob responsabilidade do Flyway Maven Plugin em `apps/api`. Não gerenciar os mesmos objetos também pelo Supabase CLI nem depender de mudanças manuais não registradas no painel. Manter ambientes separados e dados de teste fictícios.
 
 Definir responsáveis, frequência e retenção de backups e um teste de restauração. Backup do PostgreSQL não inclui os arquivos do Storage: é necessário planejar os dois conjuntos e sua consistência. A disponibilidade de backup/PITR depende do plano contratado; não presumir esse recurso no plano gratuito. Uma restauração também deve reaplicar descartes já vencidos antes de reabrir a aplicação.
 
@@ -338,18 +340,18 @@ Testes de aceite da modelagem:
 
 ## 12. Decisões pendentes para aprovação
 
-1. Aprovar PostGIS e o processo de associação de pontos relatados aos trechos do provedor.
+1. Validar o processo de associação de pontos relatados aos trechos do provedor; PostGIS foi adotado nas migrations V1.
 2. Definir os dados sensíveis e sua representação criptografada; compatibilizar Auth e consultas espaciais com RNF13.
-3. Definir como lidar com fontes sem data de verificação e conflitos entre dados públicos e OSM, cuja precedência mútua não está definida.
-4. Definir o significado de "um mês", prazo físico de descarte e tratamento de conteúdo identificável em relatos e fotos.
-5. Definir limite de descrição, unidade de 5 MB e fluxo de uploads com falhas parciais.
+3. Definir conflitos entre dados públicos e OSM, cuja precedência mútua não está definida. Fontes sem data são rejeitadas no conjunto operacional da V1.
+4. Definir a execução do descarte dentro do teto de um mês de calendário em UTC e o tratamento de conteúdo identificável em relatos e fotos.
+5. Definir limite de descrição e fluxo de uploads com falhas parciais; o SQL adota 5.000.000 bytes por foto.
 6. Definir janela fixa ou móvel dos limites por hora e mecanismo de bloqueio de login por e-mail.
 7. Validar sessões de 15 minutos, revogação e exigência de novo login com Supabase Auth.
 8. Definir leitura das fotos sem conta, propriedade dos objetos e limpeza de uploads órfãos.
 9. Antes da V2, definir exclusão de confirmadores e destino de observações derivadas de relatos descartados.
-10. Definir ferramenta de migrations, backups, responsáveis e critérios de restauração.
+10. Definir backups, responsáveis e critérios de restauração; Flyway foi adotado para as migrations.
 
-Depois da aprovação, produzir as migrations e atualizar o documento com o esquema efetivamente implantado, sem mudar o status para "Implementado" antes da verificação.
+As migrations iniciais estão versionadas com as escolhas físicas descritas no guia SQL. Atualizar este documento com o esquema efetivamente implantado após a verificação no ambiente de destino; não mudar o status para "Implementado" apenas pela existência dos arquivos.
 
 ## 13. Referências técnicas
 
@@ -373,3 +375,4 @@ Documentação oficial consultada em 19/10/2026:
 | 0.2 | 20/10/2026 | Padronização das tabelas próprias com PK numérica autoincrementável e UUID público único e obrigatório. |
 | 0.3 | 20/10/2026 | Remoção dos diagramas, simplificação do objetivo e ajuste do dicionário para iniciar pelas tabelas próprias da aplicação. |
 | 0.4 | 20/10/2026 | Confirmação dos nomes das tabelas, do schema `app`, do acesso via JDBC, do uso de `bigserial` e da FK com o Supabase Auth. |
+| 0.5 | 25/10/2026 | Referência às migrations V1, dependências Flyway/PostgreSQL e decisões físicas da implementação inicial; implantação remota ainda não verificada. |
