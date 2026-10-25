@@ -23,9 +23,14 @@ separate the source description from visual conclusions.
 ## 2. Read the project context
 
 Before implementation, inspect the relevant feature, shared design system,
-theme, existing tests, and applicable files under `docs/`. Preserve the Mão na
-Roda Ocean + sunlight identity and use Brazilian Portuguese for user-facing
-copy.
+theme, existing tests, and applicable files under `docs/`. Follow the current
+visual identity defined in `apps/mobile/AGENTS.md`, reuse the shared theme in
+`lib/app_theme.dart`, and reuse existing design-system components. Use Brazilian
+Portuguese for user-facing copy.
+
+If the guidance and implementation disagree, identify the discrepancy before
+extending the UI. Do not silently reproduce a known inconsistency or invent a
+new visual direction without documenting the decision.
 
 Use the shared theme and components. Do not introduce screen-local colors,
 typography, spacing, or competing icon packages. Follow the accessibility and
