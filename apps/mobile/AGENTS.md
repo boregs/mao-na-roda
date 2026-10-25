@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Maintain the **Ocean + sunlight** identity throughout the Android Flutter app.
+Maintain the **sage + forest** identity throughout the Android Flutter app.
 
 The visual personality is approachable, clear, dependable, and practical. Accessibility, readable information, and comfortable interaction are central to the design.
 
@@ -31,20 +31,20 @@ Define reusable styling centrally. Avoid screen-specific copies of colors, typog
 
 | Role | Light | Dark |
 |---|---|---|
-| Primary action / selection | `#176B9B` | `#8AC8EF` |
-| Content on primary | `#FFFFFF` | `#101B26` |
-| Main background | `#F6F8FA` | `#101B26` |
-| Cards and raised surfaces | `#FFFFFF` | `#172635` |
-| Main text | `#172B3A` | `#E7EFF6` |
-| Supporting text | `#526575` | Use a contrast-checked dark token |
-| Selected-container tint | `#E4F1F9` | Use a contrast-checked dark token |
-| Decorative sunlight | `#F2C75C` | `#F2C75C` |
+| Primary action / selection | `#375534` | `#AEC3B0` |
+| Content on primary | `#E3EED4` | `#0F2A1D` |
+| Main background | `#F7FBF4` | `#0F2A1D` |
+| Cards and raised surfaces | `#D8E5CD` | `#193523` |
+| Main text | `#0F2A1D` | `#E3EED4` |
+| Supporting text | `#375534` | `#AEC3B0` |
+| Selected-container tint | `#AEC3B0` | `#375534` |
+| Decorative accent | `#6B9071` | `#6B9071` |
 
 Rules:
 
-- Keep large surfaces neutral; use blue to establish hierarchy.
-- Use sunlight sparingly in branding and illustrations.
-- Blue means action or selection, not verified accessibility.
+- Use tinted surfaces instead of absolute white backgrounds.
+- Use forest green to establish hierarchy and sage for selected containers.
+- Brand green means action or selection, not verified accessibility.
 - Keep attention, error, and verification states semantically separate.
 - Communicate status with labels and icons as well as color.
 - Define foreground/background pairs together.
@@ -55,18 +55,17 @@ Rules:
 
 ## Typography
 
-Use the locally bundled **Source Sans 3** family through the app theme. Use **Source Serif 4** only for approved introductory/display headings, such as the onboarding headline. This is inspired by Claude’s contrast between practical UI typography and expressive editorial headings; it is not a copy of Claude’s proprietary font stack.
+Use the locally bundled **Source Serif 4** family through the app theme for all titles, body text, controls, and supporting information. Use its heavier weights for hierarchy and its text-oriented optical sizing for readable body copy.
 
 | Role | Size | Weight |
 |---|---:|---:|
-| Main heading | 28sp | Bold |
-| Section heading | 22sp | Bold |
-| Card heading | 18sp | Bold |
-| Body | 16sp | Regular |
-| Control label | 16sp | Bold |
-| Supporting metadata | 14sp | Regular |
-
-Do not use Source Serif 4 for buttons, forms, map labels, route summaries, warnings, or dense information.
+| Welcome/display heading | 40sp | Semibold |
+| Main heading | 32sp | Semibold |
+| Section heading | 26–28sp | Semibold |
+| Card/app-bar heading | 20–24sp | Semibold |
+| Body | 18–20sp | Regular |
+| Control label | 18sp | ExtraBold |
+| Supporting metadata | 16sp | Regular |
 
 - Map these roles centrally to `TextTheme`.
 - Use sentence case and comfortable line spacing.
