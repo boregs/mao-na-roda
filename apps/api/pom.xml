@@ -62,6 +62,35 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>${flyway.version}</version>
+				<configuration>
+					<locations>
+						<location>filesystem:${project.basedir}/src/main/resources/db/migration</location>
+					</locations>
+					<defaultSchema>app_migrations</defaultSchema>
+					<schemas>
+						<schema>app_migrations</schema>
+					</schemas>
+					<cleanDisabled>true</cleanDisabled>
+					<baselineOnMigrate>false</baselineOnMigrate>
+					<validateMigrationNaming>true</validateMigrationNaming>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.flywaydb</groupId>
+						<artifactId>flyway-database-postgresql</artifactId>
+						<version>${flyway.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>${postgresql.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 
