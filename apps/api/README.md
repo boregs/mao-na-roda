@@ -88,6 +88,13 @@ Referências: [Compute Routes](https://developers.google.com/maps/documentation/
 [modo a pé](https://developers.google.com/maps/documentation/routes/reference/rest/v2/RouteTravelMode)
 e [endereço UNICID](https://www.unicid.edu.br/a-unicid/nossas-unidades/).
 
+## Banco de dados e migrations
+
+As migrations V1 do PostgreSQL/Supabase estão em `src/main/resources/db/migration`.
+O Flyway Maven Plugin aplica o schema `app`, PostGIS, a matriz de barreiras e as
+permissões JDBC. Consulte [database/README.md](database/README.md) para a análise
+do modelo, dependências, configuração das credenciais e comandos de aplicação/teste.
+
 ## Verificar e empacotar
 
 ```powershell
