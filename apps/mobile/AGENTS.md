@@ -8,6 +8,10 @@ The visual personality is approachable, clear, dependable, and practical. Access
 
 Apply these instructions to new screens and changes to existing UI. Preserve unrelated developer work.
 
+For every frontend task, also read `skills/frontend/SKILLS.md`.
+It requires market-reference research, prioritizing Mobbin, and a written
+critique of the proposed and final UI.
+
 ## Inspect and reuse before creating
 
 Before changing UI, inspect:

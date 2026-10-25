@@ -13,7 +13,7 @@ ThemeData buildAppTheme({Brightness brightness = Brightness.light}) {
     surface: brightness == Brightness.light ? _paper : const Color(0xFF101B26),
   );
   final text = ThemeData(brightness: brightness).textTheme.apply(
-        fontFamily: 'Source Serif 3',
+        fontFamily: 'Source Sans 3',
         bodyColor: brightness == Brightness.light ? _ink : const Color(0xFFE7EFF6),
         displayColor: brightness == Brightness.light ? _ink : const Color(0xFFE7EFF6),
       );
@@ -21,7 +21,7 @@ ThemeData buildAppTheme({Brightness brightness = Brightness.light}) {
   return ThemeData(
     colorScheme: scheme,
     useMaterial3: true,
-    fontFamily: 'Source Serif 3',
+    fontFamily: 'Source Sans 3',
     textTheme: text,
     scaffoldBackgroundColor: scheme.surface,
     appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),

@@ -13,6 +13,7 @@ desktop.ini
 *.user
 *.userossc
 *.sln.docstates
+.opencode/
 
 # Generic credentials and signing material
 *.p12
