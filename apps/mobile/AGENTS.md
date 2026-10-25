@@ -51,7 +51,7 @@ Rules:
 
 ## Typography
 
-Use the locally bundled **Atkinson Hyperlegible** family through the app theme. The current assets are the original family with regular and bold weights; changing families is an app-wide migration, not a screen-level substitution.
+Use the locally bundled **Source Sans 3** family through the app theme. Use **Source Serif 4** only for approved introductory/display headings, such as the onboarding headline. This is inspired by Claude’s contrast between practical UI typography and expressive editorial headings; it is not a copy of Claude’s proprietary font stack.
 
 | Role | Size | Weight |
 |---|---:|---:|
@@ -61,6 +61,8 @@ Use the locally bundled **Atkinson Hyperlegible** family through the app theme. 
 | Body | 16sp | Regular |
 | Control label | 16sp | Bold |
 | Supporting metadata | 14sp | Regular |
+
+Do not use Source Serif 4 for buttons, forms, map labels, route summaries, warnings, or dense information.
 
 - Map these roles centrally to `TextTheme`.
 - Use sentence case and comfortable line spacing.
@@ -91,7 +93,16 @@ Give each screen or task one visually dominant primary action.
 - Label unfamiliar actions and accessibility categories.
 - Keep decorative icons out of redundant screen-reader announcements.
 
-Reuse `BrandMark` and the continuous-path visual motif. The motif represents movement and connection, with rounded lines and endpoint dots. Keep decorative paths outside operational map content.
+Reuse approved image assets from `assets/images/` and `BrandMark`. The continuous-path visual motif represents movement and connection, but do not create placeholder hero artwork. Keep decorative paths outside operational map content.
+
+Asset rules:
+
+- Branding images belong in `assets/images/branding/`.
+- Onboarding images belong in `assets/images/onboarding/`.
+- Reusable illustrations belong in `assets/images/illustrations/`.
+- Keep explanatory text out of images.
+- Use `_light` and `_dark` suffixes only for genuinely theme-specific artwork.
+- Register populated directories in `pubspec.yaml` and preserve licenses for bundled assets.
 
 The app currently uses Flutter’s built-in Material icons. A migration to Material Symbols Rounded must be coordinated through shared icon definitions; do not introduce competing icon packages per feature.
 
@@ -138,7 +149,9 @@ Severity and verification are independent. A serious reported obstacle can still
 Maintain a short first-run experience:
 
 - One welcome screen.
-- One primary “Continuar” action.
+- One primary “Continuar sem conta” action.
+- One outlined “Criar conta” action.
+- One text “Já tenho conta · Entrar” action.
 - Optional “Como funciona” explanation.
 - A locally stored completion flag.
 - Recoverable startup when preferences are unavailable.

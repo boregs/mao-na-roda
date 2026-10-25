@@ -18,4 +18,12 @@ class OnboardingStore {
       // Onboarding remains usable for the current session if storage is unavailable.
     }
   }
+
+  Future<void> reset() async {
+    try {
+      await (await SharedPreferences.getInstance()).remove(_completedKey);
+    } catch (_) {
+      // The debug action is safe to ignore if local storage is unavailable.
+    }
+  }
 }

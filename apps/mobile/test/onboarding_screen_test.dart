@@ -6,7 +6,9 @@ void main() {
   testWidgets('apresenta a proposta e ações principais', (tester) async {
     await tester.pumpWidget(MaterialApp(home: OnboardingScreen(onComplete: _noop)));
     expect(find.text('Seu caminho,\nsuas condições.'), findsOneWidget);
-    expect(find.text('Continuar'), findsOneWidget);
+    expect(find.text('Continuar sem conta'), findsOneWidget);
+    expect(find.text('Criar conta'), findsOneWidget);
+    expect(find.text('Já tenho conta · Entrar'), findsOneWidget);
     expect(find.text('Como funciona'), findsOneWidget);
   });
 

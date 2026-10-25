@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../onboarding/how_it_works_sheet.dart';
+import '../onboarding/onboarding_screen.dart';
+import '../onboarding/onboarding_store.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -55,6 +58,24 @@ class HomeScreen extends StatelessWidget {
                icon: const Icon(Icons.info_outline_rounded),
                label: const Text('Sobre o Mão na Roda'),
              ),
+             if (kDebugMode)
+               TextButton.icon(
+                 onPressed: () async {
+                   await OnboardingStore().reset();
+                   if (!context.mounted) return;
+                   Navigator.of(context).pushReplacement(
+                     MaterialPageRoute<void>(
+                       builder: (_) => OnboardingScreen(onComplete: () {
+                         Navigator.of(context).pushReplacement(
+                           MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
+                         );
+                       }),
+                     ),
+                   );
+                 },
+                 icon: const Icon(Icons.restart_alt_rounded),
+                 label: const Text('Resetar onboarding (debug)'),
+               ),
              const SizedBox(height: 24),
             Text(
               'Versão inicial em desenvolvimento',
