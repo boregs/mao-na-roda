@@ -1,5 +1,8 @@
-package com.maonaroda.api.rotas;
+package com.maonaroda.api.controller;
 
+import com.maonaroda.api.rotas.ConsultaRota;
+import com.maonaroda.api.service.GoogleRoutesService;
+import com.maonaroda.api.rotas.RotaBase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -11,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 public class RotasController {
     private final GoogleRoutesService service;
 
-    public RotasController(GoogleRoutesService service) { this.service = service; }
+    public RotasController(GoogleRoutesService service) {
+        this.service = service;
+    }
 
     @PostMapping("/base")
     @Operation(summary = "Consulta uma rota-base a pé, sem avaliar acessibilidade",
@@ -23,5 +28,7 @@ public class RotasController {
                                     {"origem":{"endereco":"Estação de Metrô Carrão, São Paulo, SP, Brasil"},
                                      "destino":{"endereco":"UNICID, Rua Cesário Galeno, 448, Tatuapé, São Paulo, SP, Brasil"}}
                                     """))))
-    public RotaBase consultar(@RequestBody ConsultaRota consulta) { return service.consultar(consulta); }
+    public RotaBase consultar(@RequestBody ConsultaRota consulta) {
+        return service.consultar(consulta);
+    }
 }

@@ -3,7 +3,7 @@ package com.maonaroda.api.rotas;
 import java.util.Map;
 
 public record PontoRota(Double latitude, Double longitude, String endereco) {
-    Map<String, Object> waypoint() {
+    public Map<String, Object> waypoint() {
         if (endereco != null) {
             if (endereco.isBlank() || endereco.length() > 500 || latitude != null || longitude != null) {
                 throw new IllegalArgumentException("Informe um endereço de até 500 caracteres ou latitude e longitude, sem misturar os formatos.");

@@ -1,5 +1,6 @@
 package com.maonaroda.api.rotas;
 
+import com.maonaroda.api.controller.RotasController;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
