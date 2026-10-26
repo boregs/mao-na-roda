@@ -20,7 +20,7 @@ Desde então, a proposta evoluiu e passou a investigar como informações sobre 
 |---|---|---|
 | **Arthur** | https://www.linkedin.com/in/arthur-oshiro-b81392341/ | Administrador do banco de dados |
 | **Guilherme** | https://www.linkedin.com/in/luiz-guilherme-rom%C3%A3o-85646b35b/ | Desenvolvedor UI/UX do aplicativo |
-| **Felipe** | https://github.com/Triplof | Desenvolvedor da API |
+| **Felipe** | https://www.linkedin.com/in/felipe-filho-3574a4173/ | Desenvolvedor da API |
 | **Pablo** | https://www.linkedin.com/in/pablo-calegari-997a40234/ | Desenvolvedor das funcionalidades do aplicativo |
 | **Rafael** | https://www.linkedin.com/in/rafaelboregs/ | Líder e auxílio geral |
 
