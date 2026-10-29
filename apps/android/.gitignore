@@ -1,0 +1,17 @@
+# Gradle e arquivos gerados pelo Android Studio
+.gradle/
+**/build/
+.idea/
+*.iml
+.cxx/
+.externalNativeBuild/
+captures/
+
+# Configuração local e credenciais
+local.properties
+*.jks
+*.keystore
+*.hprof
+
+# O Gradle Wrapper é necessário para compilar o projeto.
+!gradle/wrapper/gradle-wrapper.jar
