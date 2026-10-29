@@ -1,6 +1,6 @@
 # Tech Stack – Mão na Roda
 
-> **Versão do documento:** 0.4 <br>
+> **Versão do documento:** 0.5 <br>
 > **Data:** 15/10/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md)
 
@@ -18,7 +18,7 @@ A arquitetura da V1 prioriza uma implementação viável para uma equipe pequena
 
 ```mermaid
 flowchart LR
-    U[Pessoa usuária] --> A[Aplicativo Flutter]
+    U[Pessoa usuária] --> A[Aplicativo Android nativo]
     A --> L[Serviço de localização do dispositivo]
     A --> M[Serviço de mapas e rotas]
     A --> B[API Java / Spring Boot]
@@ -30,7 +30,7 @@ flowchart LR
 
 | Componente | Responsabilidade |
 |---|---|
-| Aplicativo Flutter | Exibir mapa, receber ações da pessoa usuária, solicitar permissões, apresentar rotas e permitir o envio de relatos. |
+| Aplicativo Android nativo | Exibir mapa, receber ações da pessoa usuária, solicitar permissões, apresentar rotas e permitir o envio de relatos. |
 | API Java | Aplicar regras de negócio, calcular a classificação das barreiras, proteger operações autenticadas e integrar os serviços necessários. |
 | Supabase | Fornecer PostgreSQL gerenciado, autenticação de contas e armazenamento das fotos enviadas em relatos. |
 | Serviço de mapas e rotas | Fornecer mapa, busca de destinos, geocodificação e rotas-base entre origem e destino. |
@@ -41,17 +41,17 @@ flowchart LR
 
 | Camada | Tecnologia | Papel no projeto | Status |
 |---|---|---|---|
-| Aplicativo móvel | Flutter e Dart | Desenvolver o aplicativo exclusivamente para Android, com interface acessível e suporte a localização. | Aprovado |
+| Aplicativo móvel | Android nativo, Java e layouts XML | Desenvolver a interface Android com AndroidX e Material Components, com acessibilidade e suporte futuro a localização. | Em desenvolvimento |
 | Backend | Java com Spring Boot | Expor a API REST e centralizar as regras de rotas, relatos, contas e autorização. | Aprovado |
 | API | REST com JSON | Permitir a comunicação entre o aplicativo e o backend. | Aprovado |
 | Banco de dados | PostgreSQL, gerenciado pelo Supabase | Armazenar contas, perfis de mobilidade, relatos, confirmações futuras e dados de acessibilidade. | Aprovado |
 | Autenticação | Supabase Auth | Criar contas, iniciar sessões e emitir tokens para acesso às operações autenticadas. | Aprovado |
 | Armazenamento de fotos | Supabase Storage | Armazenar imagens anexadas aos relatos e removê-las após o prazo definido para contas excluídas. | Aprovado |
 | Mapas, busca e rotas-base | Provedor a definir | Exibir mapa, localizar endereços e obter rotas entre dois pontos. | Pendente de validação |
-| Localização | Recursos do dispositivo via pacote Flutter | Obter a localização atual somente após consentimento. | Aprovado |
+| Localização | APIs de localização do Android | Obter a localização atual somente após consentimento. | Aprovado |
 | Documentação da API | OpenAPI/Swagger | Descrever e testar os endpoints da API. | Aprovado |
 | Testes de backend | JUnit e Spring Boot Test | Validar regras de negócio, autenticação e endpoints. | Aprovado |
-| Testes do aplicativo | Flutter Test | Validar componentes e fluxos essenciais do aplicativo. | Aprovado |
+| Testes do aplicativo | JUnit e testes instrumentados Android | Validar componentes e fluxos essenciais do aplicativo. | Aprovado |
 | Versionamento e CI | GitHub e GitHub Actions | Versionar o código e executar verificações automatizadas em Pull Requests. | Aprovado |
 | Monitoramento de falhas | Logs estruturados; ferramenta a definir | Identificar erros da API e do aplicativo em ambiente de teste ou produção. | Futuro / a definir |
 
@@ -59,9 +59,9 @@ flowchart LR
 
 ## 4. Decisões de arquitetura
 
-### 4.1 Flutter no aplicativo Android
+### 4.1 Aplicativo Android nativo
 
-O Flutter será usado para construir exclusivamente o aplicativo Android da V1. Ele permite desenvolver a interface, acessar a localização do dispositivo e integrar mapas.
+O aplicativo da V1 é desenvolvido para Android nativo, usando Java para comportamento e layouts e estilos XML para a interface, com AndroidX e Material Components. A integração de mapas, busca, rotas, localização e autenticação continua pendente.
 
 O aplicativo não deve guardar segredos, chaves privadas ou dados sensíveis em texto legível. Tokens de sessão devem utilizar o mecanismo seguro disponível na plataforma, conforme os RNF08, RNF10, RNF16 e RNF19.
 
@@ -104,7 +104,7 @@ O projeto depende de um provedor de mapas para quatro funções distintas:
 3. Converter coordenadas em referências de local, quando necessário.
 4. Gerar rotas-base entre origem e destino.
 
-O provedor ainda será escolhido após um protótipo técnico. A escolha deve considerar custo, limite de uso, cobertura em São Paulo, qualidade da busca de endereços, compatibilidade com Flutter e termos de uso.
+O provedor ainda será escolhido após um protótipo técnico. A escolha deve considerar custo, limite de uso, cobertura em São Paulo, qualidade da busca de endereços, compatibilidade com Android nativo e termos de uso.
 
 > Uma rota-base fornecida por um serviço externo não será automaticamente considerada acessível. A API Java deverá combinar a rota-base com os dados de barreiras e o perfil de mobilidade para cumprir RN01 a RN04.
 
@@ -161,3 +161,4 @@ Para a V1, a infraestrutura será composta por:
 | 0.2 | 13/10/2026 | Aprovação da stack proposta. |
 | 0.3 | 13/10/2026 | Definição da retenção e do descarte automático de fotos no Supabase. |
 | 0.4 | 15/10/2026 | Aprovação da tech do CI/CD |
+| 0.5 | 28/10/2026 | Atualização da stack móvel para Android nativo com Java e XML. |

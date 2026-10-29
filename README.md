@@ -34,9 +34,9 @@ A árvore abaixo combina a documentação já conhecida com uma estrutura propos
 │   ├── ISSUE_TEMPLATE/                  # Modelos de issues, quando definidos
 │   └── pull_request_template.md         # Modelo de pull request
 ├── apps/
-│   ├── mobile/                          # Aplicativo Flutter
-│   │   ├── lib/                         # Código-fonte do aplicativo
-│   │   └── test/                        # Testes do aplicativo
+│   ├── android/                         # Aplicativo Android nativo
+│   │   ├── app/src/main/java/           # Código Java do aplicativo
+│   │   ├── app/src/main/res/            # Layouts, estilos e recursos XML
 │   └── api/                             # API Java com Spring Boot
 │       ├── src/
 │       │   ├── main/
@@ -52,7 +52,7 @@ A árvore abaixo combina a documentação já conhecida com uma estrutura propos
 │   ├── 02-regras-de-negocio.md
 │   ├── 03-requisitos.md
 │   ├── 05-tech-stack.md
-│   ├── 06-banco-de-dados-rascunho.md
+│   ├── 06-banco-de-dados.md
 │   └── diagrams/                        # Diagramas do projeto
 ├── CONTRIBUTING.md
 └── README.md
@@ -60,7 +60,7 @@ A árvore abaixo combina a documentação já conhecida com uma estrutura propos
 
 ### Responsabilidade de cada área
 
-- `apps/mobile/`: interface e funcionalidades executadas no aplicativo.
+- `apps/android/`: aplicativo Android nativo, com Java, layouts e estilos XML.
 - `apps/api/`: endpoints, autenticação/autorização, regras de negócio e integração com o banco e serviços externos.
 - `database/`: scripts de migração e dados iniciais do banco, quando a estratégia de migrations for definida.
 - `docs/`: visão, regras, requisitos, decisões técnicas e diagramas.
@@ -72,7 +72,7 @@ A localização definitiva das migrations deve acompanhar a ferramenta escolhida
 
 As tecnologias documentadas atualmente incluem:
 
-- **Aplicativo:** Flutter.
+- **Aplicativo:** Android nativo, Java, XML, AndroidX e Material Components.
 - **API:** Java com Spring Boot.
 - **Banco de dados e autenticação:** Supabase.
 

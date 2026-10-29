@@ -34,7 +34,7 @@ Não se propõe tabela de histórico de rotas na V1. A RN18 proíbe persistir ro
 | `storage` | Gerenciado pelo Supabase Storage. Operar os arquivos pela API do Storage, sem manipular diretamente seus metadados por SQL. |
 | `app` | Schema confirmado para as tabelas do domínio, acessado pela API Java. |
 
-A estratégia definida é que a API Java acesse o banco por conexão JDBC e que o Flutter não acesse diretamente as tabelas de domínio. Manter `app` fora dos schemas expostos pela Data API e avaliar a desativação da Data API para as tabelas próprias. Auth e Storage continuam sendo integrações distintas.
+A estratégia definida é que a API Java acesse o banco por conexão JDBC e que o aplicativo Android não acesse diretamente as tabelas de domínio. Manter `app` fora dos schemas expostos pela Data API e avaliar a desativação da Data API para as tabelas próprias. Auth e Storage continuam sendo integrações distintas.
 
 ## 3. Convenções
 
@@ -267,7 +267,7 @@ Remover a FK de autoria não garante, sozinho, anonimização: descrição e fot
 | Rotina de descarte | Privilégios limitados à limpeza necessária e acesso ao Storage mantido somente no servidor. |
 | Responsável por migrations | Papel administrativo separado da aplicação em execução. |
 
-Se tabelas forem expostas via Data API, aplicar grants mínimos e RLS a cada tabela. RLS não protege chamadas que usam privilégios de bypass. Chaves `service_role`/secret não devem chegar ao Flutter, e chamadas privilegiadas precisam de autorização explícita na API.
+Se tabelas forem expostas via Data API, aplicar grants mínimos e RLS a cada tabela. RLS não protege chamadas que usam privilégios de bypass. Chaves `service_role`/secret não devem chegar ao aplicativo Android, e chamadas privilegiadas precisam de autorização explícita na API.
 
 Na conexão JDBC com papel compartilhado, o contexto do usuário Auth não é propagado automaticamente para `auth.uid()`. Não presumir que políticas com essa função protegerão consultas JDBC sem uma estratégia de contexto e privilégios validada.
 
