@@ -1,0 +1,34 @@
+<resources>
+  <style name="MaoText.Body" parent="MaoText.BodyBase">
+    <item name="android:lineHeight">28sp</item>
+    <item name="lineHeight">28sp</item>
+  </style>
+  <style name="MaoText.Heading" parent="MaoText.HeadingBase">
+    <item name="android:lineHeight">44sp</item>
+    <item name="lineHeight">44sp</item>
+  </style>
+  <style name="MaoText.Section" parent="MaoText.SectionBase">
+    <item name="android:lineHeight">34sp</item>
+    <item name="lineHeight">34sp</item>
+  </style>
+  <style name="MaoText.Card" parent="MaoText.CardBase">
+    <item name="android:lineHeight">28sp</item>
+    <item name="lineHeight">28sp</item>
+  </style>
+  <style name="MaoText.Meta" parent="MaoText.MetaBase">
+    <item name="android:lineHeight">26sp</item>
+    <item name="lineHeight">26sp</item>
+  </style>
+  <style name="MaoText.Footer" parent="MaoText.FooterBase">
+    <item name="android:lineHeight">24sp</item>
+    <item name="lineHeight">24sp</item>
+  </style>
+  <style name="MaoText.Welcome" parent="MaoText.WelcomeBase">
+    <item name="android:lineHeight">54sp</item>
+    <item name="lineHeight">54sp</item>
+  </style>
+  <style name="MaoText.InputLabel" parent="MaoText.InputLabelBase">
+    <item name="android:lineHeight">22sp</item>
+    <item name="lineHeight">22sp</item>
+  </style>
+</resources>
