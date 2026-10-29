@@ -1,0 +1,4 @@
+Material Icons by Google, https://github.com/google/material-design-icons
+Licensed under the Apache License, Version 2.0; see Material-Icons-Apache-2.0.txt.
+The accessible_forward, history and info icons from the rounded set were
+converted from their original 24px SVG files to Android VectorDrawable XML.

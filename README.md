@@ -20,7 +20,7 @@ Desde então, a proposta evoluiu e passou a investigar como informações sobre 
 |---|---|---|
 | **Arthur** | https://www.linkedin.com/in/arthur-oshiro-b81392341/ | Administrador do banco de dados |
 | **Guilherme** | https://www.linkedin.com/in/luiz-guilherme-rom%C3%A3o-85646b35b/ | Desenvolvedor UI/UX do aplicativo |
-| **Felipe** | https://github.com/Triplof | Desenvolvedor da API |
+| **Felipe** | https://www.linkedin.com/in/felipe-filho-3574a4173/ | Desenvolvedor da API |
 | **Pablo** | https://www.linkedin.com/in/pablo-calegari-997a40234/ | Desenvolvedor das funcionalidades do aplicativo |
 | **Rafael** | https://www.linkedin.com/in/rafaelboregs/ | Líder e auxílio geral |
 
@@ -34,11 +34,9 @@ A árvore abaixo representa a estrutura atual do repositório.
 │   ├── ISSUE_TEMPLATE/                  # Modelos de issues
 │   └── pull_request_template.md         # Modelo de pull request
 ├── apps/
-│   ├── mobile/                          # Aplicativo Flutter
-│   │   ├── android/                      # Projeto Android
-│   │   ├── assets/                       # Fontes e recursos
-│   │   ├── lib/                         # Código-fonte do aplicativo
-│   │   └── test/                         # Testes do aplicativo
+│   ├── android/                         # Aplicativo Android nativo
+│   │   ├── app/src/main/java/           # Código Java do aplicativo
+│   │   └── app/src/main/res/            # Layouts, estilos e recursos XML
 │   └── api/                             # API Java com Spring Boot
 │       ├── database/                    # Documentação e testes do banco
 │       ├── src/
@@ -57,14 +55,15 @@ A árvore abaixo representa a estrutura atual do repositório.
 │   ├── 03-requisitos.md
 │   ├── 04-casos-de-uso.md
 │   ├── 05-tech-stack.md
-│   └── 06-banco-de-dados.md
+│   ├── 06-banco-de-dados.md
+│   └── diagrams/                        # Diagramas do projeto
 ├── CONTRIBUTING.md
 └── README.md
 ```
 
 ### Responsabilidade de cada área
 
-- `apps/mobile/`: interface e funcionalidades executadas no aplicativo Android.
+- `apps/android/`: aplicativo Android nativo, com Java, layouts e estilos XML.
 - `apps/api/`: endpoints, autenticação/autorização, regras de negócio e integração com o banco e serviços externos.
 - `apps/api/src/main/resources/db/migration/`: migrations Flyway para PostgreSQL/PostGIS e carga inicial da matriz de barreiras.
 - `apps/api/database/`: documentação operacional do banco e testes SQL locais.
@@ -76,7 +75,7 @@ A árvore abaixo representa a estrutura atual do repositório.
 
 As tecnologias documentadas atualmente incluem:
 
-- **Aplicativo:** Flutter.
+- **Aplicativo:** Android nativo, Java, XML, AndroidX e Material Components.
 - **API:** Java com Spring Boot.
 - **Banco de dados:** PostgreSQL com PostGIS, hospedado no Supabase.
 - **Autenticação e armazenamento:** Supabase Auth e Supabase Storage.
@@ -86,7 +85,7 @@ Consulte [`docs/05-tech-stack.md`](docs/05-tech-stack.md) para decisões e pend�
 
 ## Documentação
 
-- [Aplicativo mobile](apps/mobile/README.md)
+- [Aplicativo Android](apps/android/README.md)
 - [API](apps/api/README.md)
 - [Banco de dados e migrations](apps/api/database/README.md)
 - [Visão de negócio](docs/01-visao-de-negocio.md)
