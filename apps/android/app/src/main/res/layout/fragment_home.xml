@@ -1,24 +1,142 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/paper">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="250dp" android:gravity="center" android:orientation="vertical" android:padding="32dp">
-        <ImageView android:layout_width="64dp" android:layout_height="64dp" android:src="@drawable/ic_map" android:contentDescription="@null" app:tint="@color/supporting" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center" android:text="Mapa em preparação" style="@style/MaoText.Section" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:text="O mapa e a busca de lugares ainda não estão disponíveis." android:textAppearance="@style/MaoText.Meta" />
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/paper">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp">
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_map"
+            android:contentDescription="@null"
+            app:tint="@color/supporting" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Mapa em preparação"
+            style="@style/MaoText.Section" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="O mapa e a busca de lugares ainda não estão disponíveis."
+            android:textAppearance="@style/MaoText.Meta" />
     </LinearLayout>
-    <androidx.core.widget.NestedScrollView android:id="@+id/map_panel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_marginEnd="12dp" android:layout_marginBottom="12dp" android:fillViewport="true" android:background="@drawable/bg_map_panel" android:elevation="8dp" app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" app:behavior_hideable="false" app:behavior_fitToContents="true" app:behavior_peekHeight="124dp">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingBottom="24dp">
-            <FrameLayout android:id="@+id/panel_toggle" android:layout_width="match_parent" android:layout_height="48dp" android:clickable="true" android:focusable="true" android:contentDescription="Expandir painel" android:foreground="?attr/selectableItemBackground">
-                <View android:layout_width="40dp" android:layout_height="4dp" android:layout_gravity="center" android:background="@drawable/bg_sheet_handle" />
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/map_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
+        android:fillViewport="true"
+        android:background="@drawable/bg_map_panel"
+        android:elevation="8dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="false"
+        app:behavior_fitToContents="true"
+        app:behavior_peekHeight="124dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp">
+            <FrameLayout
+                android:id="@+id/panel_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Expandir painel"
+                android:foreground="?attr/selectableItemBackground">
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_sheet_handle" />
             </FrameLayout>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="64dp" android:gravity="center_vertical" android:orientation="horizontal">
-                <com.google.android.material.button.MaterialButton android:id="@+id/search" style="@style/Widget.MaoButton.Outlined" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Buscar destino" app:icon="@drawable/ic_search" app:iconGravity="textStart" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/account" style="@style/Widget.Material3.Button.IconButton.Filled" android:layout_width="56dp" android:layout_height="56dp" android:layout_marginStart="8dp" android:contentDescription="Conta" app:icon="@drawable/ic_account" app:iconTint="@color/on_ocean" app:backgroundTint="@color/ocean" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/search"
+                    style="@style/Widget.MaoButton.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Buscar destino"
+                    app:icon="@drawable/ic_search"
+                    app:iconGravity="textStart" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/account"
+                    style="@style/Widget.Material3.Button.IconButton.Filled"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="Conta"
+                    app:icon="@drawable/ic_account"
+                    app:iconTint="@color/on_ocean"
+                    app:backgroundTint="@color/ocean" />
             </LinearLayout>
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="40dp" android:drawableStart="@drawable/ic_material_accessible_forward" android:drawablePadding="12dp" android:drawableTint="@color/ocean" android:text="Sua mobilidade" style="@style/MaoText.Section" />
-            <TextView android:id="@+id/profile_summary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textAppearance="@style/MaoText.Meta" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/profile" style="@style/Widget.MaoButton.Text" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="start|center_vertical" android:text="Escolher necessidade de mobilidade" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="40dp" android:drawableStart="@drawable/ic_material_history" android:drawablePadding="12dp" android:drawableTint="@color/ocean" android:text="Locais recentes" style="@style/MaoText.Section" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Seus destinos recentes aparecerão aqui." android:textAppearance="@style/MaoText.Meta" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/about" style="@style/Widget.MaoButton.Text" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="32dp" android:text="Como funciona" app:icon="@drawable/ic_material_info" app:iconGravity="textStart" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:drawableStart="@drawable/ic_material_accessible_forward"
+                android:drawablePadding="12dp"
+                android:drawableTint="@color/ocean"
+                android:text="Sua mobilidade"
+                style="@style/MaoText.Section" />
+            <TextView
+                android:id="@+id/profile_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="@style/MaoText.Meta" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/profile"
+                style="@style/Widget.MaoButton.Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="Escolher necessidade de mobilidade" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:drawableStart="@drawable/ic_material_history"
+                android:drawablePadding="12dp"
+                android:drawableTint="@color/ocean"
+                android:text="Locais recentes"
+                style="@style/MaoText.Section" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Seus destinos recentes aparecerão aqui."
+                android:textAppearance="@style/MaoText.Meta" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/about"
+                style="@style/Widget.MaoButton.Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Como funciona"
+                app:icon="@drawable/ic_material_info"
+                app:iconGravity="textStart" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
