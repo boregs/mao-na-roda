@@ -27,8 +27,9 @@ public class UsuarioController {
     }
 
     @PatchMapping
-    public void atualizar(@AuthenticationPrincipal Jwt jwt,
-                          @RequestBody UsuarioModel model) {
+    public void atualizar(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody UsuarioModel model) {
         service.atualizar(id(jwt), model, null);
     }
 
