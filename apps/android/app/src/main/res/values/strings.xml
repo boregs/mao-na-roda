@@ -1,1 +1,33 @@
-<resources><string name="app_name">Mão na Roda</string><string name="version_dev">Versão inicial em desenvolvimento</string><string name="onboarding_title">Seu caminho,\nsuas condições.</string><string name="onboarding_body">Rotas considerando suas necessidades de mobilidade e as condições do caminho.</string><string name="continue_guest">Continuar sem conta</string><string name="create_account">Criar conta</string><string name="sign_in_link">Já tenho conta · Entrar</string><string name="how_it_works">Como funciona</string><string name="close">Fechar</string><string name="back">Voltar</string><string name="home_title">Rotas mais acessíveis para você</string><string name="home_body">Encontre caminhos considerando as condições de acessibilidade e as barreiras relatadas por outras pessoas.</string><string name="start_search">Comece sua busca</string><string name="route_unavailable">A consulta de rotas estará disponível nesta etapa do desenvolvimento.</string><string name="consult_route">Consultar rota</string><string name="about_app">Sobre o Mão na Roda</string><string name="sign_in">Entrar</string><string name="auth_create_title">Faça parte de uma mobilidade mais acessível.</string><string name="auth_signin_title">Que bom ter você de volta.</string><string name="auth_create_body">Uma conta permite enviar relatos e guardar suas preferências.</string><string name="auth_signin_body">Entre para acessar sua conta.</string><string name="name">Nome</string><string name="surname">Sobrenome</string><string name="email">E-mail</string><string name="password">Senha</string><string name="forgot_password">Esqueci minha senha</string><string name="auth_unavailable">A autenticação ainda não está conectada ao serviço.</string><string name="auth_note">A autenticação usa um serviço seguro de contas do app.</string><string name="show_password">Mostrar senha</string><string name="hide_password">Ocultar senha</string><string name="loading">Carregando</string></resources>
+<resources>
+    <string name="app_name">Mão na Roda</string>
+    <string name="version_dev">Versão inicial em desenvolvimento</string>
+    <string name="onboarding_title">Seu caminho,\nsuas condições.</string>
+    <string name="onboarding_body">Rotas considerando suas necessidades de mobilidade e as condições do caminho.</string>
+    <string name="continue_guest">Continuar sem conta</string>
+    <string name="create_account">Criar conta</string>
+    <string name="sign_in_link">Já tenho conta · Entrar</string>
+    <string name="how_it_works">Como funciona</string>
+    <string name="close">Fechar</string>
+    <string name="back">Voltar</string>
+    <string name="home_title">Rotas mais acessíveis para você</string>
+    <string name="home_body">Encontre caminhos considerando as condições de acessibilidade e as barreiras relatadas por outras pessoas.</string>
+    <string name="start_search">Comece sua busca</string>
+    <string name="route_unavailable">A consulta de rotas estará disponível nesta etapa do desenvolvimento.</string>
+    <string name="consult_route">Consultar rota</string>
+    <string name="about_app">Sobre o Mão na Roda</string>
+    <string name="sign_in">Entrar</string>
+    <string name="auth_create_title">Faça parte de uma mobilidade mais acessível.</string>
+    <string name="auth_signin_title">Que bom ter você de volta.</string>
+    <string name="auth_create_body">Uma conta permite enviar relatos e guardar suas preferências.</string>
+    <string name="auth_signin_body">Entre para acessar sua conta.</string>
+    <string name="name">Nome</string>
+    <string name="surname">Sobrenome</string>
+    <string name="email">E-mail</string>
+    <string name="password">Senha</string>
+    <string name="forgot_password">Esqueci minha senha</string>
+    <string name="auth_unavailable">A autenticação ainda não está conectada ao serviço.</string>
+    <string name="auth_note">A autenticação usa um serviço seguro de contas do app.</string>
+    <string name="show_password">Mostrar senha</string>
+    <string name="hide_password">Ocultar senha</string>
+    <string name="loading">Carregando</string>
+</resources>
