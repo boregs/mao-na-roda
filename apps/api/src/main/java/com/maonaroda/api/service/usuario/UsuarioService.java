@@ -20,13 +20,13 @@ public class UsuarioService {
 
     public void atualizar(UUID authUserId, UsuarioModel model, UUID profileUuid) {
         if (repository.update(authUserId, model, profileUuid) != 1) {
-            throw new IllegalArgumentException("Usuário ou perfil não encontrado");
+            throw new UsuarioNaoEncontradoException();
         }
     }
 
     public void iniciarExclusao(UUID authUserId) {
         if (repository.markDeleting(authUserId) != 1) {
-            throw new IllegalArgumentException("Usuário não encontrado");
+            throw new UsuarioNaoEncontradoException();
         }
     }
 }
