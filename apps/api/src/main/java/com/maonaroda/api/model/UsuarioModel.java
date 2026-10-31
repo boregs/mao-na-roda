@@ -10,9 +10,9 @@ public record UsuarioModel(
         UUID authUserId,
         String nome,
         String sobrenome,
+        String email,
         Long perfilMobilidadeId,
         String estadoConta,
-        String email,
         @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String senha) {
 
     public UsuarioModel(String nome, String sobrenome) {
