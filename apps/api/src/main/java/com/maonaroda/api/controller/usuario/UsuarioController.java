@@ -1,6 +1,7 @@
 package com.maonaroda.api.controller.usuario;
 
 import com.maonaroda.api.model.CriarUsuarioRequest;
+import com.maonaroda.api.model.AtualizarUsuarioRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +29,9 @@ public class UsuarioController {
     }
 
     @PatchMapping
-    public ResponseEntity<Void> atualizar(@AuthenticationPrincipal Jwt jwt, @RequestBody UsuarioModel model) {
+    public ResponseEntity<Void> atualizar(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AtualizarUsuarioRequest request) {
         UUID usuarioId = id(jwt);
-        if (model.nome() == null || model.nome().isBlank() || model.nome().length() > 100
-                || model.sobrenome() == null || model.sobrenome().isBlank() || model.sobrenome().length() > 100) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe nome e sobrenome de até 100 caracteres.");
-        }
-        service.atualizar(usuarioId, model, null);
+        service.atualizar(usuarioId, new UsuarioModel(request.nome(), request.sobrenome()), request.perfilMobilidadeUuid());
         return ResponseEntity.noContent().build();
     }
 

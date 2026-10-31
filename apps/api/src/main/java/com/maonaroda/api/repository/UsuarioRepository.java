@@ -26,6 +26,13 @@ public class UsuarioRepository {
     }
 
     public int update(UUID authUserId, UsuarioModel model, UUID profileUuid) {
+        if (profileUuid == null) {
+            return jdbc.update(
+                    "UPDATE app.usuarios SET nome = ?, sobrenome = ? "
+                            + "WHERE auth_user_id = ? AND estado_conta = 'ativa'",
+                    model.nome().trim(), model.sobrenome().trim(), authUserId);
+        }
+
         return jdbc.update(
                 "UPDATE app.usuarios "
                         + "SET nome = ?, sobrenome = ?, "
@@ -33,11 +40,19 @@ public class UsuarioRepository {
                         + "SELECT id FROM app.perfis_mobilidade "
                         + "WHERE uuid = ? AND ativo) "
                         + "WHERE auth_user_id = ? "
-                        + "AND estado_conta = 'ativa'",
+                        + "AND estado_conta = 'ativa' "
+                        + "AND EXISTS (SELECT 1 FROM app.perfis_mobilidade WHERE uuid = ? AND ativo)",
                 model.nome().trim(),
                 model.sobrenome().trim(),
                 profileUuid,
-                authUserId);
+                authUserId,
+                profileUuid);
+    }
+
+    public boolean perfilAtivo(UUID profileUuid) {
+        return Boolean.TRUE.equals(jdbc.queryForObject(
+                "SELECT EXISTS (SELECT 1 FROM app.perfis_mobilidade WHERE uuid = ? AND ativo)",
+                Boolean.class, profileUuid));
     }
 
     public int markDeleting(UUID authUserId) {

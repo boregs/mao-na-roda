@@ -1,6 +1,7 @@
 package com.maonaroda.api.service.usuario;
 
 import com.maonaroda.api.model.UsuarioModel;
+import com.maonaroda.api.exception.perfil.PerfilMobilidadeInvalidoException;
 import com.maonaroda.api.exception.usuario.UsuarioNaoEncontradoException;
 import com.maonaroda.api.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class UsuarioService {
     }
 
     public void atualizar(UUID authUserId, UsuarioModel model, UUID profileUuid) {
+        if (profileUuid != null && !repository.perfilAtivo(profileUuid)) {
+            throw new PerfilMobilidadeInvalidoException();
+        }
         if (repository.update(authUserId, model, profileUuid) != 1) {
             throw new UsuarioNaoEncontradoException();
         }

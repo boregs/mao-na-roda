@@ -1,6 +1,7 @@
 package com.maonaroda.api.controller.usuario;
 
 import com.maonaroda.api.exception.usuario.UsuarioNaoEncontradoException;
+import com.maonaroda.api.exception.perfil.PerfilMobilidadeInvalidoException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -11,6 +12,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(assignableTypes = UsuarioController.class)
 public class UsuarioExceptionHandler {
+    @ExceptionHandler(PerfilMobilidadeInvalidoException.class)
+    ResponseEntity<ProblemDetail> perfilInvalido() {
+        return ResponseEntity.badRequest().body(ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "Perfil de mobilidade inexistente ou inativo."));
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ProblemDetail> jsonInvalido() {
         return ResponseEntity.badRequest()
