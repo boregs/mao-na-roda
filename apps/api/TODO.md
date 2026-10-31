@@ -4,10 +4,12 @@ A API está pronta para testes isolados do controller, mas ainda precisa dos
 itens abaixo para testes de ponta a ponta dos endpoints existentes de usuários
 e rotas.
 
-Na verificação realizada em 31/10/2026 com `mvnw verify`, foram executados
-19 testes: 7 passaram e 12 apresentaram erros porque o Spring não conseguiu
-inicializar o DataSource. Os testes isolados do controller substituem o serviço
-e o principal JWT; eles não validam a persistência nem a autenticação completa.
+Na verificação mais recente, em 31/10/2026 com `mvnw verify`, foram executados
+27 testes: 18 passaram e 9 falharam por receber HTTP 401 nos testes de integração.
+O H2 está disponível somente nos testes; não configura o PostgreSQL da aplicação.
+Os 15 testes isolados de controller e repository passaram. O controller substitui
+o serviço e o principal JWT; o repository usa um schema mínimo em H2, sem executar
+as migrations PostgreSQL/PostGIS nem validar a autenticação completa.
 
 ## P0 — Bloqueadores
 
@@ -16,6 +18,8 @@ e o principal JWT; eles não validam a persistência nem a autenticação comple
   o Spring JDBC. Preparar um banco de testes, executar as migrations e criar
   o login da aplicação com as permissões necessárias.
   **Critério de conclusão:** a API inicia e consegue consultar `app.usuarios`.
+  **Progresso:** `.env.example` contém as três propriedades JDBC. Ainda faltam
+  provisionamento e validação com o PostgreSQL do ambiente de testes.
 
 - [ ] **Configurar a autenticação.** Definir explicitamente a cadeia de filtros
   de segurança, a verificação dos tokens JWT, as regras de acesso aos endpoints
@@ -30,26 +34,32 @@ e o principal JWT; eles não validam a persistência nem a autenticação comple
   **Critério de conclusão:** a criação persiste o usuário, retorna HTTP 201
   e trata contas duplicadas de forma previsível.
 
-- [ ] **Corrigir a atualização do perfil de mobilidade.** O controller sempre
-  passa `null` como `profileUuid`, e o repository grava esse valor em
-  `perfil_mobilidade_id`. Assim, atualizar o nome remove o perfil existente.
+- [x] **Corrigir a atualização do perfil de mobilidade.** O PATCH usa um DTO
+  próprio e aceita `perfilMobilidadeUuid`. Omitir o campo ou enviar `null`
+  preserva o perfil atual. UUID malformado, perfil inexistente ou inativo
+  retorna HTTP 400; dados inválidos não alteram o registro.
   **Critério de conclusão:** atualizar nomes preserva o perfil; uma alteração
   explícita de perfil valida o UUID e verifica se o perfil está ativo.
+  **Validação:** testes HTTP e JDBC cobrem preservação, troca de perfil,
+  rejeição de perfis inválidos, isolamento entre usuários e conta em exclusão.
 
 - [ ] **Preparar um ambiente repetível de testes de integração.** Os testes
-  existentes não possuem configuração de DataSource de teste nem preparação
-  da autenticação.
+  de integração ainda precisam de um DataSource PostgreSQL de teste e da
+  preparação da autenticação.
   **Critério de conclusão:** `mvnw verify` passa usando um banco isolado para
   testes e com a segurança habilitada.
+  **Progresso:** testes JDBC isolados em H2 adicionados. A suíte completa
+  ainda não passa: falta configurar autenticação e testes com PostgreSQL/PostGIS.
 
 ## P1 — Contratos e cobertura funcional
 
-- [ ] **Separar os DTOs de entrada e saída.** O PATCH recebe `UsuarioModel`,
-  incluindo identidade, estado da conta, e-mail e senha, embora a operação não
-  utilize esses campos. O GET preenche somente nome e sobrenome, apesar de
-  expor um modelo maior.
+- [ ] **Concluir a separação dos DTOs de entrada e saída.** O PATCH já possui
+  um DTO próprio. O GET ainda preenche somente nome e sobrenome, apesar de
+  expor um modelo maior com campos de identidade, estado da conta e credenciais.
   **Critério de conclusão:** os campos aceitos e retornados correspondem ao
   contrato documentado; o comportamento de campos omitidos no PATCH está definido.
+  **Progresso:** PATCH separado em `AtualizarUsuarioRequest`; nome e sobrenome
+  continuam obrigatórios. Revisão do DTO de saída e dos demais endpoints pendente.
 
 - [ ] **Definir o comportamento da exclusão de conta.** O DELETE apenas altera
   o estado da conta. Definir se o escopo dos testes cobre essa transição ou a

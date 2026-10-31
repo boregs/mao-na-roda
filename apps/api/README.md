@@ -84,8 +84,8 @@ SPRING_DATASOURCE_USERNAME=USUARIO_DA_API
 SPRING_DATASOURCE_PASSWORD=SENHA_DO_USUARIO_DA_API
 ```
 
-`DATABASE_PASSWORD` no exemplo existente não configura o DataSource do Spring
-automaticamente. Use as propriedades acima para a aplicação. As credenciais
+`DATABASE_PASSWORD`, caso exista em um `.env` antigo, não configura o DataSource
+do Spring automaticamente. Use as propriedades acima para a aplicação. As credenciais
 administrativas de migration são separadas: consulte
 [database/README.md](database/README.md) antes de aplicar o schema e as permissões.
 `spring-boot:run` e `verify` não executam migrations.
@@ -190,10 +190,39 @@ do modelo, dependências, configuração das credenciais e comandos de aplicaç�
 ## Verificar e empacotar
 
 Validação em 31/10/2026: `compile` passou com Maven 3.9.11 e JDK 26,
-gerando bytecode Java 25. `verify` encontrou 12 erros ao carregar o contexto
-Spring por falta de configuração do DataSource (`Failed to determine a suitable
-driver class`). Os testes ainda precisam de uma configuração de banco de teste
-e da adequação à segurança atual; não há um perfil de teste isolado configurado.
+gerando bytecode Java 25. Os 15 testes isolados de controller/repository passam.
+O repository usa um schema mínimo em H2, disponível apenas no escopo de testes;
+isso não valida as migrations PostgreSQL/PostGIS nem configura o banco real.
+Na suíte completa, `verify` executou 27 testes, com 18 aprovados e 9 falhas por
+HTTP 401. A configuração de segurança e os testes de integração com PostgreSQL
+continuam pendentes; veja [TODO.md](TODO.md).
+
+Para executar somente os testes isolados, sem credenciais externas:
+
+```powershell
+.\mvnw.cmd "-Dtest=UsuarioControllerTests,UsuarioRepositoryTests" test
+```
+
+### Atualizar nome e perfil de mobilidade
+
+O contrato de `PATCH /api/v1/usuarios/me` usa nome e sobrenome obrigatórios
+(não vazios, com até 100 caracteres) e um UUID de perfil opcional:
+
+```json
+{
+  "nome": "Ana",
+  "sobrenome": "Silva",
+  "perfilMobilidadeUuid": "00000000-0000-0000-0000-000000000001"
+}
+```
+
+Use o UUID de um perfil ativo de `app.perfis_mobilidade`. Omitir
+`perfilMobilidadeUuid` ou enviar `null` preserva o perfil existente; este
+contrato não permite removê-lo. O endpoint retorna 204 após atualizar, 400
+para dados/perfil inválidos e 404 para usuário ausente ou fora do estado ativo.
+O acesso exige autenticação, cuja configuração completa ainda está pendente.
+
+### Executar a verificação completa e o JAR
 
 ```powershell
 .\mvnw.cmd verify
