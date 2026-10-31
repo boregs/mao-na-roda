@@ -1,4 +1,4 @@
-package com.maonaroda.api.service.usuario;
+package com.maonaroda.api.exception.usuario;
 
 public class UsuarioNaoEncontradoException extends RuntimeException {
     public UsuarioNaoEncontradoException() {

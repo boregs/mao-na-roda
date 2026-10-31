@@ -1,5 +1,7 @@
 package com.maonaroda.api.rotas;
 
+import com.maonaroda.api.exception.rota.FalhaRota;
+
 import com.maonaroda.api.service.GoogleRoutesService;
 import com.sun.net.httpserver.HttpServer;
 import java.net.*;
@@ -160,7 +162,7 @@ class RotasIntegrationTests {
                 () -> service.consultar(new ConsultaRota(
                         new PontoRota(null, null, "Carrão"),
                         new PontoRota(null, null, "UNICID"))));
-        assertEquals(503, error.status.value());
+        assertEquals(503, error.getStatus().value());
         assertEquals(0, calls.get());
         service.close();
     }
@@ -186,7 +188,7 @@ class RotasIntegrationTests {
                     () -> service.consultar(new ConsultaRota(
                             new PontoRota(null, null, "Carrão"),
                             new PontoRota(null, null, "UNICID"))));
-            assertEquals(504, error.status.value());
+            assertEquals(504, error.getStatus().value());
         } finally {
             service.close();
             slow.stop(0);

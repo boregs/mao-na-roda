@@ -1,6 +1,7 @@
 package com.maonaroda.api.service.usuario;
 
 import com.maonaroda.api.model.UsuarioModel;
+import com.maonaroda.api.exception.usuario.UsuarioNaoEncontradoException;
 import com.maonaroda.api.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 

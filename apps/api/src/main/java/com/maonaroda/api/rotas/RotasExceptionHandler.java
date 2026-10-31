@@ -1,6 +1,7 @@
 package com.maonaroda.api.rotas;
 
 import com.maonaroda.api.controller.RotasController;
+import com.maonaroda.api.exception.rota.FalhaRota;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
@@ -9,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 public class RotasExceptionHandler {
     @ExceptionHandler(FalhaRota.class)
     ResponseEntity<ProblemDetail> falha(FalhaRota erro) {
-        return ResponseEntity.status(erro.status)
-                .body(ProblemDetail.forStatusAndDetail(erro.status, erro.getMessage()));
+        return ResponseEntity.status(erro.getStatus())
+                .body(ProblemDetail.forStatusAndDetail(erro.getStatus(), erro.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

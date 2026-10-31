@@ -1,6 +1,6 @@
 package com.maonaroda.api.controller.usuario;
 
-import com.maonaroda.api.service.usuario.UsuarioNaoEncontradoException;
+import com.maonaroda.api.exception.usuario.UsuarioNaoEncontradoException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;

@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.Map;
 
 import com.maonaroda.api.rotas.ConsultaRota;
-import com.maonaroda.api.rotas.FalhaRota;
+import com.maonaroda.api.exception.rota.FalhaRota;
 import com.maonaroda.api.rotas.RotaBase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
