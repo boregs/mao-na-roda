@@ -15,6 +15,17 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgis:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: maonaroda_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: teste-local-descartavel
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d maonaroda_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
     defaults:
       run:
         working-directory: apps/api
@@ -27,8 +38,26 @@ jobs:
           java-version: '25'
           cache: maven
           cache-dependency-path: apps/api/pom.xml
-      # Intentionally blocks deployment until the full suite passes.
+      - name: Prepare disposable PostGIS database
+        env:
+          PGPASSWORD: teste-local-descartavel
+        run: |
+          psql -h localhost -U postgres -d maonaroda_test -v ON_ERROR_STOP=1 -f database/tests/preparar-container.sql
+      - name: Migrate database and verify integrity
+        env:
+          FLYWAY_URL: jdbc:postgresql://localhost:5432/maonaroda_test
+          FLYWAY_USER: postgres
+          FLYWAY_PASSWORD: teste-local-descartavel
+          PGPASSWORD: teste-local-descartavel
+        run: |
+          sh mvnw --batch-mode --no-transfer-progress flyway:migrate flyway:validate
+          psql -h localhost -U postgres -d maonaroda_test -v ON_ERROR_STOP=1 -f database/tests/integridade.sql
+      # A suíte completa continua bloqueando a publicação.
       - name: Verify and package
+        env:
+          TEST_POSTGIS_URL: jdbc:postgresql://localhost:5432/maonaroda_test
+          TEST_POSTGIS_USER: postgres
+          TEST_POSTGIS_PASSWORD: teste-local-descartavel
         run: sh mvnw --batch-mode --no-transfer-progress verify
       - name: Package Beanstalk source bundle
         run: |
