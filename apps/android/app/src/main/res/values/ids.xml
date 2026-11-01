@@ -1,0 +1,7 @@
+<resources>
+    <item name="accessibility_original_text_size" type="id" />
+    <item name="accessibility_original_min_height" type="id" />
+    <item name="accessibility_original_text_color" type="id" />
+    <item name="accessibility_original_button_stroke_width" type="id" />
+    <item name="accessibility_original_button_stroke_color" type="id" />
+</resources>

@@ -33,5 +33,12 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.maonaroda.mao_na_roda.HomeFragment" />
+        android:name="com.maonaroda.mao_na_roda.HomeFragment">
+        <action
+            android:id="@+id/action_home_to_accessibility_profile"
+            app:destination="@id/accessibilityProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/accessibilityProfileFragment"
+        android:name="com.maonaroda.mao_na_roda.AccessibilityProfileFragment" />
 </navigation>
