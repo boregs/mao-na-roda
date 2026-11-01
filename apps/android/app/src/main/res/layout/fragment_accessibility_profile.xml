@@ -1,0 +1,188 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/paper"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="ifContentScrolls">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="28dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/profile_back"
+            style="@style/Widget.MaoButton.Text"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:contentDescription="Voltar para a tela inicial"
+            android:text="Voltar"
+            app:icon="@drawable/ic_arrow_back"
+            app:iconGravity="textStart"
+            app:iconTint="@color/ocean" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Seu perfil de acessibilidade"
+            android:textAppearance="@style/MaoText.Heading"
+            android:textColor="@color/ink" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Escolha as necessidades que descrevem sua experiência. Você pode selecionar mais de uma e alterar quando quiser."
+            android:textAppearance="@style/MaoText.Meta"
+            android:textColor="@color/supporting" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            style="@style/Widget.MaoCard">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:text="Mobilidade e acessibilidade"
+                    android:textAppearance="@style/MaoText.Card"
+                    android:textColor="@color/ink" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Selecione todas as opções que se aplicam."
+                    android:textAppearance="@style/MaoText.Meta"
+                    android:textColor="@color/supporting" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/profile_wheelchair"
+                    style="@style/MaoText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingVertical="8dp"
+                    android:text="Usuário de cadeira de rodas" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/profile_reduced_mobility"
+                    style="@style/MaoText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingVertical="8dp"
+                    android:text="Pessoa com mobilidade reduzida" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/profile_visual"
+                    style="@style/MaoText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingVertical="8dp"
+                    android:text="Pessoa com deficiência visual" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/profile_hearing"
+                    style="@style/MaoText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingVertical="8dp"
+                    android:text="Pessoa com deficiência auditiva" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/profile_other"
+                    style="@style/MaoText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingVertical="8dp"
+                    android:text="Outro perfil de acessibilidade" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/profile_none"
+                    style="@style/MaoText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingVertical="8dp"
+                    android:text="Nenhuma necessidade específica" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            style="@style/Widget.MaoCard">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:text="Preferências da interface"
+                    android:textAppearance="@style/MaoText.Card"
+                    android:textColor="@color/ink" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="As alterações são salvas neste dispositivo automaticamente."
+                    android:textAppearance="@style/MaoText.Meta"
+                    android:textColor="@color/supporting" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/preference_large_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:text="Aumentar tamanho dos textos"
+                    android:textAppearance="@style/MaoText.Body" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/preference_high_contrast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:text="Ativar alto contraste"
+                    android:textAppearance="@style/MaoText.Body" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/preference_large_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:text="Preferir botões maiores"
+                    android:textAppearance="@style/MaoText.Body" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/preference_reduce_motion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:text="Reduzir animações de navegação"
+                    android:textAppearance="@style/MaoText.Body" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/profile_saved_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center"
+            android:text="Preferências salvas neste dispositivo"
+            android:textAppearance="@style/MaoText.Meta"
+            android:textColor="@color/supporting" />
+    </LinearLayout>
+</ScrollView>
