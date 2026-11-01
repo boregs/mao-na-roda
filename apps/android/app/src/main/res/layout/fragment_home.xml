@@ -189,6 +189,16 @@
                 android:textAppearance="@style/MaoText.Meta"
                 android:textColor="@color/supporting" />
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/report_history"
+                style="@style/Widget.MaoButton.Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="start|center_vertical"
+                android:text="Meus relatos"
+                app:icon="@drawable/ic_material_history"
+                app:iconGravity="textStart" />
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/about"
                 style="@style/Widget.MaoButton.Text"
                 android:layout_width="match_parent"

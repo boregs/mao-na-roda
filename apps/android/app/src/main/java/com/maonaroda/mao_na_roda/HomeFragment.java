@@ -1,6 +1,5 @@
 package com.maonaroda.mao_na_roda;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +15,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class HomeFragment extends Fragment {
-    private static final String[] PROFILES = {
-            "Não informado", "Cadeira de rodas", "Muletas", "Outra necessidade de mobilidade"
-    };
-    private static final String[] PROFILE_KEYS = {"unspecified", "wheelchair", "crutches", "other"};
-    private SharedPreferences preferences;
     private TextView profileSummary;
 
     @Override
@@ -31,7 +25,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle state) {
         super.onViewCreated(view, state);
-        preferences = requireContext().getSharedPreferences("prefs", 0);
+        AccessibilityUi.apply(view, AccessibilityProfileStore.preferences(requireContext()));
         profileSummary = view.findViewById(R.id.profile_summary);
         updateProfile();
 
@@ -54,35 +48,30 @@ public class HomeFragment extends Fragment {
 
         view.findViewById(R.id.account).setOnClickListener(v -> showUnavailable(
                 "Conta", "A autenticação ainda não está conectada. O envio de relatos exigirá uma conta."));
-        view.findViewById(R.id.profile).setOnClickListener(v -> chooseProfile());
+        view.findViewById(R.id.profile).setOnClickListener(v -> {
+            boolean reduceMotion = AccessibilityProfileStore.preferences(requireContext())
+                    .getBoolean(AccessibilityProfileStore.REDUCE_MOTION_KEY, false);
+            int fade = reduceMotion ? 0 : R.anim.profile_fade;
+            androidx.navigation.NavOptions options = new androidx.navigation.NavOptions.Builder()
+                    .setEnterAnim(fade).setExitAnim(fade).setPopEnterAnim(fade).setPopExitAnim(fade)
+                    .build();
+            androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_home_to_accessibility_profile, null, options);
+        });
         view.findViewById(R.id.search).setOnClickListener(v -> showSearch());
-        view.findViewById(R.id.report_barrier).setOnClickListener(v -> showUnavailable(
-                "Relatar uma barreira", "O envio de relatos ainda não está disponível. Os novos relatos serão identificados como não validados."));
+        view.findViewById(R.id.report_barrier).setOnClickListener(v ->
+                androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_home_to_report_form));
+        view.findViewById(R.id.report_history).setOnClickListener(v ->
+                androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_home_to_report_history));
         view.findViewById(R.id.about).setOnClickListener(v -> HowItWorksSheet.show(getParentFragmentManager()));
     }
 
-    private int selectedProfile() {
-        String current = preferences.getString("mobility_profile", PROFILE_KEYS[0]);
-        for (int i = 0; i < PROFILE_KEYS.length; i++)
-            if (PROFILE_KEYS[i].equals(current))
-                return i;
-        return 0;
-    }
-
     private void updateProfile() {
-        profileSummary.setText(PROFILES[selectedProfile()]);
-    }
-
-    private void chooseProfile() {
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Sua mobilidade")
-                .setSingleChoiceItems(PROFILES, selectedProfile(), (dialog, which) -> {
-                    preferences.edit().putString("mobility_profile", PROFILE_KEYS[which]).apply();
-                    updateProfile();
-                    dialog.dismiss();
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
+        profileSummary.setText(AccessibilityProfileStore.summary(
+                AccessibilityProfileStore.loadProfiles(
+                        AccessibilityProfileStore.preferences(requireContext()))));
     }
 
     private void showSearch() {
