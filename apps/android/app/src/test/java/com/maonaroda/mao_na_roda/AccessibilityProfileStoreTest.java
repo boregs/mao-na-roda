@@ -14,48 +14,15 @@ import org.junit.Test;
 
 public class AccessibilityProfileStoreTest {
     @Test
-    public void supportsMoreThanOneMobilityAndAccessibilityNeed() {
-        assertEquals(new HashSet<>(Arrays.asList(
-                        AccessibilityProfileStore.WHEELCHAIR,
-                        AccessibilityProfileStore.VISUAL)),
-                AccessibilityProfileStore.normalize(new HashSet<>(Arrays.asList(
-                        AccessibilityProfileStore.WHEELCHAIR,
-                        AccessibilityProfileStore.VISUAL))));
-    }
-
-    @Test
-    public void noSpecificNeedIsExclusiveAndUnknownValuesAreIgnored() {
-        assertEquals(Collections.singleton(AccessibilityProfileStore.NONE),
-                AccessibilityProfileStore.normalize(new HashSet<>(Arrays.asList(
-                        AccessibilityProfileStore.NONE,
-                        AccessibilityProfileStore.HEARING,
-                        "unknown"))));
-    }
-
-    @Test
-    public void emptySelectionHasHelpfulSummary() {
-        assertTrue(AccessibilityProfileStore.summary(Collections.emptySet())
-                .contains("Nenhuma necessidade"));
-    }
-
-    @Test
-    public void selectionsSurviveSaveAndReload() {
+    public void removesLegacyMobilityWithoutRemovingVisualPreferences() {
         FakePreferences preferences = new FakePreferences();
-        Set<String> selected = new HashSet<>(Arrays.asList(
-                AccessibilityProfileStore.WHEELCHAIR, AccessibilityProfileStore.HEARING));
-
-        AccessibilityProfileStore.saveProfiles(preferences, selected);
-
-        assertEquals(selected, AccessibilityProfileStore.loadProfiles(preferences));
-    }
-
-    @Test
-    public void legacyMobilityChoiceIsRestored() {
-        FakePreferences preferences = new FakePreferences();
-        preferences.edit().putString("mobility_profile", "crutches").apply();
-
-        assertEquals(Collections.singleton(AccessibilityProfileStore.REDUCED_MOBILITY),
-                AccessibilityProfileStore.loadProfiles(preferences));
+        preferences.edit().putString("mobility_profile", "crutches")
+                .putStringSet("accessibility_profiles", Collections.singleton("wheelchair"))
+                .putBoolean(AccessibilityProfileStore.LARGE_TEXT_KEY, true).apply();
+        AccessibilityProfileStore.removerPerfisLegados(preferences);
+        assertTrue(!preferences.contains("mobility_profile"));
+        assertTrue(!preferences.contains("accessibility_profiles"));
+        assertTrue(preferences.getBoolean(AccessibilityProfileStore.LARGE_TEXT_KEY, false));
     }
 
     private static final class FakePreferences implements SharedPreferences {

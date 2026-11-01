@@ -2,6 +2,13 @@ plugins {
     id 'com.android.application'
 }
 
+def localConfig = new Properties()
+def localConfigFile = rootProject.file('local.properties')
+if (localConfigFile.exists()) localConfigFile.withInputStream { localConfig.load(it) }
+def apiUrl = providers.gradleProperty('API_BASE_URL').orElse(localConfig.getProperty('API_BASE_URL', '')).get()
+def mapsKey = providers.gradleProperty('MAPS_API_KEY').orElse(localConfig.getProperty('MAPS_API_KEY', '')).get()
+if (apiUrl && !apiUrl.startsWith('https://')) throw new GradleException('API_BASE_URL exige HTTPS.')
+
 android {
     namespace 'com.maonaroda.mao_na_roda'
     compileSdk 35
@@ -13,6 +20,9 @@ android {
         versionCode 1
         versionName '1.0'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField 'String', 'API_BASE_URL', '"' + apiUrl.replace('\\', '\\\\').replace('"', '\\"') + '"'
+        buildConfigField 'boolean', 'MAPS_CONFIGURED', mapsKey ? 'true' : 'false'
+        manifestPlaceholders = [mapsApiKey: mapsKey]
     }
 
     buildFeatures {
@@ -21,17 +31,24 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.navigation:navigation-fragment:2.8.5'
     implementation 'androidx.navigation:navigation-ui:2.8.5'
+    implementation 'com.google.android.gms:play-services-maps:20.1.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.6.2'
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.arch.core:core-testing:2.2.0'
+    testImplementation 'org.json:json:20240303'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
