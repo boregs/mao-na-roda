@@ -1,146 +1,192 @@
 <resources>
-  <style name="Theme.MaoNaRoda" parent="Theme.Material3.DayNight.NoActionBar">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:windowBackground">@color/paper</item>
-    <item name="android:colorBackground">@color/paper</item>
-    <item name="colorPrimary">@color/ocean</item>
-    <item name="colorOnPrimary">@color/on_ocean</item>
-    <item name="colorSurface">@color/paper</item>
-    <item name="colorOnSurface">@color/ink</item>
-    <item name="colorOnSurfaceVariant">@color/supporting</item>
-    <item name="colorOutline">@color/outline</item>
-    <item name="colorError">@color/error</item>
-    <item name="android:colorAccent">@color/ocean</item>
-    <item name="android:navigationBarColor">@color/paper</item>
-    <item name="android:statusBarColor">@color/paper</item>
-    <item name="android:windowLightStatusBar">@bool/light_system_bars</item>
-    <item name="android:windowActionModeOverlay">true</item>
-  </style>
-  <style name="MaoText.BodyBase" parent="TextAppearance.Material3.BodyLarge">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textColor">@color/ink</item>
-    <item name="android:textSize">20sp</item>
-    <item name="android:lineSpacingExtra">5dp</item>
-    <item name="android:textStyle">normal</item>
-  </style>
-  <style name="MaoText.HeadingBase" parent="MaoText.Body">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textSize">32sp</item>
-    <item name="android:textStyle">bold</item>
-    <item name="android:lineSpacingExtra">6sp</item>
-    <item name="android:lineSpacingMultiplier">1.2</item>
-  </style>
-  <style name="MaoText.SectionBase" parent="MaoText.Body">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textSize">24sp</item>
-    <item name="android:textStyle">bold</item>
-    <item name="android:lineSpacingMultiplier">1.2</item>
-    <item name="android:lineSpacingExtra">6sp</item>
-  </style>
-  <style name="MaoText.CardBase" parent="MaoText.Body">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textSize">20sp</item>
-    <item name="android:textStyle">bold</item>
-    <item name="android:lineSpacingMultiplier">1.2</item>
-    <item name="android:lineSpacingExtra">6sp</item>
-  </style>
-  <style name="MaoText.MetaBase" parent="MaoText.Body">
-    <item name="android:textSize">18sp</item>
-    <item name="android:textColor">@color/supporting</item>
-  </style>
-  <style name="MaoText.FooterBase" parent="MaoText.Meta">
-    <item name="android:textSize">17sp</item>
-    <item name="android:gravity">center</item>
-  </style>
-  <style name="MaoText.WelcomeBase" parent="MaoText.Body">
-    <item name="fontFamily">@font/source_serif_4_semibold</item>
-    <item name="android:fontFamily">@font/source_serif_4_semibold</item>
-    <item name="android:textSize">40sp</item>
-    <item name="android:textStyle">normal</item>
-    <item name="android:lineSpacingExtra">8sp</item>
-    <item name="android:lineSpacingMultiplier">1.2</item>
-  </style>
-  <style name="Widget.MaoButton" parent="Widget.Material3.Button">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textStyle">normal</item>
-    <item name="android:minHeight">56dp</item>
-    <item name="android:textSize">20sp</item>
-    <item name="android:textAllCaps">false</item>
-    <item name="cornerRadius">12dp</item>
-    <item name="android:insetTop">0dp</item>
-    <item name="android:insetBottom">0dp</item>
-    <item name="android:stateListAnimator">@null</item>
-  </style>
-  <style name="Widget.MaoButton.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textStyle">normal</item>
-    <item name="android:minHeight">56dp</item>
-    <item name="android:textSize">20sp</item>
-    <item name="android:textAllCaps">false</item>
-    <item name="cornerRadius">12dp</item>
-    <item name="strokeColor">@color/ocean</item>
-    <item name="strokeWidth">1dp</item>
-    <item name="android:insetTop">0dp</item>
-    <item name="android:insetBottom">0dp</item>
-  </style>
-  <style name="Widget.MaoButton.Text" parent="Widget.Material3.Button.TextButton">
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textStyle">normal</item>
-    <item name="android:minHeight">48dp</item>
-    <item name="android:textSize">20sp</item>
-    <item name="android:textAllCaps">false</item>
-    <item name="android:insetTop">0dp</item>
-    <item name="android:insetBottom">0dp</item>
-  </style>
-  <style name="Widget.MaoCard" parent="Widget.Material3.CardView.Elevated">
-    <item name="cardBackgroundColor">@color/card</item>
-    <item name="cardCornerRadius">16dp</item>
-    <item name="cardElevation">0dp</item>
-    <item name="strokeWidth">0dp</item>
-  </style>
-  <style name="MaoText.InputLabelBase" parent="MaoText.Meta">
-    <item name="android:textSize">16sp</item>
-  </style>
-  <style name="Widget.MaoInput" parent="Widget.Material3.TextInputEditText.OutlinedBox">
-    <item name="android:textAppearance">@style/MaoText.Body</item>
-    <item name="android:fontFamily">@font/source_sans_3_readable</item>
-    <item name="fontFamily">@font/source_sans_3_readable</item>
-    <item name="android:textSize">20sp</item>
-    <item name="android:textStyle">normal</item>
-  </style>
-  <style name="Widget.MaoInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-    <item name="hintTextAppearance">@style/MaoText.InputLabel</item>
-  </style>
-  <style name="MaoText.Body" parent="MaoText.BodyBase">
-    <item name="lineHeight">28sp</item>
-  </style>
-  <style name="MaoText.Heading" parent="MaoText.HeadingBase">
-    <item name="lineHeight">44sp</item>
-  </style>
-  <style name="MaoText.Section" parent="MaoText.SectionBase">
-    <item name="lineHeight">34sp</item>
-  </style>
-  <style name="MaoText.Card" parent="MaoText.CardBase">
-    <item name="lineHeight">28sp</item>
-  </style>
-  <style name="MaoText.Meta" parent="MaoText.MetaBase">
-    <item name="lineHeight">26sp</item>
-  </style>
-  <style name="MaoText.Footer" parent="MaoText.FooterBase">
-    <item name="lineHeight">24sp</item>
-  </style>
-  <style name="MaoText.Welcome" parent="MaoText.WelcomeBase">
-    <item name="lineHeight">54sp</item>
-  </style>
-  <style name="MaoText.InputLabel" parent="MaoText.InputLabelBase">
-    <item name="lineHeight">22sp</item>
-  </style>
+    <style
+        name="Theme.MaoNaRoda"
+        parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:windowBackground">@color/paper</item>
+        <item name="android:colorBackground">@color/paper</item>
+        <item name="colorPrimary">@color/ocean</item>
+        <item name="colorOnPrimary">@color/on_ocean</item>
+        <item name="colorSurface">@color/paper</item>
+        <item name="colorOnSurface">@color/ink</item>
+        <item name="colorOnSurfaceVariant">@color/supporting</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorError">@color/error</item>
+        <item name="android:colorAccent">@color/ocean</item>
+        <item name="android:navigationBarColor">@color/paper</item>
+        <item name="android:statusBarColor">@color/paper</item>
+        <item name="android:windowLightStatusBar">@bool/light_system_bars</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+    <style
+        name="MaoText.BodyBase"
+        parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:lineSpacingExtra">5dp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style
+        name="MaoText.HeadingBase"
+        parent="MaoText.Body">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
+    <style
+        name="MaoText.SectionBase"
+        parent="MaoText.Body">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+    <style
+        name="MaoText.CardBase"
+        parent="MaoText.Body">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+    <style
+        name="MaoText.MetaBase"
+        parent="MaoText.Body">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/supporting</item>
+    </style>
+    <style
+        name="MaoText.FooterBase"
+        parent="MaoText.Meta">
+        <item name="android:textSize">17sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style
+        name="MaoText.WelcomeBase"
+        parent="MaoText.Body">
+        <item name="fontFamily">@font/source_serif_4_semibold</item>
+        <item name="android:fontFamily">@font/source_serif_4_semibold</item>
+        <item name="android:textSize">40sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
+    <style
+        name="Widget.MaoButton"
+        parent="Widget.Material3.Button">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+    <style
+        name="Widget.MaoButton.Outlined"
+        parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="strokeColor">@color/ocean</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+    <style
+        name="Widget.MaoButton.Text"
+        parent="Widget.Material3.Button.TextButton">
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+    <style
+        name="Widget.MaoCard"
+        parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/card</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+    <style
+        name="MaoText.InputLabelBase"
+        parent="MaoText.Meta">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style
+        name="Widget.MaoInput"
+        parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:textAppearance">@style/MaoText.Body</item>
+        <item name="android:fontFamily">@font/source_sans_3_readable</item>
+        <item name="fontFamily">@font/source_sans_3_readable</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style
+        name="Widget.MaoInputLayout"
+        parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="hintTextAppearance">@style/MaoText.InputLabel</item>
+    </style>
+    <style
+        name="MaoText.Body"
+        parent="MaoText.BodyBase">
+        <item name="lineHeight">28sp</item>
+    </style>
+    <style
+        name="MaoText.Heading"
+        parent="MaoText.HeadingBase">
+        <item name="lineHeight">44sp</item>
+    </style>
+    <style
+        name="MaoText.Section"
+        parent="MaoText.SectionBase">
+        <item name="lineHeight">34sp</item>
+    </style>
+    <style
+        name="MaoText.Card"
+        parent="MaoText.CardBase">
+        <item name="lineHeight">28sp</item>
+    </style>
+    <style
+        name="MaoText.Meta"
+        parent="MaoText.MetaBase">
+        <item name="lineHeight">26sp</item>
+    </style>
+    <style
+        name="MaoText.Footer"
+        parent="MaoText.FooterBase">
+        <item name="lineHeight">24sp</item>
+    </style>
+    <style
+        name="MaoText.Welcome"
+        parent="MaoText.WelcomeBase">
+        <item name="lineHeight">54sp</item>
+    </style>
+    <style
+        name="MaoText.InputLabel"
+        parent="MaoText.InputLabelBase">
+        <item name="lineHeight">22sp</item>
+    </style>
 </resources>
