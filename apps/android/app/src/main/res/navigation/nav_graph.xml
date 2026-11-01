@@ -37,8 +37,35 @@
         <action
             android:id="@+id/action_home_to_accessibility_profile"
             app:destination="@id/accessibilityProfileFragment" />
+        <action
+            android:id="@+id/action_home_to_report_form"
+            app:destination="@id/reportFormFragment" />
+        <action
+            android:id="@+id/action_home_to_report_history"
+            app:destination="@id/reportHistoryFragment" />
     </fragment>
     <fragment
         android:id="@+id/accessibilityProfileFragment"
         android:name="com.maonaroda.mao_na_roda.AccessibilityProfileFragment" />
+    <fragment
+        android:id="@+id/reportFormFragment"
+        android:name="com.maonaroda.mao_na_roda.ReportFormFragment">
+        <action
+            android:id="@+id/action_form_to_history"
+            app:destination="@id/reportHistoryFragment"
+            app:popUpTo="@id/reportFormFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/reportHistoryFragment"
+        android:name="com.maonaroda.mao_na_roda.ReportHistoryFragment">
+        <action
+            android:id="@+id/action_history_to_report_detail"
+            app:destination="@id/reportDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/reportDetailFragment"
+        android:name="com.maonaroda.mao_na_roda.ReportDetailFragment">
+        <argument android:name="reportId" app:argType="string" />
+    </fragment>
 </navigation>

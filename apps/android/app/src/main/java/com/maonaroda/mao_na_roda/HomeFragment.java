@@ -59,8 +59,12 @@ public class HomeFragment extends Fragment {
                     .navigate(R.id.action_home_to_accessibility_profile, null, options);
         });
         view.findViewById(R.id.search).setOnClickListener(v -> showSearch());
-        view.findViewById(R.id.report_barrier).setOnClickListener(v -> showUnavailable(
-                "Relatar uma barreira", "O envio de relatos ainda não está disponível. Os novos relatos serão identificados como não validados."));
+        view.findViewById(R.id.report_barrier).setOnClickListener(v ->
+                androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_home_to_report_form));
+        view.findViewById(R.id.report_history).setOnClickListener(v ->
+                androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_home_to_report_history));
         view.findViewById(R.id.about).setOnClickListener(v -> HowItWorksSheet.show(getParentFragmentManager()));
     }
 
