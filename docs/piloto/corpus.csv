@@ -29,4 +29,3 @@ id,cenario,origem_longitude,origem_latitude,destino_longitude,destino_latitude,p
 28,elevador_indisponivel,,,,,cadeirante|muleta_ou_outro_auxilio|mobilidade_reduzida,sim,pendente,,,,
 29,calcada_irregular,,,,,cadeirante|muleta_ou_outro_auxilio|mobilidade_reduzida,sim,pendente,,,,
 30,dados_ausentes,,,,,cadeirante|muleta_ou_outro_auxilio|mobilidade_reduzida,sim,pendente,,,,
-
