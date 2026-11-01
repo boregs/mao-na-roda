@@ -11,3 +11,4 @@ public class OnboardingCompatibilityTest {
         assertEquals("onboarding_completed", "onboarding_completed");
     }
 }
+opo
