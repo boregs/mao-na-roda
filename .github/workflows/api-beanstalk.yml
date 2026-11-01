@@ -1,0 +1,104 @@
+name: API - verify and deploy to Beanstalk
+
+on:
+  pull_request:
+    paths: ['apps/api/**', '.github/workflows/api-beanstalk.yml']
+  push:
+    branches: [main]
+    paths: ['apps/api/**', '.github/workflows/api-beanstalk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/api
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: '25'
+          cache: maven
+          cache-dependency-path: apps/api/pom.xml
+      # Intentionally blocks deployment until the full suite passes.
+      - name: Verify and package
+        run: sh mvnw --batch-mode --no-transfer-progress verify
+      - name: Package Beanstalk source bundle
+        run: |
+          mkdir -p bundle
+          cp target/api-0.0.1-SNAPSHOT.jar bundle/application.jar
+          cp deploy/Procfile bundle/Procfile
+          (cd bundle && zip ../api.zip application.jar Procfile)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-beanstalk
+          path: apps/api/api.zip
+          retention-days: 7
+
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    concurrency:
+      group: api-beanstalk-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      EB_APPLICATION: ${{ vars.EB_APPLICATION }}
+      EB_ENVIRONMENT: ${{ vars.EB_ENVIRONMENT }}
+      EB_BUCKET: ${{ vars.EB_BUCKET }}
+      API_BASE_URL: ${{ vars.API_BASE_URL }}
+      AWS_PAGER: ''
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: api-beanstalk
+      - name: Check configuration
+        env:
+          ROLE_ARN: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+        run: |
+          set -euo pipefail
+          for name in AWS_REGION EB_APPLICATION EB_ENVIRONMENT EB_BUCKET API_BASE_URL ROLE_ARN; do
+            test -n "${!name}" || { echo "Missing variable: $name"; exit 1; }
+          done
+          [[ "$API_BASE_URL" == https://* ]] || { echo 'API_BASE_URL must use HTTPS'; exit 1; }
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Upload and deploy version
+        run: |
+          set -euo pipefail
+          version="gh-${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          key="api/${version}.zip"
+          aws s3 cp api.zip "s3://${EB_BUCKET}/${key}"
+          aws elasticbeanstalk create-application-version \
+            --application-name "$EB_APPLICATION" --version-label "$version" \
+            --source-bundle "S3Bucket=${EB_BUCKET},S3Key=${key}"
+          aws elasticbeanstalk update-environment \
+            --environment-name "$EB_ENVIRONMENT" --version-label "$version"
+          aws elasticbeanstalk wait environment-updated --environment-names "$EB_ENVIRONMENT"
+          actual=$(aws elasticbeanstalk describe-environments \
+            --environment-names "$EB_ENVIRONMENT" --query 'Environments[0].VersionLabel' --output text)
+          test "$actual" = "$version"
+          health=$(aws elasticbeanstalk describe-environments \
+            --environment-names "$EB_ENVIRONMENT" --query 'Environments[0].Health' --output text)
+          test "$health" = Green
+      - name: Check public health endpoint
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 5 --retry-delay 10 \
+            --retry-all-errors --connect-timeout 10 --max-time 30 \
+            "${API_BASE_URL%/}/actuator/health" | jq -e '.status == "UP"'
