@@ -1,5 +1,10 @@
 # Mão na Roda
 
+O planejamento de visitante com ORS e mapa Android está implementado para
+configuração e validação em ambiente de teste. Consulte o
+[registro da entrega e limitações](docs/13-registro-implementacao-rotas.md), o
+[guia da API](apps/api/PLANEJAMENTO.md) e o [guia Android](apps/android/README.md).
+
 Aplicativo para ajudar pessoas com mobilidade reduzida a encontrar rotas considerando as condições de acessibilidade dos trajetos e barreiras relatadas por usuários.
 
 ## Sobre o projeto

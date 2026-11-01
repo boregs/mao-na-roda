@@ -1,5 +1,10 @@
 # API Mão na Roda
 
+**Planejamento de visitante:** catálogo público, busca ORS/Pelias, rotas ORS e
+avaliação piloto estão descritos em [PLANEJAMENTO.md](PLANEJAMENTO.md), incluindo
+configuração, limites, banco de testes e pendências de homologação. As instruções
+abaixo também cobrem o endpoint Google de rota-base preservado.
+
 Etapa inicial da issue #7: Spring Boot com verificação de saúde,
 OpenAPI/Swagger, consulta de rota-base a pé via Google e testes HTTP.
 O projeto usa Spring Boot 4.1.2 e compila para Java 25. O Maven Wrapper

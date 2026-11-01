@@ -1,5 +1,11 @@
 # Pendências para preparar a API para testes
 
+Atualização de 01/11/2026: o histórico de falhas abaixo é da base anterior.
+A nova configuração de segurança, testes e pipeline está registrada em
+[PLANEJAMENTO.md](PLANEJAMENTO.md) e [registro 13](../../docs/13-registro-implementacao-rotas.md).
+Cadastro e integração real de identidade continuam pendentes; a execução local
+de PostGIS depende do ambiente descrito no novo guia.
+
 A API está pronta para testes isolados do controller, mas ainda precisa dos
 itens abaixo para testes de ponta a ponta dos endpoints existentes de usuários
 e rotas.
