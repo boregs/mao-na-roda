@@ -1,9 +1,11 @@
 # Mão na Roda
 
-O planejamento de visitante com ORS e mapa Android está implementado para
+O planejamento de visitante com Google Routes e mapa Android está implementado para
 configuração e validação em ambiente de teste. Consulte o
-[registro da entrega e limitações](docs/13-registro-implementacao-rotas.md), o
+[registro da migração e teste local](docs/16-migracao-google-routes.md), o
 [guia da API](apps/api/PLANEJAMENTO.md) e o [guia Android](apps/android/README.md).
+O backend ainda precisa ser configurado e iniciado; ativar a Routes API no Google
+Cloud, por si só, não conecta o aplicativo.
 
 Aplicativo para ajudar pessoas com mobilidade reduzida a encontrar rotas considerando as condições de acessibilidade dos trajetos e barreiras relatadas por usuários.
 
@@ -49,7 +51,7 @@ A árvore abaixo representa a estrutura atual do repositório.
 │       │   │   ├── java/                # Código-fonte da API
 │       │   │   └── resources/
 │       │   │       ├── application.properties
-│       │   │       └── db/migration/    # Migrations Flyway V1–V5
+│       │   │       └── db/migration/    # Migrations Flyway V1–V6
 │       │   └── test/
 │       │       └── java/                # Testes da API
 │       ├── pom.xml
