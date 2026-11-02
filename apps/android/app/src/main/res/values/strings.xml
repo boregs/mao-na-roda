@@ -37,15 +37,13 @@
     <string name="plan_title">Planeje seu caminho</string>
     <string name="origin">Origem</string>
     <string name="destination">Destino</string>
-    <string name="find_origin">Buscar local de origem</string>
-    <string name="find_destination">Buscar local de destino</string>
     <string name="use_location">Usar minha localização como origem</string>
     <string name="location_consent">Permitir obter sua localização uma vez para preencher a origem? Ela será enviada ao serviço de rotas somente quando você consultar. Você também pode informar a origem manualmente.</string>
     <string name="allow_location">Permitir</string>
     <string name="location_denied">Localização não autorizada. Informe a origem manualmente.</string>
     <string name="location_unavailable">Não foi possível obter a localização. Informe a origem manualmente.</string>
     <string name="locating">Obtendo a origem uma vez…</string>
-    <string name="manual_coordinates_help">Busque um endereço e selecione o local. Também é possível digitar latitude, longitude, usando ponto nos decimais.</string>
+    <string name="manual_coordinates_help">Informe endereços completos, incluindo a cidade. Também é possível digitar latitude, longitude, usando ponto nos decimais. Confira o trajeto retornado antes de sair.</string>
     <string name="select_route_profile">Selecionar perfil de mobilidade</string>
     <string name="no_route_profile">Nenhum perfil selecionado. A escolha vale apenas para esta sessão.</string>
     <string name="cancel_query">Cancelar consulta</string>

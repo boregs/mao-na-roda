@@ -25,9 +25,8 @@ public class VisitorJourneyTest {
             scenario.onActivity(activity -> {
                 var repo = new RotasRepository() {
                     @Override public Cancelavel perfis(Retorno<List<Perfil>> r) { r.sucesso(List.of(new Perfil("cadeirante", "Cadeirante"))); return () -> { }; }
-                    @Override public Cancelavel buscar(String texto, Retorno<List<Destino>> r) { r.sucesso(List.of()); return () -> { }; }
-                    @Override public Cancelavel planejar(Ponto a, Ponto b, String perfil, Retorno<Consulta> r) {
-                        r.sucesso(new Consulta("PARCIAL", List.of(new Rota("fixture", List.of(a, b), 150, 120,
+                    @Override public Cancelavel planejar(LocalRota a, LocalRota b, String perfil, Retorno<Consulta> r) {
+                        r.sucesso(new Consulta("PARCIAL", List.of(new Rota("fixture", List.of(a.coordenada(), b.coordenada()), 150, 120,
                                 "DESCONHECIDA", 0, 0, 0, "Dados desconhecidos")), "Dados desconhecidos não garantem acessibilidade."));
                         return () -> { };
                     }

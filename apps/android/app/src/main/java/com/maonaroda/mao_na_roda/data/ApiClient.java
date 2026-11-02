@@ -10,11 +10,15 @@ import com.maonaroda.mao_na_roda.data.DadosRotas.*;
 
 public final class ApiClient implements RotasRepository {
     private final String base;
+    private final boolean depuracao;
     private final Executor callback;
     private final ExecutorService tarefas = Executors.newFixedThreadPool(2);
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private final Set<Chamada<?>> chamadas = ConcurrentHashMap.newKeySet();
-    public ApiClient(String base, Executor callback) { this.base = base.replaceAll("/+$", ""); this.callback = callback; }
+    public ApiClient(String base, Executor callback) { this(base, callback, false); }
+    public ApiClient(String base, Executor callback, boolean depuracao) {
+        this.base = base.replaceAll("/+$", ""); this.callback = callback; this.depuracao = depuracao;
+    }
     private interface Leitura<T> { T ler(String json) throws JSONException; }
     private final class Chamada<T> implements Cancelavel {
         final AtomicBoolean encerrada = new AtomicBoolean();
@@ -44,7 +48,7 @@ public final class ApiClient implements RotasRepository {
         }, 9, TimeUnit.SECONDS);
         chamada.tarefa = tarefas.submit(() -> {
             try {
-                if (!base.startsWith("https://")) throw new IllegalStateException("O endereço seguro da API ainda não foi configurado.");
+                if (!PoliticaEnderecoApi.permitida(base, depuracao)) throw new IllegalStateException();
                 if (chamada.encerrada.get()) return;
                 var connection = (HttpURLConnection) new URL(base + path).openConnection(); chamada.conexao = connection;
                 if (chamada.encerrada.get()) { connection.disconnect(); return; }
@@ -76,14 +80,21 @@ public final class ApiClient implements RotasRepository {
                     chamada.concluir(null, mensagem, retorno);
                 } else chamada.concluir(leitura.ler(json), null, retorno);
             } catch (IllegalStateException e) {
-                chamada.concluir(null, "O endereço seguro da API ainda não foi configurado.", retorno);
+                chamada.concluir(null, "O endereço da API ainda não foi configurado ou é inválido.", retorno);
             } catch (Exception e) {
                 chamada.concluir(null, "Não foi possível conectar. Verifique sua conexão e tente novamente.", retorno);
             } finally { if (chamada.conexao != null) chamada.conexao.disconnect(); }
         });
         return chamada;
     }
-    private static JSONObject ponto(Ponto p) throws JSONException { return new JSONObject().put("longitude", p.longitude()).put("latitude", p.latitude()); }
+    private static JSONObject local(LocalRota local) throws JSONException {
+        if (local.coordenada() == null) return new JSONObject().put("endereco", local.endereco());
+        var p = local.coordenada();
+        return new JSONObject().put("longitude", p.longitude()).put("latitude", p.latitude());
+    }
+    public static JSONObject planejamentoJson(LocalRota origem, LocalRota destino, String perfil) throws JSONException {
+        return new JSONObject().put("origem", local(origem)).put("destino", local(destino)).put("perfil", perfil);
+    }
     @Override public Cancelavel perfis(Retorno<List<Perfil>> retorno) {
         return executar("/api/v1/perfis-mobilidade", null, json -> {
             var array = new JSONArray(json); var list = new ArrayList<Perfil>();
@@ -91,21 +102,9 @@ public final class ApiClient implements RotasRepository {
             return List.copyOf(list);
         }, retorno);
     }
-    @Override public Cancelavel buscar(String texto, Retorno<List<Destino>> retorno) {
+    @Override public Cancelavel planejar(LocalRota origem, LocalRota destino, String perfil, Retorno<Consulta> retorno) {
         try {
-            return executar("/api/v1/destinos/busca", new JSONObject().put("texto", texto), json -> {
-                var array = new JSONArray(json); var list = new ArrayList<Destino>();
-                for (int i = 0; i < array.length(); i++) {
-                    var d = array.getJSONObject(i); var c = d.getJSONObject("coordenada");
-                    list.add(new Destino(d.getString("id"), d.getString("nome"), new Ponto(c.getDouble("longitude"), c.getDouble("latitude"))));
-                }
-                return List.copyOf(list);
-            }, retorno);
-        } catch (JSONException e) { throw new IllegalArgumentException(e); }
-    }
-    @Override public Cancelavel planejar(Ponto origem, Ponto destino, String perfil, Retorno<Consulta> retorno) {
-        try {
-            return executar("/api/v1/rotas", new JSONObject().put("origem", ponto(origem)).put("destino", ponto(destino)).put("perfil", perfil), ApiClient::lerConsulta, retorno);
+            return executar("/api/v1/rotas", planejamentoJson(origem, destino, perfil), ApiClient::lerConsulta, retorno);
         } catch (JSONException e) { throw new IllegalArgumentException(e); }
     }
     public static Consulta lerConsulta(String json) throws JSONException {
@@ -137,11 +136,17 @@ public final class ApiClient implements RotasRepository {
                     details.append("\n\n");
                 }
             }
+            if (!r.optString("aviso").isEmpty()) details.append("\n").append(r.optString("aviso"));
             list.add(new Rota(r.getString("id"), List.copyOf(pontos), r.getDouble("distanciaMetros"), r.getDouble("duracaoSegundos"),
                     qualidade.getString("estado"), qualidade.getDouble("cobertura"), barreiras.getInt("impeditivas"), barreiras.getInt("atencao"),
                     details.length() == 0 ? "Nenhuma barreira conhecida informada. Isso não garante acessibilidade." : details.toString()));
         }
-        return new Consulta(root.getString("resultado"), List.copyOf(list), "Sugestão baseada nos dados disponíveis. As condições reais podem ser diferentes.");
+        var avisos = root.optJSONArray("avisos"); var texto = new StringBuilder();
+        if (avisos != null) for (int i = 0; i < avisos.length(); i++) {
+            if (i > 0) texto.append("\n\n"); texto.append(avisos.getString(i));
+        }
+        if (texto.length() == 0) texto.append("Sugestão baseada nos dados disponíveis. As condições reais podem ser diferentes.");
+        return new Consulta(root.getString("resultado"), List.copyOf(list), texto.toString());
     }
     @Override public void close() {
         chamadas.forEach(Chamada::cancelar); tarefas.shutdownNow(); timer.shutdownNow();

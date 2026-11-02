@@ -7,7 +7,22 @@ def localConfigFile = rootProject.file('local.properties')
 if (localConfigFile.exists()) localConfigFile.withInputStream { localConfig.load(it) }
 def apiUrl = providers.gradleProperty('API_BASE_URL').orElse(localConfig.getProperty('API_BASE_URL', '')).get()
 def mapsKey = providers.gradleProperty('MAPS_API_KEY').orElse(localConfig.getProperty('MAPS_API_KEY', '')).get()
-if (apiUrl && !apiUrl.startsWith('https://')) throw new GradleException('API_BASE_URL exige HTTPS.')
+def localHttp = false
+def validApiUrl = !apiUrl
+if (apiUrl) {
+    try {
+        def endpoint = new URI(apiUrl)
+        def safeBase = endpoint.host && !endpoint.userInfo && !endpoint.query && !endpoint.fragment
+        def scheme = endpoint.scheme?.toLowerCase(Locale.ROOT)
+        localHttp = safeBase && scheme == 'http' && ['10.0.2.2', '127.0.0.1', 'localhost'].contains(endpoint.host.toLowerCase(Locale.ROOT))
+        validApiUrl = safeBase && (scheme == 'https' || localHttp)
+    } catch (URISyntaxException ignored) { validApiUrl = false }
+}
+if (!validApiUrl) throw new GradleException('API_BASE_URL exige HTTPS; HTTP local é permitido somente em debug para localhost, 127.0.0.1 ou 10.0.2.2.')
+
+tasks.matching { it.name == 'preReleaseBuild' }.configureEach {
+    doFirst { if (localHttp) throw new GradleException('A versão release exige API_BASE_URL HTTPS.') }
+}
 
 android {
     namespace 'com.maonaroda.mao_na_roda'

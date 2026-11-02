@@ -18,7 +18,27 @@ public final class DadosRotas {
         }
     }
     public record Perfil(String codigo, String nome) { }
-    public record Destino(String id, String nome, Ponto coordenada) { }
+    public record LocalRota(Ponto coordenada, String endereco) {
+        public LocalRota {
+            if ((coordenada == null) == (endereco == null)) throw new IllegalArgumentException("Informe um endereço ou coordenadas.");
+            if (endereco != null) {
+                endereco = endereco.trim();
+                if (endereco.length() < 3 || endereco.length() > 200)
+                    throw new IllegalArgumentException("Informe um endereço entre 3 e 200 caracteres.");
+            }
+        }
+        public static LocalRota deTexto(String texto) {
+            String valor = texto == null ? "" : texto.trim();
+            Ponto ponto = Ponto.manual(valor);
+            if (ponto != null) return new LocalRota(ponto, null);
+            var partes = valor.split(",", -1);
+            if (partes.length == 2) try {
+                Double.parseDouble(partes[0].trim()); Double.parseDouble(partes[1].trim());
+                throw new IllegalArgumentException("Latitude ou longitude fora dos limites.");
+            } catch (NumberFormatException ignored) { /* Um endereço também pode conter vírgula. */ }
+            return new LocalRota(null, valor);
+        }
+    }
     public record Rota(String id, List<Ponto> pontos, double distancia, double duracao,
             String qualidade, double cobertura, int impeditivas, int atencao, String detalhes) { }
     public record Consulta(String resultado, List<Rota> rotas, String aviso) { }

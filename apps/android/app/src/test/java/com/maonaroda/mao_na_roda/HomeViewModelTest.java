@@ -12,13 +12,14 @@ public class HomeViewModelTest {
     @Rule public InstantTaskExecutorRule tarefas = new InstantTaskExecutorRule();
     private static final class FakeRepository implements RotasRepository {
         final List<Retorno<Consulta>> consultas = new ArrayList<>();
-        final List<Retorno<List<Destino>>> buscas = new ArrayList<>();
+        LocalRota origem, destino;
         int canceladas;
         @Override public Cancelavel perfis(Retorno<List<Perfil>> retorno) {
             retorno.sucesso(List.of(new Perfil("cadeirante", "Cadeirante"))); return () -> { };
         }
-        @Override public Cancelavel buscar(String texto, Retorno<List<Destino>> retorno) { buscas.add(retorno); return () -> canceladas++; }
-        @Override public Cancelavel planejar(Ponto a, Ponto b, String perfil, Retorno<Consulta> retorno) { consultas.add(retorno); return () -> canceladas++; }
+        @Override public Cancelavel planejar(LocalRota a, LocalRota b, String perfil, Retorno<Consulta> retorno) {
+            origem = a; destino = b; consultas.add(retorno); return () -> canceladas++;
+        }
         @Override public void close() { }
     }
     private FakeRepository repository;
@@ -49,13 +50,25 @@ public class HomeViewModelTest {
         assertEquals("anterior", model.estado().getValue().rotas().get(0).id());
         assertEquals("Sem conexão", model.estado().getValue().mensagem());
     }
-    @Test public void buscaAntigaNaoTrocaResultadosDoOutroCampo() {
-        model.editar(true, "Estação Carrão"); model.buscar(true);
-        model.editar(false, "UNICID"); model.buscar(false);
-        repository.buscas.get(0).sucesso(List.of(new Destino("antigo", "Antigo", new Ponto(-46, -23))));
-        assertTrue(model.estado().getValue().destinos().isEmpty());
-        repository.buscas.get(1).sucesso(List.of(new Destino("novo", "Novo", new Ponto(-46, -23))));
-        assertEquals("novo", model.estado().getValue().destinos().get(0).id());
+    @Test public void enviaEnderecoSemBuscaSeparadaEPreservaDestinoPorCoordenadas() {
+        model.editar(true, " Estação Carrão, São Paulo "); model.consultar();
+        assertEquals("Estação Carrão, São Paulo", repository.origem.endereco());
+        assertNull(repository.origem.coordenada());
+        assertEquals(new Ponto(-46.7, -23.6), repository.destino.coordenada());
+        assertEquals(1, repository.consultas.size());
+    }
+    @Test public void coordenadasInvalidasNaoSaoEnviadasComoEndereco() {
+        for (String invalida : List.of("91, -46", "NaN, 0", "Infinity, 0", "1e3, -46")) {
+            model.editar(true, invalida); model.consultar();
+            assertTrue(model.estado().getValue().mensagem().contains("fora dos limites"));
+        }
+        assertTrue(repository.consultas.isEmpty());
+    }
+    @Test public void editarLocalDescartaRotaEIgnoraRespostaAntiga() {
+        model.consultar(); repository.consultas.get(0).sucesso(resposta("anterior"));
+        model.consultar(); model.editar(false, "Av. Paulista, São Paulo");
+        repository.consultas.get(1).sucesso(resposta("tardia"));
+        assertTrue(model.estado().getValue().rotas().isEmpty());
     }
     @Test public void sessaoNovaNaoRestauraPerfilOuRota() {
         var nova = new HomeViewModel(new FakeRepository());

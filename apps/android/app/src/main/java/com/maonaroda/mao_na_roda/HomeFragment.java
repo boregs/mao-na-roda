@@ -26,7 +26,6 @@ public class HomeFragment extends Fragment {
     private View root;
     private boolean atualizando;
     private List<Rota> ultimasRotas;
-    private List<Destino> ultimosDestinos;
     private int ultimaSelecionada = -1;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final LocalizacaoController localizacao = new LocalizacaoController();
@@ -68,8 +67,6 @@ public class HomeFragment extends Fragment {
         });
         if (model.origemTexto.isEmpty()) panel.setState(BottomSheetBehavior.STATE_EXPANDED);
         view.findViewById(R.id.search).setOnClickListener(v -> { ocultarTeclado(); model.consultar(); });
-        view.findViewById(R.id.search_origin).setOnClickListener(v -> { ocultarTeclado(); model.buscar(true); });
-        view.findViewById(R.id.search_destination).setOnClickListener(v -> { ocultarTeclado(); model.buscar(false); });
         view.findViewById(R.id.cancel_query).setOnClickListener(v -> model.cancelar());
         view.findViewById(R.id.profile).setOnClickListener(v -> escolherPerfil());
         view.findViewById(R.id.use_location).setOnClickListener(v -> new MaterialAlertDialogBuilder(requireContext())
@@ -127,12 +124,6 @@ public class HomeFragment extends Fragment {
         String perfil = getString(R.string.no_route_profile);
         for (var p : estado.perfis()) if (p.codigo().equals(estado.perfil())) perfil = p.nome();
         ((TextView) root.findViewById(R.id.profile_summary)).setText(perfil);
-        if (ultimosDestinos != estado.destinos()) {
-            ultimosDestinos = estado.destinos(); var results = (LinearLayout) root.findViewById(R.id.destination_results); results.removeAllViews();
-            for (var local : estado.destinos()) {
-                var button = botao(local.nome()); button.setOnClickListener(v -> { ocultarTeclado(); model.escolher(local); }); results.addView(button);
-            }
-        }
         if (ultimasRotas != estado.rotas() || ultimaSelecionada != estado.selecionada()) {
             ultimasRotas = estado.rotas(); ultimaSelecionada = estado.selecionada();
             var results = (LinearLayout) root.findViewById(R.id.route_results); results.removeAllViews();
@@ -170,7 +161,7 @@ public class HomeFragment extends Fragment {
     }
     @Override public void onStop() { localizacao.cancelar(); handler.removeCallbacks(prazoLocalizacao); super.onStop(); }
     @Override public void onDestroyView() {
-        root = null; mapa = null; ultimasRotas = null; ultimosDestinos = null; ultimaSelecionada = -1;
+        root = null; mapa = null; ultimasRotas = null; ultimaSelecionada = -1;
         super.onDestroyView();
     }
 }
