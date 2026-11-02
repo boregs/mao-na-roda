@@ -7,6 +7,9 @@ configuração e validação em ambiente de teste. Consulte o
 O backend ainda precisa ser configurado e iniciado; ativar a Routes API no Google
 Cloud, por si só, não conecta o aplicativo.
 
+Para o time preparar o ambiente e executar o aceite, consulte o
+[guia de testes, bloqueios atuais e responsabilidades](docs/17-guia-testes-time.md).
+
 Aplicativo para ajudar pessoas com mobilidade reduzida a encontrar rotas considerando as condições de acessibilidade dos trajetos e barreiras relatadas por usuários.
 
 ## Sobre o projeto

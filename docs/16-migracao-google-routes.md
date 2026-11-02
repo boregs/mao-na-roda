@@ -2,6 +2,10 @@
 
 Data: 02/11/2026. Branch de continuidade: `feat/planejamento-rotas-visitante`.
 
+Este é o registro da migração. A configuração local mudou após a validação
+descrita aqui: consulte o [guia do time e o estado atualizado](17-guia-testes-time.md)
+para os bloqueios atuais, resultados mais recentes do CI e roteiro de aceite.
+
 ## Decisão e resultado
 
 O solicitante informou que a Routes API está ativada e pediu seu uso no aplicativo.
