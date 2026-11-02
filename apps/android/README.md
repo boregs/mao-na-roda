@@ -41,6 +41,15 @@ Configure o SDK localmente; `local.properties` não deve ser versionado.
 Use **JDK 21 para executar o Gradle/lint**. O código Android continua com nível
 Java 17 e desugaring para API 24+. A API Spring usa JDK 25 separadamente.
 
+Se o Java 21 não for encontrado, `gradle/gradle-daemon-jvm.properties` fornece URLs
+para o Gradle baixar Eclipse Temurin 21 automaticamente. A primeira sincronização
+pode precisar de internet e levar mais tempo. Não é necessário trocar o Java da
+API nem gravar caminhos particulares no repositório.
+
+Se o Studio informar `No defined toolchain download url`, atualize a branch e
+clique em **Try Again** para repetir a sincronização. Em ambientes sem acesso ao
+download, instale JDK 21 e configure sua descoberta pelo Gradle antes de sincronizar.
+
 No Windows, com um JDK compatível configurado em `JAVA_HOME`:
 
 ```powershell
