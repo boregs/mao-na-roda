@@ -5,20 +5,35 @@
 | Método e caminho | Acesso | Resultado |
 |---|---|---|
 | `GET /api/v1/perfis-mobilidade` | Público | Catálogo ativo do banco, com código e nome |
-| `POST /api/v1/destinos/busca` | Público, limitado | Até cinco locais ORS/Pelias |
-| `POST /api/v1/rotas` | Público, limitado | Até três candidatas ORS avaliadas |
+| `POST /api/v1/destinos/busca` | Público, limitado | HTTP 410: busca separada descontinuada |
+| `POST /api/v1/rotas` | Público, limitado | Até três candidatas Google Routes avaliadas |
 | `POST /api/v1/rotas/base` | Público, limitado | Referência Google existente, sem avaliação de acessibilidade |
 | `/api/v1/usuarios/me` | JWT | Operações existentes de perfil; cadastro permanece 501 |
 
-Busca recebe `{"texto":"Estação Carrão, São Paulo"}`. Planejamento recebe:
+Planejamento recebe endereços ou coordenadas, inclusive um formato em cada ponto:
 
 ```json
 {
-  "origem": {"longitude": -46.6, "latitude": -23.5},
+  "origem": {"endereco": "Estação Carrão, São Paulo, SP, Brasil"},
   "destino": {"longitude": -46.601, "latitude": -23.501},
   "perfil": "cadeirante"
 }
 ```
+
+Cada ponto aceita `{"endereco":"..."}` (não vazio, até 500 caracteres na API;
+200 no aplicativo) ou `{"longitude":-46.6,"latitude":-23.5}`. Não misturar os dois
+formatos no mesmo ponto. O Routes resolve o endereço na própria consulta; não é
+necessária outra API de geocodificação. Não há autocomplete nem escolha de resultado
+de busca nesta versão. Use endereços completos e confira o acesso real no mapa.
+Clientes da antiga busca ORS devem migrar para esse contrato; o endpoint antigo
+responde 410 com essa orientação, sem consumir o provedor.
+
+O Google recebe `WALK`, alternativas habilitadas e geometria de alta qualidade em
+`GEO_JSON_LINESTRING`. A máscara solicita somente duração, distância e
+`routes.polyline.geoJsonLinestring`. O Google não recebe o perfil de mobilidade;
+o perfil é aplicado pela avaliação de evidências da própria API. As rotas a pé
+do Google podem omitir caminhos/calçadas e não garantem acessibilidade. O aviso
+é incluído no resultado global e nos detalhes de cada candidata.
 
 Os três códigos são `cadeirante`, `muleta_ou_outro_auxilio` e
 `mobilidade_reduzida`. Eles vêm da V4 Flyway. A branch antiga de catálogos usa
@@ -43,10 +58,16 @@ lacunas permanecem desconhecidas. Conhecimento parcial não equivale a seguranç
 
 Copiar `.env.example` para `.env` local e configurar JDBC com o papel da API.
 Em ambiente remoto, usar TLS com validação do certificado para JDBC.
-Definir ORS_API_KEY para Directions e ORS_GEOCODING_KEY para o geocoder hospedado.
-ORS auto-hospedado não inclui geocoder; URLs são independentes e configuráveis por
-ORS_ROUTING_URL/ORS_GEOCODING_URL. Google continua somente no endpoint explícito.
-Nenhuma falha ORS aciona Google automaticamente.
+Definir `GOOGLE_ROUTES_API_KEY`, uma chave de servidor restrita à Routes API e ao
+IP público de saída do backend. Habilitar faturamento e Routes API no projeto
+Google Cloud. A chave restrita ao Android/Maps SDK é outra e não deve ser reutilizada.
+`GOOGLE_MAPS_API_KEY` continua aceito como nome legado somente se o novo nome estiver
+ausente; não deixar a nova variável vazia se for usar apenas a antiga. ORS e Pelias
+foram removidos da execução. Não há troca automática de provedor.
+
+É possível testar sem publicar: o perfil `local` limita o backend a `127.0.0.1`;
+o Android debug acessa `http://10.0.2.2:8080`. Veja o
+[passo a passo e os pré-requisitos](../../docs/16-migracao-google-routes.md#teste-local-no-android-studio).
 
 AUTH_ISSUER e AUTH_JWK_SET_URI exigem HTTPS. AUTH_AUDIENCE usa `authenticated`
 por padrão. São validados assinatura, emissor, audiência e validade; tokens sem
@@ -59,7 +80,7 @@ de identidade e o cadastro não foram concluídos por esta entrega.
 
 - Orçamento de planejamento de 8 segundos; consulta JDBC e aquisição de conexão
   têm limites próprios. Android encerra a chamada em 9 segundos.
-- Uma chamada ORS, sem retry interativo e sem refinamento automático nesta versão;
+- Uma chamada Google Routes por planejamento, sem retry interativo e sem refinamento automático nesta versão;
   até seis candidatas avaliadas/deduplicadas, até três exibidas.
 - Até quatro planejamentos simultâneos por processo. Até 30 consultas públicas
   por minuto por endereço remoto, com memória limitada. Atrás de proxy, validar a
@@ -98,12 +119,16 @@ para Supabase nem banco compartilhado. Parar com `docker compose -f compose.test
 
 O CI repete esse caminho de migrations/integração antes de permitir deploy.
 O teste de publicação verifica transação e preservação de versão em caso de erro;
-o teste HTTP consulta os três perfis como visitante com ORS simulado.
+o teste HTTP consulta os três perfis como visitante com Google simulado.
 
 ## Pendências de homologação
 
-Chaves e chamadas reais ORS/Google, revisão dos 30 pares, qualidade da associação
-em campo, latência/custo em rede real, TLS/identidade reais e execução em dispositivo
-ainda precisam de validação. O vínculo por assinatura é um piloto conservador,
+Chave e chamada real do Google Routes no novo fluxo, revisão dos 30 pares,
+qualidade da associação em campo, latência/custo em rede real e TLS/identidade reais
+ainda precisam de validação. Os testes no emulador usam fixtures, sem validar
+trajetos reais. O vínculo por assinatura é um piloto conservador,
 não um matcher espacial geral. Refinamento/exclusões, ingestão OSM ampla, relatos
 remotos, grupos, upload de fotos e desvios permanecem etapas seguintes ao piloto.
+Traçados do Google podem ter assinaturas diferentes dos usados com ORS: não
+transferir evidências por proximidade. Revalidar o dataset piloto sobre o novo
+traçado; assinaturas sem correspondência permanecem desconhecidas.

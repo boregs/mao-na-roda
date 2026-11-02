@@ -26,7 +26,7 @@ public class PlanejadorRotasService {
         if (!simultaneas.tryAcquire()) throw new FalhaRota(HttpStatus.TOO_MANY_REQUESTS, "Há muitas consultas. Tente novamente em instantes.");
         var orcamento = new OrcamentoConsulta(Duration.ofSeconds(8));
         try {
-            // Carregar evidências antes da chamada paga: banco indisponível não consome quota ORS.
+            // Carregar evidências antes da chamada paga: banco indisponível não consome quota do provedor.
             var pacote = evidencias.carregar(request.perfil());
             var candidatas = provedor.consultar(request, orcamento.restante());
             var unicas = new LinkedHashMap<String, CandidataRota>();
@@ -37,11 +37,14 @@ public class PlanejadorRotasService {
                     }).thenComparingInt(r -> r.barreiras().impeditivas()).thenComparingInt(r -> r.barreiras().atencao())
                     .thenComparing(Comparator.comparingDouble((RotaAvaliadaResponse r) -> r.qualidade().cobertura()).reversed())
                     .thenComparingDouble(RotaAvaliadaResponse::distanciaMetros).thenComparingDouble(RotaAvaliadaResponse::duracaoSegundos))
-                    .limit(3).toList();
+                    .limit(3).map(r -> new RotaAvaliadaResponse(r.id(), r.geometria(), r.distanciaMetros(), r.duracaoSegundos(),
+                            r.barreiras(), r.qualidade(), r.trechos(), r.aviso() + " " + String.join(" ", provedor.avisos()))).toList();
             orcamento.restante();
             boolean parcial = rotas.stream().anyMatch(r -> !r.qualidade().estado().equals("DOCUMENTADA"));
+            var avisos = new ArrayList<String>();
+            avisos.add(AvaliadorAcessibilidade.AVISO); avisos.addAll(provedor.avisos());
             return new ConsultaRotasResponse(rotas.isEmpty() ? "SEM_CANDIDATA" : parcial ? "PARCIAL" : "CONCLUIDA",
-                    pacote.matriz(), pacote.versao(), rotas, List.of(AvaliadorAcessibilidade.AVISO));
+                    pacote.matriz(), pacote.versao(), rotas, List.copyOf(avisos));
         } finally { simultaneas.release(); }
     }
 }

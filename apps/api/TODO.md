@@ -1,4 +1,34 @@
-# Pendências para preparar a API para testes
+# Pendências da API
+
+## Estado atual — 02/11/2026
+
+O planejamento público usa Google Routes. A API ainda não está publicada;
+o teste no emulador pode usar o backend local. A migração e os passos estão em
+[registro 16](../../docs/16-migracao-google-routes.md) e [PLANEJAMENTO.md](PLANEJAMENTO.md).
+
+- [x] Implementar catálogo, planejamento público, limites e avaliação piloto.
+- [x] Configurar segurança explícita e validadores JWT; rotas não exigem conta.
+- [x] Migrar candidatas para Google Routes e aceitar endereços diretamente.
+- [x] Permitir HTTP apenas local no Android debug, preservando HTTPS em release.
+- [x] Testar fluxo HTTP com Google simulado e executar os três testes no emulador.
+- [ ] Configurar a chave Routes de servidor e um PostgreSQL/PostGIS preparado
+  com V1–V6 e login da aplicação; validar a primeira consulta real do novo fluxo.
+- [ ] Executar novamente a integração PostGIS da migração (3 testes ignorados
+  localmente, sem Docker). O CI e `tools/testar-postgis.ps1` habilitam essa suíte.
+- [ ] Revisar os 30 pares da matriz e o dataset sobre as geometrias Google.
+- [ ] Homologar latência, custo, rede e acessibilidade em campo.
+- [ ] Publicar ambiente HTTPS com segredos e quota compartilhada na borda.
+- [ ] Concluir cadastro/login com identidade real e integração da conta no Android.
+- [ ] Concluir relatos remotos, fotos e descarte dentro do prazo aprovado.
+
+`mvnw verify`: 48 testes aprovados e 3 PostGIS ignorados, sem falhas. O backend
+continua exigindo um banco real em execução; H2 e Google simulado são só de testes.
+
+## Histórico — diagnóstico de 31/10/2026
+
+O texto abaixo é o diagnóstico anterior à implementação do planejamento.
+Os números de falhas e os itens ainda abertos nesse histórico não descrevem o
+estado atual; para acompanhamento, use a lista acima.
 
 Atualização de 01/11/2026: o histórico de falhas abaixo é da base anterior.
 A nova configuração de segurança, testes e pipeline está registrada em

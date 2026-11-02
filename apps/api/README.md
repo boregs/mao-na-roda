@@ -1,12 +1,13 @@
 # API Mão na Roda
 
-**Planejamento de visitante:** catálogo público, busca ORS/Pelias, rotas ORS e
+**Planejamento de visitante:** catálogo público, rotas Google e
 avaliação piloto estão descritos em [PLANEJAMENTO.md](PLANEJAMENTO.md), incluindo
 configuração, limites, banco de testes e pendências de homologação. As instruções
-abaixo também cobrem o endpoint Google de rota-base preservado.
+abaixo também cobrem o endpoint de rota-base preservado. Para testar no Android
+sem publicar o backend, siga o [guia local](../../docs/16-migracao-google-routes.md#teste-local-no-android-studio).
 
-Etapa inicial da issue #7: Spring Boot com verificação de saúde,
-OpenAPI/Swagger, consulta de rota-base a pé via Google e testes HTTP.
+Spring Boot com verificação de saúde, OpenAPI/Swagger, planejamento público de
+rotas a pé via Google, avaliação piloto de evidências e testes HTTP.
 O projeto usa Spring Boot 4.1.2 e compila para Java 25. O Maven Wrapper
 fornece o Maven 3.9.11 automaticamente; não é necessário instalar Maven separado.
 
@@ -95,11 +96,12 @@ administrativas de migration são separadas: consulte
 [database/README.md](database/README.md) antes de aplicar o schema e as permissões.
 `spring-boot:run` e `verify` não executam migrations.
 
-O projeto também inclui Spring Security e endpoints de usuário que recebem
-`Jwt`, mas ainda não declara uma configuração própria de segurança/JWT.
-Não há um fluxo de autenticação completo documentado nesta versão; a política
-padrão pode bloquear as chamadas de saúde, Swagger e rotas. Configurar o banco
-e compilar não garante que esses endpoints estejam prontos para uso.
+`SecurityConfig` permite saúde, Swagger, catálogo e planejamento sem conta.
+Operações de usuário exigem JWT com assinatura, emissor, audiência e validade
+verificados. Configure `AUTH_ISSUER`, `AUTH_JWK_SET_URI` e `AUTH_AUDIENCE` conforme
+[PLANEJAMENTO.md](PLANEJAMENTO.md). Sem configuração de identidade, as operações
+públicas funcionam e tokens de acesso a contas são recusados. Cadastro e login
+com o provedor real ainda não estão concluídos.
 
 ## Executar no Windows
 
@@ -120,13 +122,16 @@ configuração de segurança e da disponibilidade dos serviços.
 Use Ctrl+C para encerrar. A variável de ambiente `PORT` permite trocar a porta.
 No emulador Android padrão, o computador é acessível por `10.0.2.2`.
 HTTP é destinado ao desenvolvimento local; serviços publicados devem usar HTTPS (RNF15).
+Para limitar a API ao próprio computador, use
+`.\mvnw.cmd "-Dspring-boot.run.profiles=local" spring-boot:run`. Em Android debug,
+`API_BASE_URL=http://10.0.2.2:8080` permite esse teste sem publicar o backend.
 
-## Chave local do Google Maps
+## Chave de servidor do Google Routes
 
 Na pasta `apps/api`, copie `.env.example` para `.env` e preencha:
 
 ```dotenv
-GOOGLE_MAPS_API_KEY=COLE_SUA_CHAVE_AQUI
+GOOGLE_ROUTES_API_KEY=COLE_SUA_CHAVE_DE_SERVIDOR_AQUI
 ```
 
 O Spring Boot importa esse arquivo como propriedades, sem biblioteca adicional.
@@ -139,6 +144,9 @@ O `.env` é ignorado pelo Git; somente `.env.example`, sem credenciais, deve ser
 versionado. A chave do Google é opcional para iniciar a aplicação; consultar
 rotas exige a chave. Habilite Routes API e restrinja a chave do backend a essa API e ao IP
 público de saída do servidor. Não use a chave Android.
+O projeto Google Cloud também precisa de faturamento configurado. O nome legado
+`GOOGLE_MAPS_API_KEY` é aceito somente quando `GOOGLE_ROUTES_API_KEY` estiver ausente.
+ORS não é necessário. O app usa sua chave Maps separada em `local.properties`.
 
 ## Consultar rota-base a pé
 
@@ -168,13 +176,14 @@ Não há armazenamento de consultas ou registro de endereços/chaves em logs da 
 Erros retornam Problem Details: 400 para entrada inválida, 404 sem rota,
 502 para falha/resposta inválida do provedor, 503 para chave ausente ou cota
 esgotada e 504 para tempo excedido. Corpos de erro do Google não são repassados.
-O timeout de resposta é 8 segundos e o de conexão é 3 segundos. Não há retries
+O timeout de resposta é 8 segundos e o de conexão é 2 segundos. Não há retries
 automáticos. `google.routes.url` e `google.routes.timeout` são configurações
 internas usadas também pelos testes; não são parâmetros do endpoint.
 
-Cada execução real pode consumir cota e gerar cobrança. Este endpoint ainda é
-um protótipo local sem autenticação ou limite de chamadas: antes de publicá-lo,
-defina proteção contra abuso e quotas. Ele não conclui RF03 nem a issue #7.
+Cada execução real pode consumir cota e gerar cobrança. O endpoint é público e
+limitado a 30 consultas por minuto por endereço remoto em cada processo.
+Antes de publicar múltiplas instâncias, defina proteção e quota compartilhada na
+borda. Uma rota-base isolada não conclui RF03 nem a issue #7.
 
 Validação real em 24/10/2026: a consulta do exemplo retornou HTTP 200, 566 metros,
 456 segundos e polyline preenchida. Esses valores podem mudar. As entradas e
@@ -194,13 +203,12 @@ do modelo, dependências, configuração das credenciais e comandos de aplicaç�
 
 ## Verificar e empacotar
 
-Validação em 31/10/2026: `compile` passou com Maven 3.9.11 e JDK 26,
-gerando bytecode Java 25. Os 15 testes isolados de controller/repository passam.
-O repository usa um schema mínimo em H2, disponível apenas no escopo de testes;
-isso não valida as migrations PostgreSQL/PostGIS nem configura o banco real.
-Na suíte completa, `verify` executou 27 testes, com 18 aprovados e 9 falhas por
-HTTP 401. A configuração de segurança e os testes de integração com PostgreSQL
-continuam pendentes; veja [TODO.md](TODO.md).
+Validação da migração em 02/11/2026: `verify` passou com JDK 25 e Maven 3.9.11,
+com 51 testes, 48 aprovados e 3 PostGIS ignorados por ausência do ambiente de
+integração local. O H2 existe somente nos testes e não configura um banco para
+a aplicação. A suíte com PostGIS é habilitada por `tools/testar-postgis.ps1`
+ou pelo CI, incluindo migrations/integridade e o planejamento HTTP nos três
+perfis com Google simulado. Veja [PLANEJAMENTO.md](PLANEJAMENTO.md) e [TODO.md](TODO.md).
 
 Para executar somente os testes isolados, sem credenciais externas:
 
@@ -225,7 +233,8 @@ Use o UUID de um perfil ativo de `app.perfis_mobilidade`. Omitir
 `perfilMobilidadeUuid` ou enviar `null` preserva o perfil existente; este
 contrato não permite removê-lo. O endpoint retorna 204 após atualizar, 400
 para dados/perfil inválidos e 404 para usuário ausente ou fora do estado ativo.
-O acesso exige autenticação, cuja configuração completa ainda está pendente.
+O acesso exige JWT válido e um usuário ativo no banco. A configuração com o
+provedor real e a integração de conta no Android ainda precisam de homologação.
 
 ### Executar a verificação completa e o JAR
 
@@ -246,8 +255,9 @@ No Linux/macOS, use `sh mvnw verify` ou `sh mvnw spring-boot:run`.
 
 A saúde depende dos indicadores habilitados; com JDBC, também pode refletir
 o estado do banco. Não valida Google Maps nem o fluxo de autenticação.
-Existem endpoints e repositório de usuário em desenvolvimento, mas a integração
-de segurança/JWT ainda precisa ser concluída e validada. A issue #7 não está concluída.
+Existem endpoints e repositório de usuário em desenvolvimento, mas cadastro e a
+integração com identidade real ainda precisam ser concluídos e validados.
+A issue #7 não está concluída.
 
 Google Maps foi escolhido por Felipe para a integração. Falta validar a
 compatibilidade com as regras de barreiras e desvios;
@@ -265,7 +275,7 @@ no `.env` para consultar rotas; não coloque chaves no código.
 | `No implementation for ArtifactHandlerManager was bound` | Confirme **Use Maven Wrapper** e Maven 3.9.11. Essa falha foi observada na importação da IDE com Maven 3.10. |
 | Falha ao baixar dependências | Confira internet, proxy e permissões de escrita em `~/.m2`; tente `mvnw -U compile` após corrigir a causa. |
 | `Failed to configure a DataSource` | Configure `SPRING_DATASOURCE_URL`, usuário e senha; a API usa PostgreSQL, sem banco embarcado. |
-| HTTP 401/403 ao abrir endpoints | Confira a configuração Spring Security/JWT; a integração de autenticação ainda está em desenvolvimento. |
+| HTTP 401/403 | Rotas, saúde e catálogo são públicos; operações de conta exigem JWT. Token inválido enviado a endpoint público também pode ser recusado. |
 | Porta 8080 ocupada | Defina `$env:PORT = '8081'` no PowerShell antes de executar. No Linux/macOS: `PORT=8081 sh mvnw spring-boot:run`. |
 
 Nos exemplos da tabela, use `.\mvnw.cmd` no Windows e `sh mvnw` no Linux/macOS.

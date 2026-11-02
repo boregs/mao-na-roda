@@ -24,7 +24,9 @@ class SegurancaPlanejamentoTests {
     }
     @Test void planejamentoPublicoValidaEntradaSemExigirConta() throws Exception {
         assertEquals(400, consultar("/api/v1/rotas", null, "{}").statusCode());
-        assertEquals(400, consultar("/api/v1/destinos/busca", null, "{\"texto\":\"a\"}").statusCode());
+        var busca = consultar("/api/v1/destinos/busca", null, "{\"texto\":\"Estação Carrão\"}");
+        assertEquals(410, busca.statusCode());
+        assertTrue(busca.body().contains("POST /api/v1/rotas"));
     }
     @Test void coordenadasAusentesNaoViramZero() throws Exception {
         String json = "{\"origem\":{\"latitude\":-23.5},\"destino\":{\"longitude\":-46.6,\"latitude\":-23.6},\"perfil\":\"cadeirante\"}";
