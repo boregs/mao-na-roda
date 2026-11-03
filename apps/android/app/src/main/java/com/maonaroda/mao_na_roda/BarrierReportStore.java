@@ -24,6 +24,11 @@ final class BarrierReportStore {
     static BarrierReportStore from(Context context) { return new BarrierReportStore(context.getFilesDir()); }
 
     synchronized List<BarrierReport> all() throws IOException {
+        File backup = new File(file.getParentFile(), file.getName() + ".bak");
+        if (backup.exists()) {
+            if (!file.exists() && !backup.renameTo(file)) throw new IOException("Não foi possível recuperar as anotações.");
+            if (file.exists()) backup.delete();
+        }
         if (!file.exists()) return Collections.emptyList();
         List<BarrierReport> reports = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -51,7 +56,15 @@ final class BarrierReportStore {
                 new FileOutputStream(temporary), StandardCharsets.UTF_8))) {
             for (BarrierReport item : reports) { writer.write(encode(item)); writer.newLine(); }
         }
-        if (!temporary.renameTo(file)) throw new IOException("Não foi possível salvar o relato.");
+        // Windows não substitui um destino existente com File.renameTo.
+        // Preservar a versão anterior permite recuperar interrupções entre as renomeações.
+        File backup = new File(file.getParentFile(), file.getName() + ".bak");
+        if (file.exists() && !file.renameTo(backup)) throw new IOException("Não foi possível preservar as anotações.");
+        if (!temporary.renameTo(file)) {
+            backup.renameTo(file);
+            throw new IOException("Não foi possível salvar o relato.");
+        }
+        backup.delete();
         return report;
     }
 

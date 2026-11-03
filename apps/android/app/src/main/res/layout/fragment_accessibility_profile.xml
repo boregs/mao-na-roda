@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Seu perfil de acessibilidade"
+            android:text="Preferências da interface"
             android:textAppearance="@style/MaoText.Heading"
             android:textColor="@color/ink" />
 
@@ -39,85 +39,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Escolha as necessidades que descrevem sua experiência. Você pode selecionar mais de uma e alterar quando quiser."
+            android:text="Ajuste a apresentação do aplicativo. O perfil de mobilidade da rota é escolhido no planejamento e vale apenas para a sessão."
             android:textAppearance="@style/MaoText.Meta"
             android:textColor="@color/supporting" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            style="@style/Widget.MaoCard">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:accessibilityHeading="true"
-                    android:text="Mobilidade e acessibilidade"
-                    android:textAppearance="@style/MaoText.Card"
-                    android:textColor="@color/ink" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Selecione todas as opções que se aplicam."
-                    android:textAppearance="@style/MaoText.Meta"
-                    android:textColor="@color/supporting" />
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/profile_wheelchair"
-                    style="@style/MaoText.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="64dp"
-                    android:paddingVertical="8dp"
-                    android:text="Usuário de cadeira de rodas" />
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/profile_reduced_mobility"
-                    style="@style/MaoText.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="64dp"
-                    android:paddingVertical="8dp"
-                    android:text="Pessoa com mobilidade reduzida" />
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/profile_visual"
-                    style="@style/MaoText.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="64dp"
-                    android:paddingVertical="8dp"
-                    android:text="Pessoa com deficiência visual" />
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/profile_hearing"
-                    style="@style/MaoText.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="64dp"
-                    android:paddingVertical="8dp"
-                    android:text="Pessoa com deficiência auditiva" />
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/profile_other"
-                    style="@style/MaoText.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="64dp"
-                    android:paddingVertical="8dp"
-                    android:text="Outro perfil de acessibilidade" />
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/profile_none"
-                    style="@style/MaoText.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="64dp"
-                    android:paddingVertical="8dp"
-                    android:text="Nenhuma necessidade específica" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

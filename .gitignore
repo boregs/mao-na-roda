@@ -38,3 +38,4 @@ desktop.ini
 # Generic test and tooling output
 test-results/
 reports/
+.local-tools/
