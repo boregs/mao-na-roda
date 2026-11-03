@@ -1,13 +1,7 @@
 # API Mão na Roda
 
-**Planejamento de visitante:** catálogo público, rotas Google e
-avaliação piloto estão descritos em [PLANEJAMENTO.md](PLANEJAMENTO.md), incluindo
-configuração, limites, banco de testes e pendências de homologação. As instruções
-abaixo também cobrem o endpoint de rota-base preservado. Para testar no Android
-sem publicar o backend, siga o [guia local](../../docs/16-migracao-google-routes.md#teste-local-no-android-studio).
-
-Spring Boot com verificação de saúde, OpenAPI/Swagger, planejamento público de
-rotas a pé via Google, avaliação piloto de evidências e testes HTTP.
+Etapa inicial da issue #7: Spring Boot com verificação de saúde,
+OpenAPI/Swagger, consulta de rota-base a pé via Google e testes HTTP.
 O projeto usa Spring Boot 4.1.2 e compila para Java 25. O Maven Wrapper
 fornece o Maven 3.9.11 automaticamente; não é necessário instalar Maven separado.
 
@@ -96,12 +90,11 @@ administrativas de migration são separadas: consulte
 [database/README.md](database/README.md) antes de aplicar o schema e as permissões.
 `spring-boot:run` e `verify` não executam migrations.
 
-`SecurityConfig` permite saúde, Swagger, catálogo e planejamento sem conta.
-Operações de usuário exigem JWT com assinatura, emissor, audiência e validade
-verificados. Configure `AUTH_ISSUER`, `AUTH_JWK_SET_URI` e `AUTH_AUDIENCE` conforme
-[PLANEJAMENTO.md](PLANEJAMENTO.md). Sem configuração de identidade, as operações
-públicas funcionam e tokens de acesso a contas são recusados. Cadastro e login
-com o provedor real ainda não estão concluídos.
+O projeto também inclui Spring Security e endpoints de usuário que recebem
+`Jwt`, mas ainda não declara uma configuração própria de segurança/JWT.
+Não há um fluxo de autenticação completo documentado nesta versão; a política
+padrão pode bloquear as chamadas de saúde, Swagger e rotas. Configurar o banco
+e compilar não garante que esses endpoints estejam prontos para uso.
 
 ## Executar no Windows
 

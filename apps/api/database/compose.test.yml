@@ -1,0 +1,18 @@
+# Apenas testes locais: dados efêmeros; não usar em produção.
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ${MNR_TEST_ADMIN_PASSWORD:?Execute testar-banco.ps1}
+    ports:
+      - "127.0.0.1:55432:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - ./tests:/tests:ro
