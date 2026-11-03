@@ -13,14 +13,23 @@ import org.springframework.http.ProblemDetail;
 public class PlanejamentoController {
     private final PerfilMobilidadeRepository perfis;
     private final PlanejadorRotasService planejador;
+
     public PlanejamentoController(PerfilMobilidadeRepository perfis, PlanejadorRotasService planejador) {
         this.perfis = perfis; this.planejador = planejador;
     }
+
     @GetMapping("/perfis-mobilidade")
-    public List<PerfilMobilidadeRepository.Perfil> perfis() { return perfis.listar(); }
+    public List<PerfilMobilidadeRepository.Perfil> perfis() {
+        return perfis.listar();
+    }
+
     @PostMapping("/rotas")
-    public ConsultaRotasResponse planejar(@RequestBody PlanejarRotaRequest request) { return planejador.planejar(request); }
+    public ConsultaRotasResponse planejar(@RequestBody PlanejarRotaRequest request) {
+        return planejador.planejar(request);
+    }
+
     public record BuscaRequest(String texto) { }
+
     @Deprecated
     @PostMapping("/destinos/busca")
     @ResponseStatus(HttpStatus.GONE)

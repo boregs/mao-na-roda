@@ -10,9 +10,12 @@ import java.util.List;
 @Component
 public class GoogleRoutesAdapter implements ProvedorRotas {
     private final GoogleRoutesService service;
+
     public GoogleRoutesAdapter(GoogleRoutesService service) { this.service = service; }
+
     @Override public List<CandidataRota> consultar(PlanejarRotaRequest request, Duration timeout) {
         return service.consultarCandidatas(request, timeout);
     }
+
     @Override public List<String> avisos() { return List.of(GoogleRoutesService.AVISO_CAMINHADA); }
 }

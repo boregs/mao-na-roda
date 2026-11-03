@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 @Configuration
 @org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 public class SecurityConfig {
+
     @Bean
     SecurityFilterChain security(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
@@ -29,12 +30,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(@Value("${auth.issuer:}") String issuer,
-            @Value("${auth.jwk-set-uri:}") String jwks, @Value("${auth.audience:authenticated}") String audience) {
+    JwtDecoder jwtDecoder(@Value("${auth.issuer:}") String issuer, @Value("${auth.jwk-set-uri:}") String jwks, @Value("${auth.audience:authenticated}") String audience) {
         // Sem configuração, as operações públicas funcionam e todo token é recusado.
         if (issuer.isBlank() || jwks.isBlank()) return token -> {
             throw new BadJwtException("Autenticação não configurada.");
         };
+
         if (!issuer.startsWith("https://") || !jwks.startsWith("https://"))
             throw new IllegalArgumentException("Emissor e JWKS de produção exigem HTTPS.");
         var decoder = NimbusJwtDecoder.withJwkSetUri(jwks).build();
@@ -46,12 +47,14 @@ public class SecurityConfig {
         OAuth2TokenValidator<Jwt> aud = jwt -> jwt.getAudience().contains(audience)
                 ? OAuth2TokenValidatorResult.success()
                 : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token"));
+
         OAuth2TokenValidator<Jwt> duracao = jwt -> jwt.getIssuedAt() != null && jwt.getExpiresAt() != null
                 && jwt.getExpiresAt().isAfter(jwt.getIssuedAt())
                 && !jwt.getExpiresAt().isAfter(jwt.getIssuedAt().plusSeconds(900))
                 && !jwt.getIssuedAt().isAfter(java.time.Instant.now().plusSeconds(60))
                 ? OAuth2TokenValidatorResult.success()
                 : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token"));
+
         return new DelegatingOAuth2TokenValidator<>(new JwtTimestampValidator(java.time.Duration.ZERO),
                 new JwtIssuerValidator(issuer), aud, duracao);
     }

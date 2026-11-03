@@ -9,15 +9,19 @@ import org.springframework.stereotype.Repository;
 public class EvidenciaRepository {
     private final JdbcTemplate jdbc;
     public EvidenciaRepository(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+
     public record Evidencia(String assinatura, String trecho, double inicio, double fim,
             String tipo, String classificacao, String condicao, String fonte, OffsetDateTime verificadoEm,
             String referenciaFonte, String versaoFonte, String motivoSemVerificacao) {
+
         public Evidencia(String assinatura, String trecho, double inicio, double fim, String tipo,
                 String classificacao, String condicao, String fonte, OffsetDateTime verificadoEm) {
             this(assinatura, trecho, inicio, fim, tipo, classificacao, condicao, fonte, verificadoEm, null, null, null);
         }
     }
+
     public record Pacote(String versao, String matriz, List<Evidencia> evidencias) { }
+
     public Pacote carregar(String perfil) {
         // Uma instrução lê dataset e matriz na mesma visão MVCC, sem manter transação durante HTTP.
         final String[] versoes = {"SEM_DATASET", "RN-v1"};
@@ -40,6 +44,7 @@ public class EvidenciaRepository {
                             rs.getObject("verificado_em", OffsetDateTime.class), rs.getString("id_fonte"),
                             rs.getString("versao_fonte"), rs.getString("motivo_sem_verificacao"));
                 }, perfil);
+
         return new Pacote(versoes[0], versoes[1], evidencias.stream().filter(e -> e.trecho() != null).toList());
     }
 }

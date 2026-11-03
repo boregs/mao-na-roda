@@ -18,19 +18,26 @@ public class PlanejadorRotasService {
     private final AssociadorEspacial associador;
     private final AvaliadorAcessibilidade avaliador;
     private final Semaphore simultaneas = new Semaphore(4);
+
     public PlanejadorRotasService(ProvedorRotas provedor, EvidenciaRepository evidencias,
             AssociadorEspacial associador, AvaliadorAcessibilidade avaliador) {
         this.provedor = provedor; this.evidencias = evidencias; this.associador = associador; this.avaliador = avaliador;
     }
+
     public ConsultaRotasResponse planejar(PlanejarRotaRequest request) {
-        if (!simultaneas.tryAcquire()) throw new FalhaRota(HttpStatus.TOO_MANY_REQUESTS, "Há muitas consultas. Tente novamente em instantes.");
+        if (!simultaneas.tryAcquire())
+            throw new FalhaRota(HttpStatus.TOO_MANY_REQUESTS, "Há muitas consultas. Tente novamente em instantes.");
+
         var orcamento = new OrcamentoConsulta(Duration.ofSeconds(8));
+
         try {
             // Carregar evidências antes da chamada paga: banco indisponível não consome quota do provedor.
             var pacote = evidencias.carregar(request.perfil());
             var candidatas = provedor.consultar(request, orcamento.restante());
             var unicas = new LinkedHashMap<String, CandidataRota>();
+
             candidatas.stream().limit(6).forEach(c -> unicas.putIfAbsent(c.assinatura(), c));
+
             var rotas = unicas.values().stream().map(c -> avaliador.avaliar(c, associador.associar(c, pacote.evidencias())))
                     .sorted(Comparator.comparingInt((RotaAvaliadaResponse r) -> switch (r.qualidade().estado()) {
                         case "DOCUMENTADA" -> 0; case "PARCIAL" -> 1; default -> 2;
@@ -40,11 +47,18 @@ public class PlanejadorRotasService {
                     .limit(3).map(r -> new RotaAvaliadaResponse(r.id(), r.geometria(), r.distanciaMetros(), r.duracaoSegundos(),
                             r.barreiras(), r.qualidade(), r.trechos(), r.aviso() + " " + String.join(" ", provedor.avisos()))).toList();
             orcamento.restante();
+
             boolean parcial = rotas.stream().anyMatch(r -> !r.qualidade().estado().equals("DOCUMENTADA"));
+
             var avisos = new ArrayList<String>();
+
             avisos.add(AvaliadorAcessibilidade.AVISO); avisos.addAll(provedor.avisos());
+
             return new ConsultaRotasResponse(rotas.isEmpty() ? "SEM_CANDIDATA" : parcial ? "PARCIAL" : "CONCLUIDA",
                     pacote.matriz(), pacote.versao(), rotas, List.copyOf(avisos));
-        } finally { simultaneas.release(); }
+
+        } finally {
+            simultaneas.release();
+        }
     }
 }

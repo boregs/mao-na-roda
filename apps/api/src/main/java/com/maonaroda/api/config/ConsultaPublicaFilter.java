@@ -20,14 +20,18 @@ public class ConsultaPublicaFilter extends OncePerRequestFilter {
         janelas.put(endereco, new Janela(atual == null ? agora : atual.inicio(), atual == null ? 1 : atual.consultas() + 1));
         return true;
     }
-    @Override protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-            FilterChain chain) throws ServletException, IOException {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String path = request.getRequestURI();
+
         if (path.startsWith("/api/v1/rotas") || path.startsWith("/api/v1/destinos")) {
             response.setHeader("Cache-Control", "no-store");
+
             if ("POST".equals(request.getMethod()) && !permitir(request.getRemoteAddr())) {
                 response.setStatus(429); response.setHeader("Retry-After", "60");
                 response.setContentType("application/problem+json"); response.setCharacterEncoding("UTF-8");
+
                 response.getWriter().write("{\"status\":429,\"title\":\"Limite de consultas\",\"detail\":\"Aguarde um minuto antes de consultar novamente.\"}");
                 return;
             }
