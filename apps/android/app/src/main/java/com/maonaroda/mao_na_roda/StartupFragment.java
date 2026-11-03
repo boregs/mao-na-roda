@@ -1,3 +1,21 @@
 package com.maonaroda.mao_na_roda;
-import android.os.Bundle; import android.view.*; import androidx.annotation.*; import androidx.fragment.app.Fragment; import androidx.navigation.fragment.NavHostFragment;
-public class StartupFragment extends Fragment { public View onCreateView(LayoutInflater i,ViewGroup p,Bundle b){return i.inflate(R.layout.fragment_startup,p,false);} public void onViewCreated(@NonNull View v,Bundle b){super.onViewCreated(v,b); boolean done=requireContext().getSharedPreferences("prefs",0).getBoolean("onboarding_completed",false); v.post(()->NavHostFragment.findNavController(this).navigate(done?R.id.action_startup_to_home:R.id.action_startup_to_onboarding));} }
+
+import android.os.Bundle;
+import android.view.*;
+import androidx.annotation.*;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
+public class StartupFragment extends Fragment {
+    public View onCreateView(LayoutInflater i, ViewGroup p, Bundle b) {
+        return i.inflate(R.layout.fragment_startup, p, false);
+    }
+
+    public void onViewCreated(@NonNull View v, Bundle b) {
+        super.onViewCreated(v, b);
+        boolean done = requireContext().getSharedPreferences("prefs", 0)
+                .getBoolean("onboarding_completed", false);
+        v.post(() -> NavHostFragment.findNavController(this).navigate(
+                done ? R.id.action_startup_to_home : R.id.action_startup_to_onboarding));
+    }
+}

@@ -14,10 +14,18 @@ public class HowItWorksSheet extends BottomSheetDialogFragment {
             new HowItWorksSheet().show(manager, "how_it_works");
         }
     }
-    @Nullable @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup parent, @Nullable Bundle state) {
+
+    @Nullable
+    @Override
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup parent,
+            @Nullable Bundle state) {
         return inflater.inflate(R.layout.sheet_how_it_works, parent, false);
     }
-    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
         super.onViewCreated(view, state);
         view.findViewById(R.id.close).setOnClickListener(v -> dismiss());
     }

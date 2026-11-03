@@ -1,0 +1,137 @@
+package com.maonaroda.api.controller.usuario;
+
+import com.maonaroda.api.model.UsuarioModel;
+import com.maonaroda.api.service.usuario.UsuarioService;
+import com.maonaroda.api.exception.usuario.UsuarioNaoEncontradoException;
+import com.maonaroda.api.exception.perfil.PerfilMobilidadeInvalidoException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.MethodParameter;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+class UsuarioControllerTests {
+    private static final String URL = "/api/v1/usuarios/me";
+    private static final UUID ID = UUID.randomUUID();
+    private static final String NOME = "{\"nome\":\"Ana\",\"sobrenome\":\"Silva\"}";
+    private static final String CADASTRO = "{\"nome\":\"Ana\",\"sobrenome\":\"Silva\","
+            + "\"email\":\"ana@example.com\",\"senha\":\"senha12345\"}";
+    private Jwt principal;
+    private RuntimeException falha;
+    private UUID chamado;
+    private UUID perfilChamado;
+    private MockMvc mvc;
+
+    @BeforeEach
+    void preparar() {
+        principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject(ID.toString()).build();
+        UsuarioService service = new UsuarioService(null) {
+            private void registrar(UUID id) {
+                chamado = id;
+                if (falha != null) throw falha;
+            }
+            @Override public UsuarioModel obter(UUID id) {
+                registrar(id);
+                return new UsuarioModel("Ana", "Silva");
+            }
+            @Override public void atualizar(UUID id, UsuarioModel model, UUID perfil) {
+                registrar(id);
+                perfilChamado = perfil;
+            }
+            @Override public void iniciarExclusao(UUID id) { registrar(id); }
+        };
+        mvc = MockMvcBuilders.standaloneSetup(new UsuarioController(service))
+                .setControllerAdvice(new UsuarioExceptionHandler())
+                .setCustomArgumentResolvers(new HandlerMethodArgumentResolver() {
+                    @Override public boolean supportsParameter(MethodParameter parameter) {
+                        return parameter.getParameterType() == Jwt.class;
+                    }
+                    @Override public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container,
+                            NativeWebRequest request, WebDataBinderFactory factory) { return principal; }
+                }).build();
+    }
+
+    @Test void obterRetornaUsuario() throws Exception {
+        mvc.perform(get(URL)).andExpect(status().isOk()).andExpect(jsonPath("$.nome").value("Ana"));
+        assertEquals(ID, chamado);
+    }
+
+    @Test void atualizarEExcluirRetornamSemConteudo() throws Exception {
+        mvc.perform(patch(URL).contentType("application/json").content(NOME))
+                .andExpect(status().isNoContent()).andExpect(content().string(""));
+        mvc.perform(delete(URL)).andExpect(status().isNoContent()).andExpect(content().string(""));
+        assertEquals(ID, chamado);
+    }
+
+    @Test void criarNaoSimulaSucesso() throws Exception {
+        mvc.perform(post(URL).contentType("application/json").content(CADASTRO))
+                .andExpect(status().isNotImplemented());
+    }
+
+    @Test void encaminhaPerfilExplicitoEValidaUuid() throws Exception {
+        UUID perfil = UUID.randomUUID();
+        mvc.perform(patch(URL).contentType("application/json").content(
+                "{\"nome\":\"Ana\",\"sobrenome\":\"Silva\",\"perfilMobilidadeUuid\":\"" + perfil + "\"}"))
+                .andExpect(status().isNoContent());
+        assertEquals(perfil, perfilChamado);
+        mvc.perform(patch(URL).contentType("application/json").content(
+                "{\"nome\":\"Ana\",\"sobrenome\":\"Silva\",\"perfilMobilidadeUuid\":\"invalido\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test void perfilAusenteOuInativoRetorna400() throws Exception {
+        falha = new PerfilMobilidadeInvalidoException();
+        mvc.perform(patch(URL).contentType("application/json").content(NOME))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Perfil de mobilidade inexistente ou inativo."));
+    }
+
+    @Test void rejeitaCorposInvalidos() throws Exception {
+        mvc.perform(post(URL).contentType("application/json").content("{}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(patch(URL).contentType("application/json").content("{}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(patch(URL).contentType("application/json").content("{"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test void usuarioAusenteRetorna404() throws Exception {
+        falha = new EmptyResultDataAccessException(1);
+        mvc.perform(get(URL)).andExpect(status().isNotFound());
+        falha = new UsuarioNaoEncontradoException();
+        mvc.perform(patch(URL).contentType("application/json").content(NOME)).andExpect(status().isNotFound());
+        mvc.perform(delete(URL)).andExpect(status().isNotFound());
+    }
+
+    @Test void falhaInternaNaoExpoeDetalhes() throws Exception {
+        falha = new DataAccessResourceFailureException("segredo-do-banco");
+        mvc.perform(get(URL)).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.detail").value("Não foi possível concluir a operação."));
+        mvc.perform(patch(URL).contentType("application/json").content(NOME))
+                .andExpect(status().isInternalServerError());
+        mvc.perform(delete(URL)).andExpect(status().isInternalServerError());
+    }
+
+    @Test void exigeIdentidadeValida() throws Exception {
+        principal = null;
+        mvc.perform(get(URL)).andExpect(status().isUnauthorized());
+        mvc.perform(patch(URL).contentType("application/json").content(NOME)).andExpect(status().isUnauthorized());
+        mvc.perform(delete(URL)).andExpect(status().isUnauthorized());
+        mvc.perform(post(URL).contentType("application/json").content(CADASTRO)).andExpect(status().isUnauthorized());
+        principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject("invalido").build();
+        mvc.perform(get(URL)).andExpect(status().isUnauthorized());
+    }
+}
