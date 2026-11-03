@@ -19,14 +19,12 @@ no classpath do plugin. O módulo PostgreSQL é necessário além do Flyway core
 Não é necessário SDK Java do Supabase, Hibernate, `pgcrypto` ou `uuid-ossp` para
 essas migrations: `gen_random_uuid()` é nativo das versões atuais do PostgreSQL.
 
-As credenciais administrativas pertencem à etapa de migration. A aplicação já
-possui `spring-boot-starter-jdbc`, driver PostgreSQL de execução e
-`UsuarioRepository` com `JdbcTemplate`. Configure o login restrito da API nas
-variáveis `SPRING_DATASOURCE_*`, separadas das credenciais `FLYWAY_*`.
-`spring-boot:run` e `verify` não executam migrations.
-
-A preparação repetível de um banco descartável e a validação da tarefa #12
-estão em [INTEGRACAO.md](INTEGRACAO.md).
+As credenciais administrativas pertencem à etapa de migration. A aplicação usa
+repositórios JDBC e driver PostgreSQL no classpath de execução, configurados por
+`SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD`.
+Use um login separado com as permissões de `maonaroda_api`.
+`spring-boot:run` e `verify` não executam migrations. Para o planejamento atual
+e o teste local, consulte [PLANEJAMENTO.md](../PLANEJAMENTO.md).
 
 ## Arquivos e ordem
 
@@ -39,6 +37,7 @@ Os SQLs estão em [`../src/main/resources/db/migration`](../src/main/resources/d
 | `V3__garantir_autoria_e_retencao.sql` | Timestamps, autor ativo no envio e desvinculação ao excluir conta. |
 | `V4__carregar_matriz_de_barreiras.sql` | Três perfis, dez barreiras e as trinta classificações RN01/RN02. |
 | `V5__configurar_permissoes_jdbc.sql` | Grupos de acesso da API e do worker de descarte. |
+| `V6__adicionar_evidencias_do_piloto.sql` | Dataset piloto, trechos orientados e evidências de barreiras, sem carga fictícia. |
 
 O histórico fica em `app_migrations.flyway_schema_history`, separado do domínio
 e dos schemas gerenciados. Flyway administra somente esse schema de histórico;
@@ -132,7 +131,7 @@ Se PostGIS já estiver instalado em outro schema, V1 falha com uma mensagem
 específica. Inspecione dependências e siga a documentação do provedor antes de
 ajustar a instalação; as migrations não movem nem apagam a extensão existente.
 
-Versione mudanças seguintes como `V6__...sql`, etc. Não edite migrations já
+Versione mudanças seguintes como `V7__...sql`, etc. Não edite migrations já
 aplicadas: `validate` confere os checksums. O Flyway controla as transações;
 os SQLs de migrations não contêm BEGIN/COMMIT próprios.
 

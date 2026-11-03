@@ -11,6 +11,7 @@ public record PontoRota(Double latitude, Double longitude, String endereco) {
             }
             return Map.of("address", endereco.trim());
         }
+
         if (latitude == null || longitude == null
                 || !Double.isFinite(latitude) || !Double.isFinite(longitude)
                 || latitude < -90 || latitude > 90
@@ -18,6 +19,7 @@ public record PontoRota(Double latitude, Double longitude, String endereco) {
             throw new IllegalArgumentException(
                     "Informe latitude entre -90 e 90 e longitude entre -180 e 180, ou um endereço.");
         }
+
         return Map.of("location", Map.of("latLng", Map.of("latitude", latitude, "longitude", longitude)));
     }
 }

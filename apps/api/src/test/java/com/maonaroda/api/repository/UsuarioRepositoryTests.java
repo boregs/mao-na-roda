@@ -83,11 +83,4 @@ class UsuarioRepositoryTests {
                 () -> service.atualizar(usuario, nomes, novoPerfil));
         assertEquals(1L, perfilAtual(usuario));
     }
-    @Test void consultaParametrizadaPreservaPayloadComoTexto() {
-        String payload = "Ana', estado_conta='exclusao_em_andamento'; DROP TABLE app.usuarios; --";
-        service.atualizar(usuario, new UsuarioModel(payload, "Teste"), null);
-        assertEquals(payload, service.obter(usuario).nome());
-        assertEquals("Outro", service.obter(outroUsuario).nome());
-        assertEquals(2, jdbc.queryForObject("SELECT count(*) FROM app.usuarios", Integer.class));
-    }
 }

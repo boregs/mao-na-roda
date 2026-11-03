@@ -32,6 +32,7 @@ public class RotasController {
                                             {"origem":{"endereco":"Estação de Metrô Carrão, São Paulo, SP, Brasil"},
                                              "destino":{"endereco":"UNICID, Rua Cesário Galeno, 448, Tatuapé, São Paulo, SP, Brasil"}}
                                             """))))
+
     public RotaBase consultar(@RequestBody ConsultaRota consulta) {
         return service.consultar(consulta);
     }

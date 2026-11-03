@@ -38,7 +38,7 @@ class MaoNaRodaApiApplicationTests {
 
     @Test
     void naoExpoeConfiguracoesDoAmbiente() throws Exception {
-        assertEquals(404, get("/actuator/env").statusCode());
+        assertEquals(401, get("/actuator/env").statusCode());
     }
 
     private HttpResponse<String> get(String path) throws Exception {
