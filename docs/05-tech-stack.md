@@ -1,7 +1,8 @@
 # Tech Stack – Mão na Roda
 
-> **Versão do documento:** 0.5 <br>
+> **Versão do documento:** 0.6 <br>
 > **Data:** 15/10/2026 <br>
+> **Última atualização:** 02/11/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md)
 
 ---
@@ -104,7 +105,13 @@ O projeto depende de um provedor de mapas para quatro funções distintas:
 3. Converter coordenadas em referências de local, quando necessário.
 4. Gerar rotas-base entre origem e destino.
 
-O provedor ainda será escolhido após um protótipo técnico. A escolha deve considerar custo, limite de uso, cobertura em São Paulo, qualidade da busca de endereços, compatibilidade com Android nativo e termos de uso.
+Em 02/11/2026, por solicitação do responsável, foi escolhido Google Maps SDK
+para o mapa Android e Google Routes para as candidatas de caminhada. Endereços
+são enviados ao Routes pelo backend na própria consulta, sem busca ORS/Pelias
+separada. A chave de servidor permanece no backend. O perfil é aplicado às
+evidências de acessibilidade pelo Mão na Roda, não como garantia do Google.
+Custo, limites, termos de uso, acessos e qualidade dos trajetos reais ainda
+precisam ser homologados. Consulte a [decisão e o teste local](16-migracao-google-routes.md).
 
 > Uma rota-base fornecida por um serviço externo não será automaticamente considerada acessível. A API Java deverá combinar a rota-base com os dados de barreiras e o perfil de mobilidade para cumprir RN01 a RN04.
 
@@ -142,7 +149,8 @@ Para a V1, a infraestrutura será composta por:
 
 ## 7. Pendências e próximos passos
 
-- [ ] Escolher e validar o provedor de mapas, busca de destinos e rotas-base.
+- [x] Escolher o provedor de mapas e rotas-base: Google Maps SDK e Google Routes.
+- [ ] Homologar o novo fluxo com chave Routes, banco e trajetos reais.
 - [ ] Fazer um protótipo que calcule uma rota-base e aplique as barreiras do perfil de mobilidade.
 - [ ] Definir o modelo de dados inicial para perfis, barreiras, relatos e fotos.
 - [ ] Definir limites de tamanho e formatos aceitos para as fotos.
@@ -162,3 +170,4 @@ Para a V1, a infraestrutura será composta por:
 | 0.3 | 13/10/2026 | Definição da retenção e do descarte automático de fotos no Supabase. |
 | 0.4 | 15/10/2026 | Aprovação da tech do CI/CD |
 | 0.5 | 28/10/2026 | Atualização da stack móvel para Android nativo com Java e XML. |
+| 0.6 | 02/11/2026 | Escolha de Google Maps SDK/Routes e registro da migração do planejamento. |

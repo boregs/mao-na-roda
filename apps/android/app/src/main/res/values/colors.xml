@@ -13,4 +13,7 @@
     <color name="sunlight">#F2C75C</color>
     <color name="disabled_container">#BBC3C3</color>
     <color name="disabled_content">#4A5C6A</color>
+    <color name="home_map_surface">#EAF0EC</color>
+    <color name="home_floating_surface">#FAFCFB</color>
+    <color name="home_surface_outline">#D1DBD6</color>
 </resources>

@@ -6,7 +6,7 @@ import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
-@RestControllerAdvice(assignableTypes = RotasController.class)
+@RestControllerAdvice(assignableTypes = {RotasController.class, com.maonaroda.api.controller.PlanejamentoController.class})
 public class RotasExceptionHandler {
     @ExceptionHandler(FalhaRota.class)
     ResponseEntity<ProblemDetail> falha(FalhaRota erro) {
@@ -26,5 +26,11 @@ public class RotasExceptionHandler {
                 .body(ProblemDetail.forStatusAndDetail(
                         HttpStatus.BAD_REQUEST,
                         "JSON inválido. Informe origem e destino com endereço ou coordenadas numéricas."));
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataAccessException.class)
+    ResponseEntity<ProblemDetail> bancoIndisponivel() {
+        return ResponseEntity.status(503).body(ProblemDetail.forStatusAndDetail(
+                HttpStatus.SERVICE_UNAVAILABLE, "Os dados de planejamento estão indisponíveis. Tente novamente."));
     }
 }

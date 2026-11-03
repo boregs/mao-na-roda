@@ -1,0 +1,46 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/paper" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+        <com.google.android.material.button.MaterialButton android:id="@+id/report_back"
+            style="@style/Widget.MaoButton.Text" android:layout_width="wrap_content"
+            android:layout_height="56dp" android:text="Voltar" app:icon="@drawable/ic_arrow_back"
+            app:iconGravity="textStart" app:iconTint="@color/ocean" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="Relatar uma barreira"
+            android:textAppearance="@style/MaoText.Heading" android:textColor="@color/ink" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="Conte o que encontrou para manter um registro neste dispositivo. O relato não é enviado nem verificado."
+            android:textAppearance="@style/MaoText.Meta" android:textColor="@color/supporting" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" android:text="Tipo de barreira *"
+            android:textAppearance="@style/MaoText.Card" android:textColor="@color/ink" />
+        <Spinner android:id="@+id/report_category" android:layout_width="match_parent"
+            android:layout_height="64dp" android:contentDescription="Categoria da barreira" />
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/report_description_layout"
+            style="@style/Widget.MaoInputLayout" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="12dp"
+            android:hint="Descreva o problema *">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/report_description"
+                style="@style/Widget.MaoInput" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:gravity="top|start"
+                android:inputType="textCapSentences|textMultiLine" android:minLines="4"
+                android:maxLength="1000" android:contentDescription="Descrição obrigatória da barreira" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/report_add_photo"
+            style="@style/Widget.MaoButton.Outlined" android:layout_width="match_parent"
+            android:layout_height="64dp" android:layout_marginTop="20dp"
+            android:text="Adicionar foto (opcional)" app:icon="@drawable/ic_info"
+            app:iconGravity="textStart" />
+        <ImageView android:id="@+id/report_photo_preview" android:layout_width="match_parent"
+            android:layout_height="200dp" android:layout_marginTop="8dp"
+            android:contentDescription="Prévia da foto anexada" android:scaleType="centerCrop"
+            android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/report_save"
+            style="@style/Widget.MaoButton" android:layout_width="match_parent"
+            android:layout_height="64dp" android:layout_marginTop="20dp"
+            android:text="Salvar relato" />
+    </LinearLayout>
+</ScrollView>

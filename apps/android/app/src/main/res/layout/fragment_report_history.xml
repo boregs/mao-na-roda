@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/paper" android:padding="20dp">
+    <com.google.android.material.button.MaterialButton android:id="@+id/history_back"
+        style="@style/Widget.MaoButton.Text" android:layout_width="wrap_content"
+        android:layout_height="56dp" android:text="Voltar" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" android:text="Meus relatos"
+        android:textAppearance="@style/MaoText.Heading" android:textColor="@color/ink" />
+    <TextView android:id="@+id/history_empty" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="24dp"
+        android:gravity="center" android:text="Ainda não há relatos. Quando encontrar uma barreira, você pode registrá-la por aqui."
+        android:textAppearance="@style/MaoText.Body" android:textColor="@color/supporting" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:layout_marginTop="12dp">
+        <LinearLayout android:id="@+id/history_list" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical" />
+    </ScrollView>
+</LinearLayout>

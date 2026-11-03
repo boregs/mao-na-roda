@@ -196,9 +196,12 @@ class RotasIntegrationTests {
     }
 
     private HttpResponse<String> post(String body) throws Exception {
+        return post("/api/v1/rotas/base", body);
+    }
+    private HttpResponse<String> post(String path, String body) throws Exception {
         try (var client = HttpClient.newHttpClient()) {
             return client.send(
-                    HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/v1/rotas/base"))
+                    HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
                             .header("Content-Type", "application/json")
                             .POST(HttpRequest.BodyPublishers.ofString(body))
                             .build(),
