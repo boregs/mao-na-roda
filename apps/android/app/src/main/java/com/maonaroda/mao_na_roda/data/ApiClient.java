@@ -117,9 +117,11 @@ public final class ApiClient implements RotasRepository {
             if (coords.length() < 2 || coords.length() > 50000) throw new JSONException("Geometria inválida.");
             for (int j = 0; j < coords.length(); j++) { var p = coords.getJSONArray(j); pontos.add(new Ponto(p.getDouble(0), p.getDouble(1))); }
             var qualidade = r.getJSONObject("qualidade"); var barreiras = r.getJSONObject("barreiras");
+            var evidencias = new ArrayList<Evidencia>();
             var details = new StringBuilder(); var trechos = r.getJSONArray("trechos");
             for (int j = 0; j < trechos.length(); j++) {
-                var items = trechos.getJSONObject(j).getJSONArray("barreiras");
+                var trecho = trechos.getJSONObject(j);
+                var items = trecho.getJSONArray("barreiras");
                 for (int k = 0; k < items.length(); k++) {
                     var b = items.getJSONObject(k);
                     if ("ausente".equals(b.optString("condicao"))) continue;
@@ -134,12 +136,31 @@ public final class ApiClient implements RotasRepository {
                     if (!b.isNull("motivoSemVerificacao") && !b.optString("motivoSemVerificacao").isEmpty())
                         details.append("\n").append(b.optString("motivoSemVerificacao"));
                     details.append("\n\n");
+                    double inicio = trecho.optDouble("inicio", -1);
+                    double fim = trecho.optDouble("fim", -1);
+                    if ("presente".equals(b.optString("condicao")) && inicio >= 0 && fim > inicio && fim <= 1) {
+                        evidencias.add(new Evidencia(inicio, fim, b.optString("tipo").replace('_', ' ')
+                                + (b.optBoolean("desatualizada") ? " (requer nova verificação)" : "")));
+                    }
                 }
             }
             if (!r.optString("aviso").isEmpty()) details.append("\n").append(r.optString("aviso"));
+            var etapas = new ArrayList<Etapa>();
+            var passos = r.optJSONArray("etapas");
+            if (passos != null) for (int j = 0; j < passos.length(); j++) {
+                var passo = passos.getJSONObject(j);
+                var linha = passo.getJSONObject("geometria").getJSONArray("coordinates");
+                var pontosEtapa = new ArrayList<Ponto>();
+                for (int k = 0; k < linha.length(); k++) {
+                    var ponto = linha.getJSONArray(k);
+                    pontosEtapa.add(new Ponto(ponto.getDouble(0), ponto.getDouble(1)));
+                }
+                if (pontosEtapa.size() >= 2) etapas.add(new Etapa(passo.optString("instrucao"), List.copyOf(pontosEtapa)));
+            }
             list.add(new Rota(r.getString("id"), List.copyOf(pontos), r.getDouble("distanciaMetros"), r.getDouble("duracaoSegundos"),
                     qualidade.getString("estado"), qualidade.getDouble("cobertura"), barreiras.getInt("impeditivas"), barreiras.getInt("atencao"),
-                    details.length() == 0 ? "Nenhuma barreira conhecida informada. Isso não garante acessibilidade." : details.toString()));
+                    details.length() == 0 ? "Nenhuma barreira conhecida informada. Isso não garante acessibilidade." : details.toString(),
+                    List.copyOf(etapas), List.copyOf(evidencias)));
         }
         var avisos = root.optJSONArray("avisos"); var texto = new StringBuilder();
         if (avisos != null) for (int i = 0; i < avisos.length(); i++) {

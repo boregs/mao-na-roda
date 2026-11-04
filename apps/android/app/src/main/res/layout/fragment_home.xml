@@ -43,6 +43,9 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/consult_route" />
             <com.google.android.material.button.MaterialButton android:id="@+id/cancel_query" style="@style/Widget.MaoButton.Text"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cancel_query" />
+            <LinearLayout android:id="@+id/percurso" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" />
+
             <LinearLayout android:id="@+id/route_results" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
             <com.google.android.material.button.MaterialButton android:id="@+id/interface_preferences" style="@style/Widget.MaoButton.Text"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/interface_preferences" />

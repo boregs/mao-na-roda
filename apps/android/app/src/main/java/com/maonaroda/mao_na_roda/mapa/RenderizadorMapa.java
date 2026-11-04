@@ -11,6 +11,23 @@ import java.util.*;
 
 public final class RenderizadorMapa {
     private final GoogleMap mapa;
+    private Marker posicao;
+    public void posicao(com.maonaroda.mao_na_roda.data.DadosRotas.Ponto ponto) {
+        if (ponto == null) {
+            if (posicao != null) posicao.remove();
+            posicao = null;
+            return;
+        }
+        var coordenada = new LatLng(ponto.latitude(), ponto.longitude());
+        if (posicao == null) posicao = mapa.addMarker(new MarkerOptions().position(coordenada)
+                .title("Sua posição").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        else posicao.setPosition(coordenada);
+    }
+
+    public void recentralizar() {
+        if (posicao != null) mapa.animateCamera(CameraUpdateFactory.newLatLngZoom(posicao.getPosition(), 17));
+    }
+
     private String assinatura = "";
     public RenderizadorMapa(GoogleMap mapa, Context context) {
         this.mapa = mapa;
@@ -26,7 +43,7 @@ public final class RenderizadorMapa {
         if (width <= 0 || height <= 0) return;
         String id = rotas.isEmpty() ? "" : rotas.stream().map(Rota::id).collect(java.util.stream.Collectors.joining(",")) + ":" + selecionada;
         if (id.equals(assinatura)) return;
-        assinatura = id; mapa.clear(); if (rotas.isEmpty()) return;
+        assinatura = id; mapa.clear(); posicao = null; if (rotas.isEmpty()) return;
         var bounds = new LatLngBounds.Builder();
         for (int i = 0; i < rotas.size(); i++) {
             var polyline = new PolylineOptions().width(i == selecionada ? 12 : 6)
