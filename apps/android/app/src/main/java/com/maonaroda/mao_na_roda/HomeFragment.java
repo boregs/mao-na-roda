@@ -128,7 +128,15 @@ public class HomeFragment extends Fragment {
     }
     private void escolherPerfil() {
         var estado = model.estado().getValue();
-        if (estado.perfis().isEmpty()) { model.carregarPerfis(); return; }
+        if (estado.perfis().isEmpty()) {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.select_route_profile)
+                    .setMessage("O catálogo de perfis ainda não está disponível. Confira a conexão com a API e tente novamente.")
+                    .setNegativeButton(R.string.close, null)
+                    .setPositiveButton("Tentar novamente", (dialog, index) -> model.carregarPerfis())
+                    .show();
+            return;
+        }
         String[] nomes = new String[estado.perfis().size()]; int selecionado = -1;
         for (int i = 0; i < nomes.length; i++) { nomes[i] = estado.perfis().get(i).nome(); if (estado.perfis().get(i).codigo().equals(estado.perfil())) selecionado = i; }
         new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.select_route_profile)
