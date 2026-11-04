@@ -114,7 +114,7 @@ Na pasta `apps/api`, com JDK 25 configurado:
    Exemplo PowerShell, substituindo os marcadores:
 
    ```powershell
-   $env:FLYWAY_URL = 'jdbc:postgresql://db.PROJECT_REF.supabase.co:5432/postgres?sslmode=verify-full&sslrootcert=C:/certificados/supabase-ca.crt'
+   $env:FLYWAY_URL = 'jdbc:postgresql://db.PROJECT_REF.supabase.co:5432/postgres?sslmode=verify-full&sslrootcert=C:/git/mao-na-roda/apps/api/certs/supabase-prod-ca-2021.crt'
    $env:FLYWAY_USER = 'postgres'
    $credencial = Get-Credential -UserName $env:FLYWAY_USER -Message 'Senha PostgreSQL de migrations'
    $env:FLYWAY_PASSWORD = $credencial.GetNetworkCredential().Password
@@ -185,6 +185,12 @@ ou privilégios administrativos adicionais. A API lê o domínio, insere contas,
 relatos/fotos e atualiza os campos editáveis da conta. A exclusão da identidade
 passa pelo Auth. O worker lê/exclui relatos e fotos; só deve apagar as referências
 após concluir a remoção dos objetos no Storage.
+
+Todas as tabelas de `app` têm RLS ativo (V7). As políticas permissivas de V7
+espelham os grants acima para `maonaroda_api` e `maonaroda_descarte`; sem elas,
+os logins não leem nem gravam linhas. No Supabase de produção, o login da API é
+`maonaroda_api_login` (no Session pooler: `maonaroda_api_login.<project-ref>`),
+criado sem senha; defina-a no SQL Editor com `ALTER ROLE ... PASSWORD`.
 
 O acesso privado JDBC usa grants, sem políticas `auth.uid()`: a identidade do
 usuário não é propagada automaticamente pela conexão compartilhada. A API
