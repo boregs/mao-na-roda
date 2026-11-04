@@ -186,6 +186,12 @@ relatos/fotos e atualiza os campos editáveis da conta. A exclusão da identidad
 passa pelo Auth. O worker lê/exclui relatos e fotos; só deve apagar as referências
 após concluir a remoção dos objetos no Storage.
 
+Todas as tabelas de `app` têm RLS ativo (V7). As políticas permissivas de V7
+espelham os grants acima para `maonaroda_api` e `maonaroda_descarte`; sem elas,
+os logins não leem nem gravam linhas. No Supabase de produção, o login da API é
+`maonaroda_api_login` (no Session pooler: `maonaroda_api_login.<project-ref>`),
+criado sem senha; defina-a no SQL Editor com `ALTER ROLE ... PASSWORD`.
+
 O acesso privado JDBC usa grants, sem políticas `auth.uid()`: a identidade do
 usuário não é propagada automaticamente pela conexão compartilhada. A API
 deve autorizar cada operação e ocultar relatos com `descartar_em <= now()`.
