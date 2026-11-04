@@ -56,7 +56,7 @@ pública. Não foram alteradas migrations nem a matriz de barreiras.
 
 ### 1. Preparar o backend
 
-É necessário JDK 25 e um PostgreSQL/PostGIS preparado com as migrations V1–V6,
+É necessário JDK 25 e um PostgreSQL/PostGIS preparado com as migrations Flyway V1–V6,
 incluindo o catálogo dos três perfis. O login da aplicação deve herdar
 `maonaroda_api`; use credenciais de migration separadas. Consulte
 [banco e permissões](../apps/api/database/README.md).

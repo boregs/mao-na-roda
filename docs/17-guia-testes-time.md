@@ -33,7 +33,7 @@ isso não preenche o `local.properties` para as próximas compilações no Studi
 
 | Ordem | Frente | Entrega necessária |
 |---|---|---|
-| 1 | Banco / DBA | Banco de desenvolvimento PostgreSQL/PostGIS, migrations V1–V6 aplicadas e login com grupo `maonaroda_api` |
+| 1 | Banco / DBA | Banco de desenvolvimento PostgreSQL/PostGIS, migrations V1–V6 aplicadas pelo Flyway e login com grupo `maonaroda_api` |
 | 2 | API / Google Cloud | Chave de servidor para Routes API, faturamento/restrições conferidos e `.env` configurado |
 | 3 | API | Backend iniciado; saúde e catálogo funcionando; primeira chamada real a `/api/v1/rotas` registrada |
 | 4 | Android | Branch atualizada, URL da API, chave Maps e assinatura debug configuradas; app executado no emulador |
@@ -99,8 +99,12 @@ por causa da API. O [README Android](../apps/android/README.md) cobre a sincroni
 Pedir ao responsável pelo banco:
 
 1. Host, porta, nome do banco, login e senha PostgreSQL da aplicação.
-2. Confirmação de migrations **V1–V6** aplicadas/validadas pelo Flyway, PostGIS
-   no schema esperado e catálogo dos três perfis carregado pela V4.
+2. Confirmação de esquema equivalente às migrations **V1–V6**, PostGIS no schema
+   esperado e catálogo dos três perfis carregado pela V4. Em desenvolvimento e
+   testes, as migrations são aplicadas e validadas pelo Flyway. Em produção, o
+   esquema foi aplicado manualmente a partir de `database/migrations` e ainda
+   depende de verificação e `flyway:baseline` na versão 6
+   ([produção existente](../apps/api/database/README.md#produção-existente)).
 3. Login separado do administrador, herdando as permissões de `maonaroda_api`.
 4. Configuração TLS/certificado para conexão remota.
 
@@ -108,7 +112,8 @@ A chave `anon`/publishable do Supabase não é senha JDBC. O usuário do Flyway 
 separado do login da aplicação. O passo a passo administrativo está em
 [banco e migrations](../apps/api/database/README.md#aplicar-no-supabase).
 Não editar migrations já aplicadas nem executar os scripts de bootstrap local
-em um projeto Supabase. O schema Auth real deve continuar gerenciado pelo provedor.
+em um projeto Supabase. Não executar `database/migrations` em ambientes novos:
+eles são apenas cópia de referência de produção; use o Flyway. O schema Auth real deve continuar gerenciado pelo provedor.
 
 O `.env` não aplica migrations. `spring-boot:run` e `verify` também não as aplicam.
 Para desenhar a primeira rota não é necessário publicar um dataset de barreiras;

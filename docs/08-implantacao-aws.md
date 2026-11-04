@@ -111,8 +111,12 @@ ele e a API e impeça acesso direto que contorne os controles do Gateway.
 7. Aplique e valide as migrations do banco **antes da primeira implantação**, com
    credenciais específicas para migrations e seguindo o README do banco. Este
    fluxo não executa Flyway, não provisiona PostgreSQL e não altera permissões do
-   banco. Nas próximas versões, aplique migrations compatíveis com a versão
-   anterior como pré-requisito controlado da implantação.
+   banco. O banco de produção já foi preparado manualmente com um esquema
+   equivalente a V1–V6 (`database/migrations`); antes de usar o Flyway nele,
+   registre o baseline conforme
+   [produção existente](../apps/api/database/README.md#produção-existente). Nas
+   próximas versões, aplique pelo Flyway migrations `V7__...` em diante,
+   compatíveis com a versão anterior, como pré-requisito controlado da implantação.
 
 ## OIDC e variáveis no GitHub
 
