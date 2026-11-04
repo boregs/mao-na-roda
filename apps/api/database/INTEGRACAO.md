@@ -103,8 +103,14 @@ SPRING_PROFILES_ACTIVE=supabase
 SPRING_DATASOURCE_URL=jdbc:postgresql://HOST:5432/postgres
 SPRING_DATASOURCE_USERNAME=LOGIN_RESTRITO
 SPRING_DATASOURCE_PASSWORD=SENHA_LOCAL
-SUPABASE_DB_CA_CERT=C:/certificados/supabase-ca.crt
+SUPABASE_DB_CA_CERT=C:/git/mao-na-roda/apps/api/certs/supabase-prod-ca-2021.crt
 ```
+
+O certificado raiz público da Supabase (Supabase Root 2021 CA, válido até
+2031-04-26) está versionado em `apps/api/certs/supabase-prod-ca-2021.crt`. Use o
+caminho absoluto do seu clone em `SUPABASE_DB_CA_CERT`, pois o pgJDBC resolve
+`sslrootcert` relativo ao diretório de execução. Se a Supabase rotacionar a CA,
+baixe o novo arquivo em Database Settings → SSL Configuration e substitua-o.
 
 O perfil `application-supabase.properties` configura Hikari, limites de conexão,
 `sslmode=verify-full` e certificado raiz. Use URL sem parâmetros SSL conflitantes e

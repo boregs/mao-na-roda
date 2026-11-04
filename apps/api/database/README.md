@@ -114,7 +114,7 @@ Na pasta `apps/api`, com JDK 25 configurado:
    Exemplo PowerShell, substituindo os marcadores:
 
    ```powershell
-   $env:FLYWAY_URL = 'jdbc:postgresql://db.PROJECT_REF.supabase.co:5432/postgres?sslmode=verify-full&sslrootcert=C:/certificados/supabase-ca.crt'
+   $env:FLYWAY_URL = 'jdbc:postgresql://db.PROJECT_REF.supabase.co:5432/postgres?sslmode=verify-full&sslrootcert=C:/git/mao-na-roda/apps/api/certs/supabase-prod-ca-2021.crt'
    $env:FLYWAY_USER = 'postgres'
    $credencial = Get-Credential -UserName $env:FLYWAY_USER -Message 'Senha PostgreSQL de migrations'
    $env:FLYWAY_PASSWORD = $credencial.GetNetworkCredential().Password
