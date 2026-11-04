@@ -148,3 +148,39 @@ jobs:
           curl --fail --silent --show-error --retry 5 --retry-delay 10 \
             --retry-all-errors --connect-timeout 10 --max-time 30 \
             "${API_BASE_URL%/}/actuator/health" | jq -e '.status == "UP"'
+
+      - name: DEBUG - public endpoint response (API Gateway)
+        if: failure()
+        run: |
+          curl -s -i --max-time 30 "${API_BASE_URL%/}/actuator/health" || true
+
+      - name: DEBUG - Beanstalk environment endpoint (bypasses API Gateway)
+        if: failure()
+        run: |
+          CNAME=$(aws elasticbeanstalk describe-environments \
+            --environment-names "$EB_ENVIRONMENT" \
+            --query 'Environments[0].CNAME' --output text)
+          echo "Environment URL: $CNAME"
+          curl -s -i --max-time 30 "http://${CNAME}/actuator/health" || true
+
+      - name: DEBUG - environment status and recent events
+        if: failure()
+        run: |
+          aws elasticbeanstalk describe-environments --environment-names "$EB_ENVIRONMENT" \
+            --query 'Environments[0].{Status:Status,Health:Health,HealthStatus:HealthStatus,Version:VersionLabel}'
+          aws elasticbeanstalk describe-events --environment-name "$EB_ENVIRONMENT" \
+            --max-items 25 \
+            --query 'Events[].[EventDate,Severity,Message]' --output text
+          aws elasticbeanstalk describe-instances-health --environment-name "$EB_ENVIRONMENT" \
+            --attribute-names All || true
+
+      - name: DEBUG - application logs from the instance
+        if: failure()
+        run: |
+          aws elasticbeanstalk request-environment-info \
+            --environment-name "$EB_ENVIRONMENT" --info-type tail
+          sleep 20
+          URL=$(aws elasticbeanstalk retrieve-environment-info \
+            --environment-name "$EB_ENVIRONMENT" --info-type tail \
+            --query 'EnvironmentInfo[-1].Message' --output text)
+          curl -s "$URL" | grep -v '^$' | tail -n 150
