@@ -16,7 +16,9 @@ public record ConsultaRotasResponse(String resultado, String versaoMatriz, Strin
             String verificadoEm, boolean desatualizada, String referenciaFonte, String versaoFonte,
             String motivoSemVerificacao) { }
 
+    public record EtapaResponse(String instrucao, int distanciaMetros, Geometria geometria) { }
+
     public record RotaAvaliadaResponse(String id, Geometria geometria, double distanciaMetros,
             double duracaoSegundos, ResumoBarreiras barreiras, QualidadeEvidencia qualidade,
-            List<TrechoAvaliadoResponse> trechos, String aviso) { }
+            List<TrechoAvaliadoResponse> trechos, String aviso, List<EtapaResponse> etapas) { }
 }

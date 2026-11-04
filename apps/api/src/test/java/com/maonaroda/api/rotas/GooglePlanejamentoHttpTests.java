@@ -88,7 +88,7 @@ class GooglePlanejamentoHttpTests {
             assertEquals("HIGH_QUALITY", sent.path("polylineQuality").asString());
             assertTrue(sent.path("computeAlternativeRoutes").asBoolean());
             assertFalse(sent.has("perfil"), "O perfil classifica evidências locais; não é enviado como garantia ao Google");
-            assertEquals("routes.duration,routes.distanceMeters,routes.polyline.geoJsonLinestring", mask.get());
+            assertEquals("routes.duration,routes.distanceMeters,routes.polyline.geoJsonLinestring,routes.legs.steps.distanceMeters,routes.legs.steps.navigationInstruction.instructions,routes.legs.steps.polyline.geoJsonLinestring", mask.get());
             assertEquals("chave-ficticia-de-teste", key.get());
         }
     }
@@ -149,6 +149,34 @@ class GooglePlanejamentoHttpTests {
                     () -> semChave.consultarCandidatas(request, java.time.Duration.ofSeconds(8))).getStatus().value());
             assertEquals(0, calls.get());
         } finally { service.close(); semChave.close(); }
+    }
+
+    @Test
+    void mantemEtapasNaCandidataCorrespondente() throws Exception {
+        String primeira = candidataComEtapa(-46.601, "Vire à esquerda");
+        String segunda = candidataComEtapa(-46.602, "Vire à direita");
+        response.set("{\"routes\":[" + primeira + "," + segunda + "]}");
+        var result = postPlanejamento("cadeirante", "{\"endereco\":\"Carrão\"}", "{\"endereco\":\"UNICID\"}");
+        assertEquals(200, result.statusCode(), result.body());
+        var rotas = json.readTree(result.body()).path("rotas");
+        assertEquals(2, rotas.size());
+        for (var rota : rotas) {
+            var etapa = rota.path("etapas").path(0);
+            var fim = rota.path("geometria").path("coordinates").path(1);
+            assertEquals(fim, etapa.path("geometria").path("coordinates").path(1));
+            assertEquals(fim.path(0).asDouble() == -46.601 ? "Vire à esquerda" : "Vire à direita",
+                    etapa.path("instrucao").asString());
+        }
+    }
+
+    private String candidataComEtapa(double longitude, String instrucao) {
+        String linha = """
+                {"geoJsonLinestring":{"type":"LineString","coordinates":[[-46.6,-23.5],[%s,-23.501]]}}
+                """.formatted(longitude);
+        return """
+                {"distanceMeters":650,"duration":"510.5s","polyline":%s,"legs":[{"steps":[
+                {"distanceMeters":650,"navigationInstruction":{"instructions":"%s"},"polyline":%s}]}]}
+                """.formatted(linha, instrucao, linha);
     }
 
     private HttpResponse<String> postPlanejamento(String perfil, String origem, String destino) throws Exception {

@@ -5,8 +5,15 @@ import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
 import com.maonaroda.api.model.rota.Coordenada;
 
-public record CandidataRota(List<List<Double>> coordenadas, double distancia, double duracao) {
+import com.maonaroda.api.model.rota.ConsultaRotasResponse.EtapaResponse;
+
+public record CandidataRota(List<List<Double>> coordenadas, double distancia, double duracao,
+        List<EtapaResponse> etapas) {
+    public CandidataRota(List<List<Double>> coordenadas, double distancia, double duracao) {
+        this(coordenadas, distancia, duracao, List.of());
+    }
     public CandidataRota {
+        etapas = List.copyOf(etapas);
         if (coordenadas == null
                 || coordenadas.size() < 2
                 || coordenadas.size() > 50000
