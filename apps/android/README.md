@@ -14,14 +14,18 @@ Aplicativo Android nativo em Java, com layouts e estilos XML, AndroidX e Materia
 
 ## Configurar mapa e API
 
-Em `apps/android/local.properties`, preservando `sdk.dir`, adicionar:
+Por padrão, o app usa a API publicada em
+`https://npnfl9edo4.execute-api.us-east-2.amazonaws.com`. Em
+`apps/android/local.properties`, preservando `sdk.dir`, adicionar a chave Maps e,
+opcionalmente, `API_BASE_URL` para apontar para outro ambiente:
 
 ```properties
-API_BASE_URL=https://seu-ambiente-de-testes.example
 MAPS_API_KEY=chave-android-restrita
+# Opcional: sobrescreve a URL padrão da API
+API_BASE_URL=https://npnfl9edo4.execute-api.us-east-2.amazonaws.com
 ```
 
-São exemplos a substituir localmente. Não versionar o arquivo. Serviços remotos
+Não versionar o arquivo. Serviços remotos
 exigem HTTPS com certificado válido. Em debug, HTTP é permitido somente para
 `10.0.2.2`, `127.0.0.1` e `localhost`; veja o teste local abaixo.
 A chave Maps deve ser restrita ao applicationId e ao certificado de assinatura

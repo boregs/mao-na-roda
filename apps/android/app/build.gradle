@@ -5,7 +5,8 @@ plugins {
 def localConfig = new Properties()
 def localConfigFile = rootProject.file('local.properties')
 if (localConfigFile.exists()) localConfigFile.withInputStream { localConfig.load(it) }
-def apiUrl = providers.gradleProperty('API_BASE_URL').orElse(localConfig.getProperty('API_BASE_URL', '')).get()
+def apiUrlPadrao = 'https://npnfl9edo4.execute-api.us-east-2.amazonaws.com'
+def apiUrl = providers.gradleProperty('API_BASE_URL').orElse(localConfig.getProperty('API_BASE_URL', apiUrlPadrao)).get()
 def mapsKey = providers.gradleProperty('MAPS_API_KEY').orElse(localConfig.getProperty('MAPS_API_KEY', '')).get()
 def localHttp = false
 def validApiUrl = !apiUrl
