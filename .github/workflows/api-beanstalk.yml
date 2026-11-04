@@ -65,7 +65,8 @@ jobs:
           mkdir -p bundle
           cp target/api-0.0.1-SNAPSHOT.jar bundle/application.jar
           cp deploy/Procfile bundle/Procfile
-          (cd bundle && zip ../api.zip application.jar Procfile)
+          cp certs/supabase-prod-ca-2021.crt bundle/supabase-ca.crt
+          (cd bundle && zip ../api.zip application.jar Procfile supabase-ca.crt)
       - uses: actions/upload-artifact@v4
         with:
           name: api-beanstalk
