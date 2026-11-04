@@ -189,7 +189,10 @@ e [endereço UNICID](https://www.unicid.edu.br/a-unicid/nossas-unidades/).
 
 ## Banco de dados e migrations
 
-As migrations V1 do PostgreSQL/Supabase estão em `src/main/resources/db/migration`.
+As migrations V1–V6 do PostgreSQL/Supabase estão em `src/main/resources/db/migration`,
+em subpastas pela data de criação (`25-10/`, `01-11/`), e são a fonte da verdade do banco.
+A pasta `database/migrations` na raiz é apenas cópia de referência do que foi aplicado
+manualmente em produção.
 O Flyway Maven Plugin aplica o schema `app`, PostGIS, a matriz de barreiras e as
 permissões JDBC. Consulte [database/README.md](database/README.md) para a análise
 do modelo, dependências, configuração das credenciais e comandos de aplicação/teste.

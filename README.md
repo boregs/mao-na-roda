@@ -42,23 +42,31 @@ A árvore abaixo representa a estrutura atual do repositório.
 .
 ├── .github/
 │   ├── ISSUE_TEMPLATE/                  # Modelos de issues
+│   ├── workflows/                       # CI/CD: Android e API (Elastic Beanstalk)
 │   └── pull_request_template.md         # Modelo de pull request
 ├── apps/
 │   ├── android/                         # Aplicativo Android nativo
 │   │   ├── app/src/main/java/           # Código Java do aplicativo
 │   │   └── app/src/main/res/            # Layouts, estilos e recursos XML
 │   └── api/                             # API Java com Spring Boot
-│       ├── database/                    # Documentação e testes do banco
+│       ├── database/                    # Documentação, testes SQL e carga do piloto
+│       ├── deploy/                      # Procfile da implantação
+│       ├── tools/                       # Scripts de teste com PostGIS
 │       ├── src/
 │       │   ├── main/
 │       │   │   ├── java/                # Código-fonte da API
 │       │   │   └── resources/
-│       │   │       ├── application.properties
-│       │   │       └── db/migration/    # Migrations Flyway V1–V6
+│       │   │       ├── application*.properties
+│       │   │       └── db/migration/    # Migrations Flyway (fonte da verdade)
+│       │   │           ├── 25-10/       # V1–V5
+│       │   │           └── 01-11/       # V6
 │       │   └── test/
 │       │       └── java/                # Testes da API
+│       ├── compose.test.yml
 │       ├── pom.xml
 │       └── README.md
+├── database/
+│   └── migrations/                      # Cópia de referência dos SQLs aplicados manualmente em produção
 ├── docs/
 │   ├── 01-visao-de-negocio.md
 │   ├── 02-regras-de-negocio.md
@@ -66,7 +74,15 @@ A árvore abaixo representa a estrutura atual do repositório.
 │   ├── 04-casos-de-uso.md
 │   ├── 05-tech-stack.md
 │   ├── 06-banco-de-dados.md
-│   └── diagrams/                        # Diagramas do projeto
+│   ├── 07-analise-de-aplicativos.md
+│   ├── 08-implantacao-aws.md
+│   ├── 12-diagnostico-e-proximas-entregas.md
+│   ├── 13-registro-implementacao-rotas.md
+│   ├── 14-publicacao-e-validacao-remota.md
+│   ├── 15-correcao-sincronizacao-android-studio.md
+│   ├── 16-migracao-google-routes.md
+│   ├── 17-guia-testes-time.md
+│   └── piloto/                          # Corpus do piloto de rotas
 ├── CONTRIBUTING.md
 └── README.md
 ```
@@ -75,7 +91,8 @@ A árvore abaixo representa a estrutura atual do repositório.
 
 - `apps/android/`: aplicativo Android nativo, com Java, layouts e estilos XML.
 - `apps/api/`: endpoints, autenticação/autorização, regras de negócio e integração com o banco e serviços externos.
-- `apps/api/src/main/resources/db/migration/`: migrations Flyway para PostgreSQL/PostGIS e carga inicial da matriz de barreiras.
+- `apps/api/src/main/resources/db/migration/`: migrations Flyway para PostgreSQL/PostGIS e carga inicial da matriz de barreiras. É a **fonte da verdade** do banco; os arquivos ficam em subpastas pela data de criação (`25-10/`, `01-11/`). Novas mudanças entram como `V7__...sql` em diante.
+- `database/migrations/`: cópia de referência dos SQLs equivalentes a V1–V6, aplicados manualmente no SQL Editor do Supabase de produção. Não evoluir esses arquivos nem executá-los em ambientes novos; use o Flyway.
 - `apps/api/database/`: documentação operacional do banco e testes SQL locais.
 - `docs/`: visão, regras, requisitos, casos de uso, decisões técnicas e modelo de dados.
 - `.github/`: modelos e automações relacionados a issues e pull requests.
@@ -104,6 +121,14 @@ Consulte [`docs/05-tech-stack.md`](docs/05-tech-stack.md) para decisões e pend�
 - [Casos de uso](docs/04-casos-de-uso.md)
 - [Tech stack](docs/05-tech-stack.md)
 - [Banco de dados](docs/06-banco-de-dados.md)
+- [Análise de aplicativos](docs/07-analise-de-aplicativos.md)
+- [Implantação na AWS](docs/08-implantacao-aws.md)
+- [Diagnóstico e próximas entregas](docs/12-diagnostico-e-proximas-entregas.md)
+- [Registro da implementação de mapas e rotas](docs/13-registro-implementacao-rotas.md)
+- [Publicação e validação remota](docs/14-publicacao-e-validacao-remota.md)
+- [Correção da sincronização no Android Studio](docs/15-correcao-sincronizacao-android-studio.md)
+- [Migração para Google Routes](docs/16-migracao-google-routes.md)
+- [Guia de testes de rotas para o time](docs/17-guia-testes-time.md)
 
 ## Como contribuir
 

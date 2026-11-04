@@ -29,6 +29,10 @@ Nenhuma publicação ou chamada paga é necessária para os testes simulados.
   `mobilidade_reduzida`, da V4. O tipo correto é `calcada_danificada_irregular`.
   O diagnóstico 12 descreve os nomes antigos como achado da outra branch; não são
   os códigos do contrato implementado. Não renomear catálogos já migrados.
+- Atualização posterior (PR #32): os scripts da branch de catálogos foram levados
+  à main em `database/migrations` como cópia de referência do que foi aplicado
+  manualmente em produção (equivalentes a V1–V6). O seed com os códigos antigos
+  foi removido. O Flyway, com a V4, continua sendo o contrato do catálogo.
 - Segurança: rotas/consulta de destinos/catálogo públicos; usuários e relatos
   protegidos; JWT de emissor/audiência configuráveis. Sem configuração, tokens são
   recusados. Sem sessão, credenciais no APK ou localização em logs próprios.

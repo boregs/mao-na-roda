@@ -1,17 +1,19 @@
 # Banco de Dados — Mão na Roda
 
-> **Versão do documento:** 0.5 <br>
-> **Data:** 25/10/2026 <br>
-> **Status:** Modelo lógico com migrations V1 versionadas; implantação remota não verificada <br>
+> **Versão do documento:** 0.6 <br>
+> **Data:** 04/11/2026 <br>
+> **Status:** Migrations V1–V6 versionadas no Flyway; esquema equivalente aplicado manualmente em produção, pendente de baseline do Flyway <br>
 > **Documentos relacionados:** [Regras de negócio](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/02-regras-de-negocio.md) · [Requisitos](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/03-requisitos.md) · [Tech stack](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/05-tech-stack.md)
 
 ## 1. Objetivo e limites do documento
 
 Propor a organização dos dados do Mão na Roda no Supabase, documentando entidades, relacionamentos, regras de integridade, acesso e descarte.
 
-Este documento não descreve um banco remoto inspecionado. Não houve acesso ao projeto Supabase. A implementação SQL inicial da V1 está versionada em [`apps/api/src/main/resources/db/migration`](../apps/api/src/main/resources/db/migration), com análise do provedor, dependências, decisões físicas e instruções em [`apps/api/database/README.md`](../apps/api/database/README.md).
+A implementação SQL da V1 está versionada em [`apps/api/src/main/resources/db/migration`](../apps/api/src/main/resources/db/migration) (Flyway, V1–V6 em subpastas por data de criação), que é a **fonte da verdade** do banco. A análise do provedor, dependências, decisões físicas e instruções estão em [`apps/api/database/README.md`](../apps/api/database/README.md).
 
-Os tipos abaixo representam o modelo lógico inicial. Para as migrations V1, o solicitante escolheu manter nome/sobrenome em texto e a FK da preferência; a criptografia de campos permanece pendente. Foram adotados PostGIS em `extensions`, verificação obrigatória, fotos de até 5.000.000 bytes e retenção limitada a um mês de calendário em UTC. As diferenças e os limites estão detalhados no guia SQL, sem representar implantação no Supabase ou conclusão de todos os requisitos. As regras já aprovadas continuam sendo a referência; decisões de produto ainda abertas estão na seção 12.
+O banco de produção no Supabase foi criado executando manualmente, no SQL Editor, os scripts de [`database/migrations`](../database/migrations), equivalentes a V1–V6. Esses scripts são apenas uma cópia de referência do que foi aplicado: não devem ser evoluídos nem executados em ambientes novos. Como a aplicação foi manual, produção ainda não possui histórico do Flyway (ver seção 10).
+
+Os tipos abaixo representam o modelo lógico inicial. Para as migrations V1, o solicitante escolheu manter nome/sobrenome em texto e a FK da preferência; a criptografia de campos permanece pendente. Foram adotados PostGIS em `extensions`, verificação obrigatória, fotos de até 5.000.000 bytes e retenção limitada a um mês de calendário em UTC. As diferenças e os limites estão detalhados no guia SQL, sem representar conclusão de todos os requisitos. As regras já aprovadas continuam sendo a referência; decisões de produto ainda abertas estão na seção 12.
 
 ## 2. Responsabilidades e escopo
 
@@ -309,6 +311,10 @@ Medir consultas reais com `EXPLAIN ANALYZE` em ambiente de testes. `geometry` em
 
 Migrations e cargas iniciais estão versionadas no Git, sob responsabilidade do Flyway Maven Plugin em `apps/api`. Não gerenciar os mesmos objetos também pelo Supabase CLI nem depender de mudanças manuais não registradas no painel. Manter ambientes separados e dados de teste fictícios.
 
+Produção foi preparada manualmente a partir de `database/migrations` e não possui `app_migrations.flyway_schema_history`. Antes do primeiro `flyway:migrate` em produção, comparar o esquema com V1–V6 e registrar o baseline na versão 6, conforme [Produção existente](../apps/api/database/README.md#produção-existente). A partir daí, toda mudança entra somente como `V7__...sql` em diante no Flyway; `database/migrations` não deve ser alterado.
+
+A V6 adiciona as tabelas do piloto de rotas (`datasets_rotas`, `trechos_pedestres` e `evidencias_trecho`), sem carga fictícia; a publicação revisada é descrita em [carga administrativa do piloto](../apps/api/database/piloto/README.md).
+
 Definir responsáveis, frequência e retenção de backups e um teste de restauração. Backup do PostgreSQL não inclui os arquivos do Storage: é necessário planejar os dois conjuntos e sua consistência. A disponibilidade de backup/PITR depende do plano contratado; não presumir esse recurso no plano gratuito. Uma restauração também deve reaplicar descartes já vencidos antes de reabrir a aplicação.
 
 ## 11. Rastreabilidade e validação
@@ -351,7 +357,7 @@ Testes de aceite da modelagem:
 9. Antes da V2, definir exclusão de confirmadores e destino de observações derivadas de relatos descartados.
 10. Definir backups, responsáveis e critérios de restauração; Flyway foi adotado para as migrations.
 
-As migrations iniciais estão versionadas com as escolhas físicas descritas no guia SQL. Atualizar este documento com o esquema efetivamente implantado após a verificação no ambiente de destino; não mudar o status para "Implementado" apenas pela existência dos arquivos.
+As migrations iniciais estão versionadas com as escolhas físicas descritas no guia SQL. O script manual `database/migrations/0001_catalogos.sql` não inclui partes da V1 (verificação de `auth.users`, conferência do PostGIS no schema `extensions` e `ALTER DEFAULT PRIVILEGES` que revogam acesso de PUBLIC, anon, authenticated e service_role). Confirmar esses itens em produção antes do baseline do Flyway; não mudar o status para "Implementado" antes dessa verificação.
 
 ## 13. Referências técnicas
 
@@ -376,3 +382,4 @@ Documentação oficial consultada em 19/10/2026:
 | 0.3 | 20/10/2026 | Remoção dos diagramas, simplificação do objetivo e ajuste do dicionário para iniciar pelas tabelas próprias da aplicação. |
 | 0.4 | 20/10/2026 | Confirmação dos nomes das tabelas, do schema `app`, do acesso via JDBC, do uso de `bigserial` e da FK com o Supabase Auth. |
 | 0.5 | 25/10/2026 | Referência às migrations V1, dependências Flyway/PostgreSQL e decisões físicas da implementação inicial; implantação remota ainda não verificada. |
+| 0.6 | 04/11/2026 | Flyway definido como fonte da verdade (V1–V6 em subpastas por data); registro de que produção foi criada manualmente por `database/migrations`, pendências de verificação e baseline; menção às tabelas do piloto (V6). |

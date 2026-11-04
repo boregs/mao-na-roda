@@ -28,7 +28,13 @@ e o teste local, consulte [PLANEJAMENTO.md](../PLANEJAMENTO.md).
 
 ## Arquivos e ordem
 
-Os SQLs estão em [`../src/main/resources/db/migration`](../src/main/resources/db/migration):
+Os SQLs estão em [`../src/main/resources/db/migration`](../src/main/resources/db/migration),
+organizados em subpastas pela data de criação: [`25-10/`](../src/main/resources/db/migration/25-10)
+(V1–V5) e [`01-11/`](../src/main/resources/db/migration/01-11) (V6). O Flyway
+percorre as subpastas e ordena pela versão, não pela pasta. Esta é a fonte da
+verdade do banco; [`database/migrations`](../../../database/migrations), na raiz
+do repositório, é apenas a cópia de referência aplicada manualmente em produção
+(ver [Produção existente](#produção-existente)).
 
 | Migration | Conteúdo |
 |---|---|
@@ -134,6 +140,35 @@ ajustar a instalação; as migrations não movem nem apagam a extensão existent
 Versione mudanças seguintes como `V7__...sql`, etc. Não edite migrations já
 aplicadas: `validate` confere os checksums. O Flyway controla as transações;
 os SQLs de migrations não contêm BEGIN/COMMIT próprios.
+
+### Produção existente
+
+O banco de produção foi criado executando manualmente, no SQL Editor do
+Supabase, os scripts de [`database/migrations`](../../../database/migrations)
+(`0001`–`0005`), equivalentes a V1–V6: `0002`–`0005` correspondem a V3–V6 e
+`0001` reúne a V2 com as tabelas de catálogo. Por isso produção **não possui**
+`app_migrations.flyway_schema_history`, e um `flyway:migrate` direto tentaria
+recriar o schema `app` e falharia. Não executar esses scripts em ambientes novos
+nem evoluí-los; mudanças entram somente pelo Flyway.
+
+Antes do primeiro uso do Flyway em produção:
+
+1. Compare o esquema de produção com V1–V6. Em especial, `0001` não inclui
+   partes da V1: a verificação de `auth.users`, a conferência do PostGIS no
+   schema `extensions` e os `ALTER DEFAULT PRIVILEGES` que revogam acesso de
+   PUBLIC, anon, authenticated e service_role em `app`. Aplique manualmente o
+   que faltar, registrando o que foi feito.
+2. Com as variáveis `FLYWAY_*` configuradas como acima, registre o baseline na
+   versão 6:
+
+   ```powershell
+   .\mvnw.cmd flyway:baseline "-Dflyway.baselineVersion=6" "-Dflyway.baselineDescription=producao aplicada manualmente"
+   .\mvnw.cmd flyway:info
+   .\mvnw.cmd flyway:validate
+   ```
+
+3. `flyway:info` deve mostrar V1–V6 abaixo do baseline e nenhuma pendente. A
+   partir daí, use `flyway:migrate` normalmente para `V7__...` em diante.
 
 ### Logins de execução
 
