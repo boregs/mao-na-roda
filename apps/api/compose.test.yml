@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: maonaroda_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: teste-local-descartavel
+    ports: ['127.0.0.1:55432:5432']
+    volumes:
+      - ./database:/workspace/database:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d maonaroda_test']
+      interval: 5s
+      timeout: 5s
+      retries: 12
