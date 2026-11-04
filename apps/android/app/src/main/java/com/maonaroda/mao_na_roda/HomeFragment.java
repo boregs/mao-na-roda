@@ -33,6 +33,8 @@ public class HomeFragment extends Fragment {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final LocalizacaoController gpsPercurso = new LocalizacaoController();
     private RotasRepository.Cancelavel replanejamento;
+    private int geracaoReplanejamento;
+    private boolean buscandoRota;
     private androidx.appcompat.app.AlertDialog revisaoRota;
     private final Runnable semSinal = () -> {
         if (model.percurso == null || !model.percurso.ativo) return;
@@ -181,7 +183,8 @@ public class HomeFragment extends Fragment {
     }
     private void detalhes(Rota rota) {
         var text = new TextView(requireContext()); text.setTextSize(20); text.setPadding(dp(20), dp(12), dp(20), dp(12));
-        text.setText(getString(R.string.route_details, rota.qualidade(), rota.cobertura() * 100, rota.detalhes()));
+        text.setText(getString(R.string.route_details, rota.qualidade(), rota.cobertura() * 100, rota.detalhes())
+                + "\n\nDurante o percurso, o app pode enviar sua posição para buscar um desvio de uma barreira impeditiva. Você confirma qualquer troca de rota.");
         var scroll = new ScrollView(requireContext()); scroll.addView(text);
         var dialogo = new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.route_details_title)
                 .setView(scroll).setNegativeButton(R.string.close, null);
@@ -211,10 +214,9 @@ public class HomeFragment extends Fragment {
             else solicitarAcompanhamento();
         });
         centro.setOnClickListener(v -> { if (mapa != null) mapa.recentralizar(); });
-        novoPlano.setOnClickListener(v -> replanejar());
+        novoPlano.setOnClickListener(v -> replanejar(null));
         encerrar.setOnClickListener(v -> {
             pausarPercurso();
-            cancelarReplanejamento();
             model.percurso = null;
             model.mensagem("Percurso encerrado.");
         });
@@ -232,7 +234,7 @@ public class HomeFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == android.content.pm.PackageManager.PERMISSION_GRANTED) acompanhar();
         else new MaterialAlertDialogBuilder(requireContext()).setTitle("Localização durante o percurso")
-                .setMessage("Usamos sua posição enquanto o percurso estiver ativo e esta tela estiver aberta.")
+                .setMessage("Usamos sua posição enquanto o percurso estiver ativo e esta tela estiver aberta. Perto de uma barreira impeditiva, a posição pode ser enviada para buscar um desvio.")
                 .setNegativeButton(R.string.close, null).setPositiveButton(R.string.allow_location, (d, w) ->
                         permissaoPercurso.launch(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                                 Manifest.permission.ACCESS_FINE_LOCATION})).show();
@@ -257,6 +259,9 @@ public class HomeFragment extends Fragment {
                 sessao.ativo = false;
                 sessao.posicao = null;
                 cancelarReplanejamento();
+            } else if (!buscandoRota && (revisaoRota == null || !revisaoRota.isShowing())) {
+                var bloqueio = sessao.consumirBloqueioProximo();
+                if (bloqueio != null) replanejar(bloqueio);
             }
             mostrarPercurso();
         }, () -> {
@@ -268,6 +273,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void pausarPercurso() {
+        cancelarReplanejamento();
         gpsPercurso.cancelar();
         handler.removeCallbacks(semSinal);
         if (model != null && model.percurso != null && !model.percurso.chegou()) {
@@ -303,49 +309,72 @@ public class HomeFragment extends Fragment {
         pausa.setText(sessao.ativo ? "Pausar percurso" : "Retomar percurso");
         centro.setEnabled(mapa != null && sessao.posicao != null);
         novoPlano.setVisibility(sessao.desviou() ? View.VISIBLE : View.GONE);
-        novoPlano.setEnabled(replanejamento == null);
+        novoPlano.setEnabled(!buscandoRota);
         encerrar.setText(sessao.chegou() ? "Concluir percurso" : "Encerrar percurso");
     }
 
     private void cancelarReplanejamento() {
+        geracaoReplanejamento++;
+        buscandoRota = false;
         if (revisaoRota != null) revisaoRota.dismiss();
         revisaoRota = null;
         if (replanejamento != null) replanejamento.cancelar();
         replanejamento = null;
     }
 
-    private void replanejar() {
+    private void replanejar(Evidencia bloqueio) {
         var sessao = model.percurso;
+        if (sessao == null || !sessao.ativo || sessao.posicao == null || buscandoRota) return;
         var origem = sessao.posicao;
-        if (origem == null || replanejamento != null) return;
-        replanejamento = model.replanejar(sessao, origem, new RotasRepository.Retorno<>() {
-            @Override public void sucesso(Consulta value) {
+        double distanciaRestante = sessao.restante();
+        int geracao = ++geracaoReplanejamento;
+        buscandoRota = true;
+        model.mensagem(bloqueio == null ? "Buscando outra rota…" : "Buscando desvio para: " + bloqueio.descricao());
+        var chamada = model.replanejar(sessao, origem, new RotasRepository.Retorno<>() {
+            private boolean concluirConsulta() {
+                if (geracao != geracaoReplanejamento) return false;
+                buscandoRota = false;
                 replanejamento = null;
-                if (root == null || model.percurso != sessao) return;
-                if (value.rotas().isEmpty()) {
-                    model.mensagem("Nenhuma rota alternativa encontrada. O percurso atual foi mantido.");
+                return root != null && model.percurso == sessao && sessao.ativo;
+            }
+
+            @Override public void sucesso(Consulta value) {
+                if (!concluirConsulta()) return;
+                if (bloqueio != null && !sessao.bloqueioAindaAdiante(bloqueio)) {
+                    model.mensagem("A sugestão expirou. O percurso atual foi mantido.");
                     return;
                 }
-                mostrarPercurso();
-                var opcoes = new String[value.rotas().size()];
+                var alternativas = bloqueio == null ? value.rotas()
+                        : value.rotas().stream().filter(rota -> sessao.evitaBloqueio(rota, bloqueio))
+                                .collect(java.util.stream.Collectors.toList());
+                if (alternativas.isEmpty()) {
+                    model.mensagem("Nenhuma alternativa adequada encontrada. O percurso atual foi mantido.");
+                    return;
+                }
+                model.mensagem("Revise as alternativas antes de trocar de rota.");
+                var opcoes = new String[alternativas.size()];
                 for (int i = 0; i < opcoes.length; i++) {
-                    var rota = value.rotas().get(i);
+                    var rota = alternativas.get(i);
                     opcoes[i] = getString(R.string.route_summary, i + 1, rota.distancia(), rota.duracao() / 60,
                             rota.cobertura() * 100, rota.impeditivas(), rota.atencao());
+                    if (bloqueio != null) {
+                        opcoes[i] += String.format(java.util.Locale.getDefault(), "\nDiferença estimada: %+.0f m",
+                                rota.distancia() - distanciaRestante);
+                    }
                 }
-                revisaoRota = new MaterialAlertDialogBuilder(requireContext()).setTitle("Revise as novas rotas")
-                        .setItems(opcoes, (d, i) -> confirmarRota(sessao, value.rotas().get(i)))
+                String titulo = bloqueio == null ? "Revise as novas rotas" : "Desvio sugerido para: " + bloqueio.descricao();
+                revisaoRota = new MaterialAlertDialogBuilder(requireContext()).setTitle(titulo)
+                        .setItems(opcoes, (d, i) -> confirmarRota(sessao, alternativas.get(i), bloqueio))
                         .setNegativeButton(R.string.close, null).show();
             }
             @Override public void falha(String erro) {
-                replanejamento = null;
-                if (root != null && model.percurso == sessao) model.mensagem(erro);
+                if (concluirConsulta()) model.mensagem(erro + " O percurso atual foi mantido.");
             }
         });
-        mostrarPercurso();
+        if (buscandoRota && geracao == geracaoReplanejamento) replanejamento = chamada;
     }
 
-    private void confirmarRota(Percurso anterior, Rota rota) {
+    private void confirmarRota(Percurso anterior, Rota rota, Evidencia bloqueio) {
         var texto = new TextView(requireContext());
         texto.setTextSize(18);
         texto.setPadding(dp(20), dp(12), dp(20), dp(12));
@@ -355,7 +384,11 @@ public class HomeFragment extends Fragment {
         AccessibilityUi.apply(scroll, AccessibilityProfileStore.preferences(requireContext()));
         revisaoRota = new MaterialAlertDialogBuilder(requireContext()).setTitle("Confirmar nova rota").setView(scroll)
                 .setNegativeButton(R.string.close, null).setPositiveButton("Usar esta rota", (d, w) -> {
-                    if (model.percurso != anterior || anterior.chegou()) return;
+                    if (model.percurso != anterior || !anterior.ativo || anterior.chegou()) return;
+                    if (bloqueio != null && !anterior.bloqueioAindaAdiante(bloqueio)) {
+                        model.mensagem("A sugestão expirou. O percurso atual foi mantido.");
+                        return;
+                    }
                     pausarPercurso();
                     model.percurso = new Percurso(rota, anterior.perfil, anterior.destino);
                     model.substituirRota(rota);
@@ -385,7 +418,6 @@ public class HomeFragment extends Fragment {
         localizacao.cancelar();
         handler.removeCallbacks(prazoLocalizacao);
         pausarPercurso();
-        cancelarReplanejamento();
         super.onStop();
     }
     @Override public void onDestroyView() {

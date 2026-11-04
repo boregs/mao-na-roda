@@ -23,6 +23,8 @@ public final class Percurso {
     private final double[] acumulado;
     private final double[] fimEtapa;
     private final Set<Evidencia> avisadas = new HashSet<>();
+    private final Set<Evidencia> consultadas = new HashSet<>();
+    private Evidencia bloqueioProximo;
     private double progresso;
     private long instante;
     private int fora, perto, etapaAtual, leiturasAposEtapa;
@@ -56,6 +58,7 @@ public final class Percurso {
 
     public void invalidarLeitura() {
         posicao = null;
+        bloqueioProximo = null;
         fora = perto = leiturasAposEtapa = 0;
     }
 
@@ -68,6 +71,7 @@ public final class Percurso {
         double segundos = instante == 0 ? 0 : (tempoMillis - instante) / 1000.0;
         instante = tempoMillis;
         posicao = ponto;
+        bloqueioProximo = null;
         // Restringe saltos para trechos distantes em cruzamentos, retornos e vias paralelas.
         var leitura = projetar(ponto, Math.max(0, progresso - CORREDOR),
                 progresso + CORREDOR + Math.min(segundos, 10) * 3);
@@ -99,7 +103,93 @@ public final class Percurso {
                     && evidencia.inicio() * total() - progresso <= APROXIMACAO && avisadas.add(evidencia))
                 novos.add(evidencia.descricao());
         }
+        bloqueioProximo = rota.evidencias().stream()
+                .filter(e -> e.impeditiva() && !consultadas.contains(e)
+                        && e.inicio() * total() >= Math.max(progresso, leitura.progresso + precisao)
+                        && e.inicio() * total() - leitura.progresso <= APROXIMACAO)
+                .min(java.util.Comparator.comparingDouble(Evidencia::inicio)).orElse(null);
         if (!novos.isEmpty()) alerta = "Evidências próximas: " + String.join(", ", novos);
+    }
+
+    public Evidencia consumirBloqueioProximo() {
+        if (!ativo || chegou() || bloqueioProximo == null) return null;
+        var bloqueio = bloqueioProximo;
+        bloqueioProximo = null;
+        consultadas.add(bloqueio);
+        return bloqueio;
+    }
+
+    public boolean bloqueioAindaAdiante(Evidencia evidencia) {
+        return progresso < evidencia.inicio() * total();
+    }
+
+    public boolean evitaBloqueio(Rota alternativa, Evidencia evidencia) {
+        if (alternativa.impeditivas() > 0 || alternativa.id().equals(rota.id())) return false;
+        var linha = rota.pontos();
+        // As frações dos trechos vêm de ST_LineSubstring sobre geometria EPSG:4326.
+        double comprimento = 0;
+        for (int i = 1; i < linha.size(); i++) comprimento += graus(linha.get(i - 1), linha.get(i));
+        if (comprimento == 0) return false;
+        double inicio = evidencia.inicio() * comprimento;
+        double fim = evidencia.fim() * comprimento;
+        double acumuladoGraus = 0;
+        double sul = 90, norte = -90, oeste = 180, leste = -180;
+        for (int i = 1; i < linha.size() && acumuladoGraus < fim; i++) {
+            var a = linha.get(i - 1);
+            var b = linha.get(i);
+            double segmento = graus(a, b);
+            double proximo = acumuladoGraus + segmento;
+            if (segmento > 0 && proximo > inicio) {
+                double de = Math.max(0, (inicio - acumuladoGraus) / segmento);
+                double ate = Math.min(1, (fim - acumuladoGraus) / segmento);
+                double latitudeDe = interpolar(a.latitude(), b.latitude(), de);
+                double latitudeAte = interpolar(a.latitude(), b.latitude(), ate);
+                double longitudeDe = interpolar(a.longitude(), b.longitude(), de);
+                double longitudeAte = interpolar(a.longitude(), b.longitude(), ate);
+                sul = Math.min(sul, Math.min(latitudeDe, latitudeAte));
+                norte = Math.max(norte, Math.max(latitudeDe, latitudeAte));
+                oeste = Math.min(oeste, Math.min(longitudeDe, longitudeAte));
+                leste = Math.max(leste, Math.max(longitudeDe, longitudeAte));
+            }
+            acumuladoGraus = proximo;
+        }
+        double margem = 5 / METROS_POR_GRAU;
+        double margemLongitude = margem / Math.cos(Math.toRadians(Math.max(Math.abs(sul), Math.abs(norte))));
+        if (sul > norte || leste - oeste >= 180 || oeste - margemLongitude <= -180 || leste + margemLongitude >= 180)
+            return false;
+        var pontos = alternativa.pontos();
+        for (int i = 1; i < pontos.size(); i++) {
+            var a = pontos.get(i - 1);
+            var b = pontos.get(i);
+            if (Math.abs(a.longitude() - b.longitude()) > 180
+                    || cruzaArea(a, b, sul - margem, norte + margem, oeste - margemLongitude, leste + margemLongitude))
+                return false;
+        }
+        return pontos.size() >= 2;
+    }
+
+    private static boolean cruzaArea(Ponto a, Ponto b, double sul, double norte, double oeste, double leste) {
+        double delta = b.latitude() - a.latitude();
+        if (delta == 0) {
+            return a.latitude() >= sul && a.latitude() <= norte
+                    && Math.max(a.longitude(), b.longitude()) >= oeste && Math.min(a.longitude(), b.longitude()) <= leste;
+        }
+        double tSul = (sul - a.latitude()) / delta;
+        double tNorte = (norte - a.latitude()) / delta;
+        double de = Math.max(0, Math.min(tSul, tNorte));
+        double ate = Math.min(1, Math.max(tSul, tNorte));
+        if (de > ate) return false;
+        double x1 = interpolar(a.longitude(), b.longitude(), de);
+        double x2 = interpolar(a.longitude(), b.longitude(), ate);
+        return Math.max(x1, x2) >= oeste && Math.min(x1, x2) <= leste;
+    }
+
+    private static double graus(Ponto a, Ponto b) {
+        return Math.hypot(b.latitude() - a.latitude(), b.longitude() - a.longitude());
+    }
+
+    private static double interpolar(double a, double b, double t) {
+        return a + (b - a) * t;
     }
 
     public boolean desviou() { return fora >= CONFIRMACOES; }

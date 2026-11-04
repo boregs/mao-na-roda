@@ -140,7 +140,8 @@ public final class ApiClient implements RotasRepository {
                     double fim = trecho.optDouble("fim", -1);
                     if ("presente".equals(b.optString("condicao")) && inicio >= 0 && fim > inicio && fim <= 1) {
                         evidencias.add(new Evidencia(inicio, fim, b.optString("tipo").replace('_', ' ')
-                                + (b.optBoolean("desatualizada") ? " (requer nova verificação)" : "")));
+                                + (b.optBoolean("desatualizada") ? " (requer nova verificação)" : ""),
+                                "impeditiva".equals(b.optString("classificacao"))));
                     }
                 }
             }

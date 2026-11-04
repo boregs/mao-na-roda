@@ -40,7 +40,7 @@ public final class DadosRotas {
         }
     }
     public record Etapa(String instrucao, List<Ponto> pontos) { }
-    public record Evidencia(double inicio, double fim, String descricao) { }
+    public record Evidencia(double inicio, double fim, String descricao, boolean impeditiva) { }
     public record Rota(String id, List<Ponto> pontos, double distancia, double duracao,
             String qualidade, double cobertura, int impeditivas, int atencao, String detalhes,
             List<Etapa> etapas, List<Evidencia> evidencias) {

@@ -15,10 +15,12 @@ public class PercursoTest {
         return new Ponto(metros / 111_195, 0);
     }
 
-    private Percurso percurso() {
+    private Percurso percurso() { return percurso(false); }
+
+    private Percurso percurso(boolean impeditiva) {
         var rota = new Rota("rota", List.of(origem, meio, fim), 100, 90, "PARCIAL", .2, 0, 1, "",
                 List.of(new Etapa("Siga em frente", List.of(origem, meio)), new Etapa("Continue", List.of(meio, fim))),
-                List.of(new Evidencia(.5, .7, "piso irregular")));
+                List.of(new Evidencia(.5, .7, "piso irregular", impeditiva)));
         return new Percurso(rota, "cadeirante", new LocalRota(fim, null));
     }
 
@@ -52,6 +54,36 @@ public class PercursoTest {
         assertEquals(100, sessao.restante(), .001);
         assertEquals("", sessao.alerta);
         assertFalse(sessao.desviou());
+    }
+
+    @Test public void replanejaUmaVezParaBloqueioAdianteComGpsPreciso() {
+        var sessao = percurso(true);
+        sessao.ativo = true;
+        sessao.atualizar(ponto(20), 50, 1000);
+        assertNull(sessao.consumirBloqueioProximo());
+        sessao.atualizar(ponto(20), 4, 3000);
+        assertNotNull(sessao.consumirBloqueioProximo());
+        sessao.atualizar(ponto(25), 4, 5000);
+        assertNull(sessao.consumirBloqueioProximo());
+
+        var atencao = percurso();
+        atencao.ativo = true;
+        atencao.atualizar(ponto(20), 4, 1000);
+        assertNull(atencao.consumirBloqueioProximo());
+    }
+
+    @Test public void eliminaAlternativaQueVoltaAoTrechoBloqueado() {
+        var sessao = percurso(true);
+        var bloqueio = sessao.rota.evidencias().get(0);
+        var desvio = List.of(origem, new Ponto(meio.longitude(), .0002),
+                new Ponto(ponto(80).longitude(), .0002), fim);
+        assertFalse(sessao.evitaBloqueio(alternativa(List.of(origem, fim), 0), bloqueio));
+        assertFalse(sessao.evitaBloqueio(alternativa(desvio, 1), bloqueio));
+        assertTrue(sessao.evitaBloqueio(alternativa(desvio, 0), bloqueio));
+    }
+
+    private Rota alternativa(List<Ponto> pontos, int impeditivas) {
+        return new Rota("alternativa", pontos, 110, 90, "PARCIAL", .2, impeditivas, 0, "");
     }
 
     @Test public void exigeDesvioPersistenteEInterrompeAoPausar() {
