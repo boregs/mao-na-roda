@@ -97,6 +97,31 @@ A árvore abaixo representa a estrutura atual do repositório.
 - `docs/`: visão, regras, requisitos, casos de uso, decisões técnicas e modelo de dados.
 - `.github/`: modelos e automações relacionados a issues e pull requests.
 
+## Arquitetura e Deploy
+A API Spring Boot roda no Elastic Beanstalk (us-east-2). O frontend acessa apenas a URL do API Gateway, e o deploy é feito pelo GitHub Actions.
+
+![Arquitetura-AWS](/assets/arquitetura-aws-icones.png)
+
+### Componentes
+ 
+| Componente | Função |
+|---|---|
+| API Gateway (HTTP API) | Ponto de entrada público. |
+| Application Load Balancer | Recebe o tráfego do API Gateway. |
+| EC2 (t3.micro, Linux) | Instância do Beanstalk que roda nginx e a API Spring Boot. |
+| Secrets Manager | Guarda as credenciais do Supabase e a chave da Google Maps API. |
+| S3 | Bucket criado pelo Beanstalk, recebe o pacote de cada deploy. |
+| IAM role | Assumida pelo GitHub Actions via OIDC, sem chaves de longa duração. |
+| Supabase | Banco Postgres, acessado via pooler (JDBC). |
+| Google Maps API | Chamada somente pelo backend. |
+
+### Fluxo de deploy
+ 
+1. Um push na `main` executa os testes e empacota o JAR (`application.jar` + `Procfile`).
+2. O workflow assume a IAM role via OIDC.
+3. O pacote é enviado ao bucket S3 e o ambiente do Beanstalk é atualizado com a nova versão.
+4. A última etapa confirma que `/actuator/health` responde `UP` pela URL pública.
+
 
 ## Tecnologias
 
