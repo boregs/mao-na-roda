@@ -20,7 +20,7 @@ public class AutenticacaoExceptionHandler {
             case CONTA_EXISTENTE -> HttpStatus.CONFLICT;
             case SENHA_FRACA, EMAIL_INVALIDO -> HttpStatus.BAD_REQUEST;
             case EMAIL_NAO_CONFIRMADO -> HttpStatus.FORBIDDEN;
-            case LIMITE_PROVEDOR -> HttpStatus.TOO_MANY_REQUESTS;
+            case BLOQUEADO, LIMITE_PROVEDOR -> HttpStatus.TOO_MANY_REQUESTS;
             case INDISPONIVEL -> HttpStatus.SERVICE_UNAVAILABLE;
         };
         String detalhe = switch (erro.tipo()) {
@@ -30,6 +30,7 @@ public class AutenticacaoExceptionHandler {
             case SENHA_FRACA -> "A senha não atende aos requisitos de segurança.";
             case EMAIL_INVALIDO -> "Informe um e-mail válido.";
             case EMAIL_NAO_CONFIRMADO -> "Confirme seu e-mail antes de entrar.";
+            case BLOQUEADO -> "Muitas tentativas de login. Tente novamente mais tarde.";
             case LIMITE_PROVEDOR -> "Muitas solicitações. Aguarde um minuto e tente novamente.";
             case INDISPONIVEL -> "O serviço de contas está indisponível. Tente novamente.";
         };

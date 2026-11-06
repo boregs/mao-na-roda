@@ -36,7 +36,7 @@ class AutenticacaoControllerTests {
     @BeforeEach void preparar() {
         cadastro = Optional.of(SESSAO);
         principal = Jwt.withTokenValue("jwt-atual").header("alg", "RS256").subject("x").build();
-        var service = new AutenticacaoService(null) {
+        var service = new AutenticacaoService(null, null) {
             @Override public Optional<SessaoResponse> cadastrar(CriarUsuarioRequest r) {
                 if (falha != null) throw falha;
                 return cadastro;
@@ -99,6 +99,15 @@ class AutenticacaoControllerTests {
         assertFalha(Tipo.SENHA_FRACA, 400, "A senha não atende aos requisitos de segurança.");
         assertFalha(Tipo.EMAIL_NAO_CONFIRMADO, 403, "Confirme seu e-mail antes de entrar.");
         assertFalha(Tipo.INDISPONIVEL, 503, "O serviço de contas está indisponível. Tente novamente.");
+    }
+
+    @Test void bloqueioInformaQuandoTentarNovamente() throws Exception {
+        falha = new FalhaAutenticacao(Tipo.BLOQUEADO, 840);
+        mvc.perform(post("/api/v1/auth/login").contentType("application/json").content(LOGIN))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "840"))
+                .andExpect(jsonPath("$.codigo").value("BLOQUEADO"))
+                .andExpect(jsonPath("$.tentarNovamenteEmSegundos").value(840));
     }
 
     @Test void bancoIndisponivelNaoExpoeDetalhes() throws Exception {

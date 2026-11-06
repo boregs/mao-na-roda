@@ -8,6 +8,7 @@ public class FalhaAutenticacao extends RuntimeException {
         SENHA_FRACA,
         EMAIL_INVALIDO,
         EMAIL_NAO_CONFIRMADO,
+        BLOQUEADO,
         LIMITE_PROVEDOR,
         INDISPONIVEL
     }
