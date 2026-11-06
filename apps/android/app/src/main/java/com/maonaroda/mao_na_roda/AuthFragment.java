@@ -9,6 +9,7 @@ import android.widget.*;
 import androidx.annotation.*;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import com.maonaroda.mao_na_roda.data.ApiClient;
 import com.maonaroda.mao_na_roda.data.ContaRepository.Sessao;
@@ -58,7 +59,9 @@ public class AuthFragment extends Fragment {
         v.findViewById(R.id.switchMode).setOnClickListener(x -> {
             Bundle a = new Bundle();
             a.putBoolean("signIn", !signIn);
-            NavHostFragment.findNavController(this).navigate(R.id.authFragment, a);
+            // Substitui a tela atual para não acumular cadastro/login na pilha de navegação.
+            NavHostFragment.findNavController(this).navigate(R.id.authFragment, a,
+                    new NavOptions.Builder().setPopUpTo(R.id.authFragment, true).build());
         });
     }
 
