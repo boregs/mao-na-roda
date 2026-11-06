@@ -49,4 +49,10 @@ public class ContaApiTest {
         assertEquals("Não foi possível verificar a sessão. Tente novamente.", ApiClient.mensagemProtegida(503,
                 "{\"codigo\":\"SESSAO_NAO_VERIFICADA\",\"detail\":\"Não foi possível verificar a sessão. Tente novamente.\"}"));
     }
+
+    @Test public void senhaIncorretaNaExclusaoNaoEncerraSessao() {
+        String mensagem = ApiClient.mensagemProtegida(403, "{\"codigo\":\"SENHA_INCORRETA\",\"detail\":\"Senha incorreta.\"}");
+        assertEquals("Senha incorreta.", mensagem);
+        assertNotEquals(ContaRepository.SESSAO_ENCERRADA, mensagem);
+    }
 }

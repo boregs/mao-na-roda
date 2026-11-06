@@ -21,4 +21,7 @@ public interface ContaRepository {
     Cancelavel entrar(String email, String senha, Retorno<Sessao> retorno);
 
     Cancelavel sair(String accessToken, Retorno<Void> retorno);
+
+    /** Exclui a conta após conferir a senha (UC10 A2). Senha incorreta não encerra a sessão. */
+    Cancelavel excluirConta(String accessToken, String senha, Retorno<Void> retorno);
 }

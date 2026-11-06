@@ -160,6 +160,13 @@ public final class ApiClient implements RotasRepository, ContaRepository {
         return executar("/api/v1/auth/logout", null, true, accessToken, json -> null, ApiClient::mensagemProtegida, retorno);
     }
 
+    @Override public Cancelavel excluirConta(String accessToken, String senha, Retorno<Void> retorno) {
+        try {
+            return executar("/api/v1/usuarios/me/exclusao", new JSONObject().put("senha", senha), true, accessToken,
+                    json -> null, ApiClient::mensagemProtegida, retorno);
+        } catch (JSONException e) { throw new IllegalArgumentException(e); }
+    }
+
     private static JSONObject local(LocalRota local) throws JSONException {
         if (local.coordenada() == null) return new JSONObject().put("endereco", local.endereco());
         var p = local.coordenada();
