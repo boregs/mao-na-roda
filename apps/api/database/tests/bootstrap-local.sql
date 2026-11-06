@@ -4,7 +4,7 @@
 -- Fixture mínima do contrato externo; não implementa Supabase Auth/Storage.
 -- CREATE sem IF NOT EXISTS impede execução sobre um schema auth já existente.
 CREATE SCHEMA auth;
-CREATE TABLE auth.users (id uuid PRIMARY KEY);
+CREATE TABLE auth.users (id uuid PRIMARY KEY, raw_user_meta_data jsonb);
 
 DO $$
 BEGIN
