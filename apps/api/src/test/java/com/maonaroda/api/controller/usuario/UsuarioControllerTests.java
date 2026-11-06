@@ -27,6 +27,7 @@ class UsuarioControllerTests {
     private static final String URL = "/api/v1/usuarios/me";
     private static final UUID ID = UUID.randomUUID();
     private static final String NOME = "{\"nome\":\"Ana\",\"sobrenome\":\"Silva\"}";
+    private static final UUID PUBLICO = UUID.randomUUID();
     private Jwt principal;
     private RuntimeException falha;
     private UUID chamado;
@@ -35,7 +36,8 @@ class UsuarioControllerTests {
 
     @BeforeEach
     void preparar() {
-        principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject(ID.toString()).build();
+        principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject(ID.toString())
+                .claim("email", "ana@example.com").build();
         UsuarioService service = new UsuarioService(null) {
             private void registrar(UUID id) {
                 chamado = id;
@@ -43,7 +45,7 @@ class UsuarioControllerTests {
             }
             @Override public UsuarioModel obter(UUID id) {
                 registrar(id);
-                return new UsuarioModel("Ana", "Silva");
+                return new UsuarioModel(null, PUBLICO, null, "Ana", "Silva", null, null, null, null);
             }
             @Override public void atualizar(UUID id, UsuarioModel model, UUID perfil) {
                 registrar(id);
@@ -62,8 +64,15 @@ class UsuarioControllerTests {
                 }).build();
     }
 
-    @Test void obterRetornaUsuario() throws Exception {
-        mvc.perform(get(URL)).andExpect(status().isOk()).andExpect(jsonPath("$.nome").value("Ana"));
+    @Test void obterRetornaSomenteContratoPublico() throws Exception {
+        mvc.perform(get(URL)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.uuid").value(PUBLICO.toString()))
+                .andExpect(jsonPath("$.nome").value("Ana"))
+                .andExpect(jsonPath("$.sobrenome").value("Silva"))
+                .andExpect(jsonPath("$.email").value("ana@example.com"))
+                .andExpect(jsonPath("$.authUserId").doesNotExist())
+                .andExpect(jsonPath("$.estadoConta").doesNotExist())
+                .andExpect(jsonPath("$.senha").doesNotExist());
         assertEquals(ID, chamado);
     }
 

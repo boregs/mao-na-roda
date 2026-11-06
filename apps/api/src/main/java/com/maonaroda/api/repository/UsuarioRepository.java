@@ -16,12 +16,11 @@ public class UsuarioRepository {
 
     public UsuarioModel find(UUID authUserId) {
         return jdbc.queryForObject(
-                "SELECT nome, sobrenome "
+                "SELECT uuid, nome, sobrenome "
                         + "FROM app.usuarios "
                         + "WHERE auth_user_id = ? AND estado_conta = 'ativa'",
-                (rs, row) -> new UsuarioModel(
-                        rs.getString("nome"),
-                        rs.getString("sobrenome")),
+                (rs, row) -> new UsuarioModel(null, rs.getObject("uuid", UUID.class), null,
+                        rs.getString("nome"), rs.getString("sobrenome"), null, null, null, null),
                 authUserId);
     }
 
