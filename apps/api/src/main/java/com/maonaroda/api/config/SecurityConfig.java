@@ -23,7 +23,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**",
                                 "/swagger-ui.html", "/api/v1/perfis-mobilidade").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/rotas", "/api/v1/rotas/base",
-                                "/api/v1/destinos/busca").permitAll()
+                                "/api/v1/destinos/busca", "/api/v1/auth/cadastro", "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                         .requestMatchers("/api/v1/usuarios/**", "/api/v1/relatos/**").authenticated()
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults())).build();

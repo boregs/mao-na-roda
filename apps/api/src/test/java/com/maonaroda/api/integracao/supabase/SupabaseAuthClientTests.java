@@ -1,0 +1,126 @@
+package com.maonaroda.api.integracao.supabase;
+
+import com.maonaroda.api.exception.auth.FalhaAutenticacao;
+import com.maonaroda.api.exception.auth.FalhaAutenticacao.Tipo;
+import com.sun.net.httpserver.HttpServer;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
+import static org.junit.jupiter.api.Assertions.*;
+
+class SupabaseAuthClientTests {
+    HttpServer server;
+    SupabaseAuthClient client;
+    AtomicInteger status = new AtomicInteger(200);
+    AtomicReference<String> response = new AtomicReference<>("{}");
+    String method, path, query, key, auth, body;
+    static final String SESSAO = "{\"access_token\":\"jwt-ficticio\",\"token_type\":\"bearer\","
+            + "\"expires_in\":900,\"refresh_token\":\"refresh-que-nao-sai-da-api\",\"user\":{\"id\":\"x\"}}";
+
+    @BeforeEach void preparar() throws Exception {
+        server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            method = exchange.getRequestMethod();
+            path = exchange.getRequestURI().getPath();
+            query = exchange.getRequestURI().getQuery();
+            key = exchange.getRequestHeaders().getFirst("apikey");
+            auth = exchange.getRequestHeaders().getFirst("Authorization");
+            body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            byte[] bytes = response.get().getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(status.get(), bytes.length == 0 ? -1 : bytes.length);
+            if (bytes.length > 0) exchange.getResponseBody().write(bytes);
+            exchange.close();
+        });
+        server.start();
+        client = new SupabaseAuthClient("http://127.0.0.1:" + server.getAddress().getPort() + "/",
+                "anon-ficticia", Duration.ofSeconds(2));
+    }
+
+    @AfterEach void parar() { server.stop(0); client.close(); }
+
+    @Test void cadastroEnviaNomesComoMetadadosEDevolveSessaoSemRefreshToken() {
+        response.set(SESSAO);
+        var sessao = client.cadastrar("ana@example.com", "senha12345", "Ana", "Silva").orElseThrow();
+        assertEquals("POST", method);
+        assertEquals("/auth/v1/signup", path);
+        assertEquals("anon-ficticia", key);
+        assertNull(auth);
+        var enviado = JsonMapper.builder().build().readTree(body);
+        assertEquals("ana@example.com", enviado.path("email").asString());
+        assertEquals("senha12345", enviado.path("password").asString());
+        assertEquals("Ana", enviado.path("data").path("nome").asString());
+        assertEquals("Silva", enviado.path("data").path("sobrenome").asString());
+        assertEquals("jwt-ficticio", sessao.accessToken());
+        assertEquals("Bearer", sessao.tokenType());
+        assertEquals(900, sessao.expiraEmSegundos());
+        assertFalse(sessao.toString().contains("refresh"));
+    }
+
+    @Test void cadastroSemSessaoIndicaConfirmacaoPendente() {
+        response.set("{\"id\":\"x\",\"email\":\"ana@example.com\"}");
+        assertTrue(client.cadastrar("ana@example.com", "senha12345", "Ana", "Silva").isEmpty());
+    }
+
+    @Test void errosDeCadastroSaoTraduzidos() {
+        assertCadastro(422, "{\"code\":422,\"error_code\":\"user_already_exists\",\"msg\":\"x\"}", Tipo.CONTA_EXISTENTE);
+        assertCadastro(422, "{\"error_code\":\"email_exists\"}", Tipo.CONTA_EXISTENTE);
+        assertCadastro(422, "{\"error_code\":\"weak_password\"}", Tipo.SENHA_FRACA);
+        assertCadastro(400, "{\"error_code\":\"email_address_invalid\"}", Tipo.EMAIL_INVALIDO);
+        assertCadastro(429, "{\"error_code\":\"over_request_rate_limit\"}", Tipo.LIMITE_PROVEDOR);
+        assertCadastro(500, "erro sem json", Tipo.INDISPONIVEL);
+    }
+
+    @Test void loginUsaGrantDeSenha() {
+        response.set(SESSAO);
+        var sessao = client.entrar("ana@example.com", "senha12345");
+        assertEquals("/auth/v1/token", path);
+        assertEquals("grant_type=password", query);
+        assertEquals("jwt-ficticio", sessao.accessToken());
+    }
+
+    @Test void errosDeLoginSaoTraduzidos() {
+        assertLogin(400, "{\"error_code\":\"invalid_credentials\"}", Tipo.CREDENCIAIS_INVALIDAS);
+        assertLogin(400, "{\"error\":\"invalid_grant\",\"error_description\":\"Invalid login credentials\"}",
+                Tipo.CREDENCIAIS_INVALIDAS);
+        assertLogin(400, "{\"error_code\":\"email_not_confirmed\"}", Tipo.EMAIL_NAO_CONFIRMADO);
+        assertLogin(429, "{}", Tipo.LIMITE_PROVEDOR);
+        assertLogin(503, "{}", Tipo.INDISPONIVEL);
+        assertLogin(200, "{\"user\":{}}", Tipo.INDISPONIVEL);
+    }
+
+    @Test void logoutEnviaTokenDoUsuarioEAceitaSessaoJaEncerrada() {
+        status.set(204); response.set("");
+        client.sair("jwt-do-usuario");
+        assertEquals("/auth/v1/logout", path);
+        assertEquals("scope=local", query);
+        assertEquals("Bearer jwt-do-usuario", auth);
+        status.set(401);
+        assertDoesNotThrow(() -> client.sair("jwt-do-usuario"));
+    }
+
+    @Test void semConfiguracaoNaoChamaRede() {
+        var semConfig = new SupabaseAuthClient("", "", Duration.ofSeconds(1));
+        var erro = assertThrows(FalhaAutenticacao.class, () -> semConfig.entrar("a@b.c", "x"));
+        assertEquals(Tipo.INDISPONIVEL, erro.tipo());
+        semConfig.close();
+    }
+
+    private void assertCadastro(int codigo, String corpo, Tipo esperado) {
+        status.set(codigo); response.set(corpo);
+        var erro = assertThrows(FalhaAutenticacao.class,
+                () -> client.cadastrar("ana@example.com", "senha12345", "Ana", "Silva"));
+        assertEquals(esperado, erro.tipo());
+    }
+
+    private void assertLogin(int codigo, String corpo, Tipo esperado) {
+        status.set(codigo); response.set(corpo);
+        var erro = assertThrows(FalhaAutenticacao.class, () -> client.entrar("ana@example.com", "senha12345"));
+        assertEquals(esperado, erro.tipo());
+    }
+}

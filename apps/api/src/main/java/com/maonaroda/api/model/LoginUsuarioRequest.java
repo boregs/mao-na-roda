@@ -2,8 +2,9 @@ package com.maonaroda.api.model;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record LoginUsuarioRequest(
-        @NotBlank @Email String email,
-        @NotBlank String senha) {
+        @NotBlank @Email @Size(max = 320) String email,
+        @NotBlank @Size(max = 128) String senha) {
 }
