@@ -26,6 +26,7 @@
     <string name="password">Senha</string>
     <string name="forgot_password">Esqueci minha senha</string>
     <string name="auth_unavailable">A autenticação ainda não está conectada ao serviço.</string>
+    <string name="auth_confirm_email">Conta criada. Confirme seu e-mail e depois entre.</string>
     <string name="auth_note">A autenticação usa um serviço seguro de contas do app.</string>
     <string name="show_password">Mostrar senha</string>
     <string name="hide_password">Ocultar senha</string>
