@@ -31,6 +31,14 @@
     <string name="account_expired">Sua sessão de %1$s expirou. Entre novamente para continuar.</string>
     <string name="sign_out">Sair da conta</string>
     <string name="signed_out">Você saiu da conta.</string>
+    <string name="delete_account">Excluir conta</string>
+    <string name="delete_account_title">Excluir sua conta?</string>
+    <string name="delete_account_explanation">Seu cadastro e suas preferências serão removidos e você sairá do aplicativo. Relatos e fotos já enviados continuam visíveis por até um mês como enviados por \"usuário excluído\" e depois são descartados. Para confirmar, informe sua senha.</string>
+    <string name="delete_account_confirm">Excluir</string>
+    <string name="cancel">Cancelar</string>
+    <string name="password_required">Informe sua senha.</string>
+    <string name="account_deleted">Sua conta foi excluída.</string>
+    <string name="delete_session_ended">Sua sessão terminou. Se você já tinha confirmado a exclusão, a conta foi excluída; se não, entre novamente para excluí-la.</string>
     <string name="auth_note">A autenticação usa um serviço seguro de contas do app.</string>
     <string name="show_password">Mostrar senha</string>
     <string name="hide_password">Ocultar senha</string>

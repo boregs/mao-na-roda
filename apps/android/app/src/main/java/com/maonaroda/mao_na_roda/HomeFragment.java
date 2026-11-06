@@ -18,6 +18,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.maonaroda.mao_na_roda.mapa.*;
 import com.maonaroda.mao_na_roda.data.DadosRotas.*;
 import com.maonaroda.mao_na_roda.data.ApiClient;
+import com.maonaroda.mao_na_roda.data.ContaRepository;
+import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.maonaroda.mao_na_roda.data.RotasRepository;
 import com.maonaroda.mao_na_roda.data.SessaoStore;
 import com.google.android.material.snackbar.Snackbar;
@@ -103,7 +107,8 @@ public class HomeFragment extends Fragment {
                 .setNegativeButton(R.string.close, null);
         if (token != null) {
             dialogo.setMessage(getString(R.string.account_signed_in, email))
-                    .setPositiveButton(R.string.sign_out, (d, which) -> sair(token)).show();
+                    .setPositiveButton(R.string.sign_out, (d, which) -> sair(token))
+                    .setNeutralButton(R.string.delete_account, (d, which) -> confirmarExclusao(token)).show();
             return;
         }
         dialogo.setMessage(email == null ? getString(R.string.account_signed_out)
@@ -116,6 +121,64 @@ public class HomeFragment extends Fragment {
         Bundle argumentos = new Bundle();
         argumentos.putBoolean("signIn", entrar);
         NavHostFragment.findNavController(this).navigate(R.id.authFragment, argumentos);
+    }
+    /** UC10: explica os efeitos (RN16) e pede a senha antes de excluir a conta. */
+    private void confirmarExclusao(String token) {
+        var contexto = requireContext();
+        var campoLayout = new TextInputLayout(contexto);
+        campoLayout.setHint(R.string.password);
+        campoLayout.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+        var campo = new TextInputEditText(campoLayout.getContext());
+        campo.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        campoLayout.addView(campo);
+        int margem = Math.round(24 * getResources().getDisplayMetrics().density);
+        var container = new FrameLayout(contexto);
+        container.setPadding(margem, margem / 2, margem, 0);
+        container.addView(campoLayout);
+        AlertDialog dialogo = new MaterialAlertDialogBuilder(contexto)
+                .setTitle(R.string.delete_account_title)
+                .setMessage(R.string.delete_account_explanation)
+                .setView(container)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete_account_confirm, null)
+                .create();
+        dialogo.setOnShowListener(d -> {
+            Button confirmar = dialogo.getButton(AlertDialog.BUTTON_POSITIVE);
+            confirmar.setOnClickListener(v -> {
+                String senha = campo.getText() == null ? "" : campo.getText().toString();
+                if (senha.isEmpty()) {
+                    campoLayout.setError(getString(R.string.password_required));
+                    return;
+                }
+                campoLayout.setError(null);
+                confirmar.setEnabled(false);
+                var api = new ApiClient(BuildConfig.API_BASE_URL, r -> new Handler(Looper.getMainLooper()).post(r), BuildConfig.DEBUG);
+                api.excluirConta(token, senha, new RotasRepository.Retorno<>() {
+                    @Override public void sucesso(Void valor) {
+                        api.close();
+                        dialogo.dismiss();
+                        encerrarSessaoLocal(R.string.account_deleted);
+                    }
+                    @Override public void falha(String mensagem) {
+                        api.close();
+                        if (ContaRepository.SESSAO_ENCERRADA.equals(mensagem)) {
+                            // A resposta de uma exclusão anterior pode ter se perdido.
+                            dialogo.dismiss();
+                            encerrarSessaoLocal(R.string.delete_session_ended);
+                            return;
+                        }
+                        confirmar.setEnabled(true);
+                        campoLayout.setError(mensagem);
+                    }
+                });
+            });
+        });
+        dialogo.show();
+    }
+    private void encerrarSessaoLocal(int mensagem) {
+        if (!isAdded()) return;
+        SessaoStore.de(requireContext()).encerrar();
+        if (root != null) Snackbar.make(root, mensagem, Snackbar.LENGTH_LONG).show();
     }
     /** Encerra localmente na hora; o logout no servidor é feito em seguida, sem bloquear a tela. */
     private void sair(String token) {
