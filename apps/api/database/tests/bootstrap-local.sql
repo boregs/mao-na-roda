@@ -5,6 +5,11 @@
 -- CREATE sem IF NOT EXISTS impede execução sobre um schema auth já existente.
 CREATE SCHEMA auth;
 CREATE TABLE auth.users (id uuid PRIMARY KEY, raw_user_meta_data jsonb);
+CREATE TABLE auth.sessions (
+    id uuid PRIMARY KEY,
+    user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    not_after timestamptz
+);
 
 DO $$
 BEGIN
