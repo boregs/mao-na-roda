@@ -17,6 +17,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.maonaroda.mao_na_roda.mapa.*;
 import com.maonaroda.mao_na_roda.data.DadosRotas.*;
+import com.maonaroda.mao_na_roda.data.ApiClient;
+import com.maonaroda.mao_na_roda.data.RotasRepository;
+import com.maonaroda.mao_na_roda.data.SessaoStore;
+import com.google.android.material.snackbar.Snackbar;
 import com.maonaroda.mao_na_roda.localizacao.LocalizacaoController;
 import java.util.List;
 
@@ -74,8 +78,7 @@ public class HomeFragment extends Fragment {
                 .setNegativeButton(R.string.close, null).setPositiveButton(R.string.allow_location, (d, which) ->
                         permissao.launch(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION})).show());
         view.findViewById(R.id.interface_preferences).setOnClickListener(v -> NavHostFragment.findNavController(this).navigate(R.id.action_home_to_accessibility_profile));
-        view.findViewById(R.id.account).setOnClickListener(v -> new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.account_title).setMessage(R.string.auth_unavailable).setPositiveButton(R.string.close, null).show());
+        view.findViewById(R.id.account).setOnClickListener(v -> abrirConta());
         view.findViewById(R.id.report_barrier).setOnClickListener(v -> NavHostFragment.findNavController(this).navigate(R.id.action_home_to_report_form));
         view.findViewById(R.id.report_history).setOnClickListener(v -> NavHostFragment.findNavController(this).navigate(R.id.action_home_to_report_history));
         view.findViewById(R.id.about).setOnClickListener(v -> HowItWorksSheet.show(getParentFragmentManager()));
@@ -91,6 +94,38 @@ public class HomeFragment extends Fragment {
             });
         }
         model.carregarPerfis();
+    }
+    private void abrirConta() {
+        var sessao = SessaoStore.de(requireContext());
+        String token = sessao.tokenValido();
+        String email = sessao.ultimoEmail();
+        var dialogo = new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.account_title)
+                .setNegativeButton(R.string.close, null);
+        if (token != null) {
+            dialogo.setMessage(getString(R.string.account_signed_in, email))
+                    .setPositiveButton(R.string.sign_out, (d, which) -> sair(token)).show();
+            return;
+        }
+        dialogo.setMessage(email == null ? getString(R.string.account_signed_out)
+                        : getString(R.string.account_expired, email))
+                .setPositiveButton(R.string.sign_in, (d, which) -> abrirAutenticacao(true));
+        if (email == null) dialogo.setNeutralButton(R.string.create_account, (d, which) -> abrirAutenticacao(false));
+        dialogo.show();
+    }
+    private void abrirAutenticacao(boolean entrar) {
+        Bundle argumentos = new Bundle();
+        argumentos.putBoolean("signIn", entrar);
+        NavHostFragment.findNavController(this).navigate(R.id.authFragment, argumentos);
+    }
+    /** Encerra localmente na hora; o logout no servidor é feito em seguida, sem bloquear a tela. */
+    private void sair(String token) {
+        SessaoStore.de(requireContext()).encerrar();
+        var api = new ApiClient(BuildConfig.API_BASE_URL, r -> new Handler(Looper.getMainLooper()).post(r), BuildConfig.DEBUG);
+        api.sair(token, new RotasRepository.Retorno<>() {
+            @Override public void sucesso(Void valor) { api.close(); }
+            @Override public void falha(String mensagem) { api.close(); }
+        });
+        if (root != null) Snackbar.make(root, R.string.signed_out, Snackbar.LENGTH_SHORT).show();
     }
     private TextWatcher watcher(boolean inicio) {
         return new TextWatcher() {

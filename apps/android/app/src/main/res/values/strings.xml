@@ -25,8 +25,12 @@
     <string name="email">E-mail</string>
     <string name="password">Senha</string>
     <string name="forgot_password">Esqueci minha senha</string>
-    <string name="auth_unavailable">A autenticação ainda não está conectada ao serviço.</string>
     <string name="auth_confirm_email">Conta criada. Confirme seu e-mail e depois entre.</string>
+    <string name="account_signed_in">Você entrou como %1$s.</string>
+    <string name="account_signed_out">Entre ou crie uma conta para enviar relatos e guardar suas preferências.</string>
+    <string name="account_expired">Sua sessão de %1$s expirou. Entre novamente para continuar.</string>
+    <string name="sign_out">Sair da conta</string>
+    <string name="signed_out">Você saiu da conta.</string>
     <string name="auth_note">A autenticação usa um serviço seguro de contas do app.</string>
     <string name="show_password">Mostrar senha</string>
     <string name="hide_password">Ocultar senha</string>
