@@ -3,6 +3,7 @@ package com.maonaroda.mao_na_roda;
 import static org.junit.Assert.*;
 
 import com.maonaroda.mao_na_roda.data.ApiClient;
+import com.maonaroda.mao_na_roda.data.ContaRepository;
 import org.junit.Test;
 
 public class ContaApiTest {
@@ -39,5 +40,13 @@ public class ContaApiTest {
         assertEquals("Não foi possível entrar. Confira o e-mail e a senha.", ApiClient.mensagemConta(401, ""));
         assertEquals("O serviço de contas está indisponível. Tente novamente mais tarde.", ApiClient.mensagemConta(503, "<html>"));
         assertEquals("Não foi possível concluir. Tente novamente.", ApiClient.mensagemConta(500, "{\"detail\":\"interno\"}"));
+    }
+
+    @Test public void chamadaProtegidaIdentificaSessaoEncerrada() {
+        assertEquals(ContaRepository.SESSAO_ENCERRADA, ApiClient.mensagemProtegida(401,
+                "{\"codigo\":\"SESSAO_ENCERRADA\",\"detail\":\"Sua sessão terminou. Entre novamente.\"}"));
+        // 503 da verificação de sessão é falha temporária, não fim da sessão.
+        assertEquals("Não foi possível verificar a sessão. Tente novamente.", ApiClient.mensagemProtegida(503,
+                "{\"codigo\":\"SESSAO_NAO_VERIFICADA\",\"detail\":\"Não foi possível verificar a sessão. Tente novamente.\"}"));
     }
 }

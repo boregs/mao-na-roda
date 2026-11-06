@@ -123,6 +123,11 @@ public final class ApiClient implements RotasRepository, ContaRepository {
         return "Não foi possível concluir. Tente novamente.";
     }
 
+    /** Chamadas que enviam o token: 401 sempre significa sessão encerrada. */
+    public static String mensagemProtegida(int status, String json) {
+        return status == 401 ? SESSAO_ENCERRADA : mensagemConta(status, json);
+    }
+
     public static Sessao lerSessao(String json) throws JSONException {
         var root = new JSONObject(json);
         if (!root.has("accessToken")) return null;
@@ -152,7 +157,7 @@ public final class ApiClient implements RotasRepository, ContaRepository {
     }
 
     @Override public Cancelavel sair(String accessToken, Retorno<Void> retorno) {
-        return executar("/api/v1/auth/logout", null, true, accessToken, json -> null, ApiClient::mensagemConta, retorno);
+        return executar("/api/v1/auth/logout", null, true, accessToken, json -> null, ApiClient::mensagemProtegida, retorno);
     }
 
     private static JSONObject local(LocalRota local) throws JSONException {
