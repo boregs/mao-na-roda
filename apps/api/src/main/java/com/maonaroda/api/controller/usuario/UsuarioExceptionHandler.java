@@ -25,6 +25,14 @@ public class UsuarioExceptionHandler {
         return AutenticacaoExceptionHandler.resposta(erro);
     }
 
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    ResponseEntity<ProblemDetail> camposInvalidos(org.springframework.web.bind.MethodArgumentNotValidException erro) {
+        var corpo = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Revise os campos informados.");
+        corpo.setProperty("campos", erro.getBindingResult().getFieldErrors().stream()
+                .map(org.springframework.validation.FieldError::getField).distinct().sorted().toList());
+        return ResponseEntity.badRequest().body(corpo);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ProblemDetail> jsonInvalido() {
         return ResponseEntity.badRequest()

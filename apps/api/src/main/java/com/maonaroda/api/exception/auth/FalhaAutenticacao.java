@@ -4,6 +4,7 @@ package com.maonaroda.api.exception.auth;
 public class FalhaAutenticacao extends RuntimeException {
     public enum Tipo {
         CREDENCIAIS_INVALIDAS,
+        SENHA_INCORRETA,
         CONTA_EXISTENTE,
         SENHA_FRACA,
         EMAIL_INVALIDO,

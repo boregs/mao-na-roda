@@ -33,13 +33,21 @@ public class AutenticacaoService {
 
     public SessaoResponse entrar(LoginUsuarioRequest request) {
         String email = normalizar(request.email());
+        return comLimiteDeTentativas(email, () -> auth.entrar(email, request.senha()));
+    }
+
+    /**
+     * RNF18 para qualquer conferência de senha (login e exclusão da conta): reserva a tentativa,
+     * confirma a falha só para credenciais inválidas e zera o contador no sucesso.
+     */
+    private <T> T comLimiteDeTentativas(String email, java.util.function.Supplier<T> tentativa) {
         String hash = hash(email);
         if (!tentativas.reservar(hash))
             throw new FalhaAutenticacao(Tipo.BLOQUEADO, tentativas.segundosAteLiberar(hash));
 
-        SessaoResponse sessao;
+        T resultado;
         try {
-            sessao = auth.entrar(email, request.senha());
+            resultado = tentativa.get();
         } catch (FalhaAutenticacao erro) {
             if (erro.tipo() == Tipo.CREDENCIAIS_INVALIDAS) tentativas.registrarFalha(hash);
             else tentativas.liberar(hash);
@@ -49,15 +57,28 @@ public class AutenticacaoService {
             throw erro;
         }
         tentativas.limpar(hash);
-        return sessao;
+        return resultado;
     }
 
     public void sair(String accessToken) {
         auth.sair(accessToken);
     }
 
-    /** RF12: remove a identidade no Auth; o banco remove sessões e cadastro em cascata. */
-    public void excluirConta(java.util.UUID usuario) {
+    /**
+     * RF12 / UC10 A2: confirma a senha da própria conta e remove a identidade no Auth; o banco
+     * remove sessões e cadastro em cascata. O e-mail vem do token, nunca do corpo da requisição.
+     * O sucesso da senha também apaga a linha de tentativas desse e-mail (RN16).
+     */
+    public void excluirConta(java.util.UUID usuario, String emailDoToken, String senha) {
+        String email = normalizar(emailDoToken);
+        java.util.UUID dono;
+        try {
+            dono = comLimiteDeTentativas(email, () -> auth.confirmarSenha(email, senha));
+        } catch (FalhaAutenticacao erro) {
+            if (erro.tipo() == Tipo.CREDENCIAIS_INVALIDAS) throw new FalhaAutenticacao(Tipo.SENHA_INCORRETA);
+            throw erro;
+        }
+        if (!usuario.equals(dono)) throw new FalhaAutenticacao(Tipo.SENHA_INCORRETA);
         auth.excluirUsuario(usuario);
     }
 

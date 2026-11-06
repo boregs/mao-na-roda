@@ -20,6 +20,7 @@ class SupabaseAuthClientTests {
     AtomicInteger status = new AtomicInteger(200);
     AtomicReference<String> response = new AtomicReference<>("{}");
     String method, path, query, key, auth, body;
+    final java.util.List<String> chamadas = new java.util.concurrent.CopyOnWriteArrayList<>();
     static final String SESSAO = "{\"access_token\":\"jwt-ficticio\",\"token_type\":\"bearer\","
             + "\"expires_in\":900,\"refresh_token\":\"refresh-que-nao-sai-da-api\",\"user\":{\"id\":\"x\"}}";
 
@@ -32,6 +33,7 @@ class SupabaseAuthClientTests {
             key = exchange.getRequestHeaders().getFirst("apikey");
             auth = exchange.getRequestHeaders().getFirst("Authorization");
             body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            chamadas.add(method + " " + path + " " + auth);
             byte[] bytes = response.get().getBytes(StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(status.get(), bytes.length == 0 ? -1 : bytes.length);
             if (bytes.length > 0) exchange.getResponseBody().write(bytes);
@@ -102,6 +104,22 @@ class SupabaseAuthClientTests {
         assertEquals("Bearer jwt-do-usuario", auth);
         status.set(401);
         assertDoesNotThrow(() -> client.sair("jwt-do-usuario"));
+    }
+
+    @Test void confirmarSenhaDevolveDonoEEncerraSessaoDeConfirmacao() {
+        var dono = java.util.UUID.randomUUID();
+        response.set("{\"access_token\":\"jwt-confirmacao\",\"expires_in\":900,\"user\":{\"id\":\"" + dono + "\"}}");
+        assertEquals(dono, client.confirmarSenha("ana@example.com", "senha12345"));
+        assertEquals(java.util.List.of("POST /auth/v1/token null", "POST /auth/v1/logout Bearer jwt-confirmacao"), chamadas);
+    }
+
+    @Test void confirmarSenhaTraduzErros() {
+        status.set(400); response.set("{\"error_code\":\"invalid_credentials\"}");
+        assertEquals(Tipo.CREDENCIAIS_INVALIDAS,
+                assertThrows(FalhaAutenticacao.class, () -> client.confirmarSenha("a@b.co", "x")).tipo());
+        status.set(200); response.set("{\"access_token\":\"t\",\"user\":{}}");
+        assertEquals(Tipo.INDISPONIVEL,
+                assertThrows(FalhaAutenticacao.class, () -> client.confirmarSenha("a@b.co", "x")).tipo());
     }
 
     private SupabaseAuthClient comChaveDeServico(String chave) {

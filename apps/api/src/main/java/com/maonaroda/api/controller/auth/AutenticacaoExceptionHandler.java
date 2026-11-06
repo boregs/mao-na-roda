@@ -24,13 +24,15 @@ public class AutenticacaoExceptionHandler {
             case CREDENCIAIS_INVALIDAS -> HttpStatus.UNAUTHORIZED;
             case CONTA_EXISTENTE -> HttpStatus.CONFLICT;
             case SENHA_FRACA, EMAIL_INVALIDO -> HttpStatus.BAD_REQUEST;
-            case EMAIL_NAO_CONFIRMADO -> HttpStatus.FORBIDDEN;
+            case SENHA_INCORRETA, EMAIL_NAO_CONFIRMADO -> HttpStatus.FORBIDDEN;
             case BLOQUEADO, LIMITE_PROVEDOR -> HttpStatus.TOO_MANY_REQUESTS;
             case INDISPONIVEL -> HttpStatus.SERVICE_UNAVAILABLE;
         };
         String detalhe = switch (erro.tipo()) {
             // UC07 A1: não indicar se o e-mail ou a senha está incorreto.
             case CREDENCIAIS_INVALIDAS -> "Não foi possível entrar. Confira o e-mail e a senha.";
+            // 403, e não 401: o token é válido; 401 indica ao aplicativo que a sessão terminou.
+            case SENHA_INCORRETA -> "Senha incorreta.";
             case CONTA_EXISTENTE -> "Já existe uma conta com este e-mail. Entre com sua senha.";
             case SENHA_FRACA -> "A senha não atende aos requisitos de segurança.";
             case EMAIL_INVALIDO -> "Informe um e-mail válido.";

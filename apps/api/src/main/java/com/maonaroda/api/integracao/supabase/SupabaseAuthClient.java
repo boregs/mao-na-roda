@@ -74,11 +74,41 @@ public class SupabaseAuthClient {
         var resposta = enviar("POST", "/auth/v1/token?grant_type=password",
                 Map.of("email", email, "password", senha), null, anonKey);
         if (sucesso(resposta.status())) return sessao(resposta.corpo());
+        throw erroLogin(resposta);
+    }
+
+    private FalhaAutenticacao erroLogin(Resposta resposta) {
         String codigo = codigo(resposta.corpo());
-        if ("email_not_confirmed".equals(codigo)) throw new FalhaAutenticacao(Tipo.EMAIL_NAO_CONFIRMADO);
+        if ("email_not_confirmed".equals(codigo)) return new FalhaAutenticacao(Tipo.EMAIL_NAO_CONFIRMADO);
         if (resposta.status() == 400 && ("invalid_credentials".equals(codigo) || "invalid_grant".equals(codigo)))
-            throw new FalhaAutenticacao(Tipo.CREDENCIAIS_INVALIDAS);
-        throw erroGenerico(resposta);
+            return new FalhaAutenticacao(Tipo.CREDENCIAIS_INVALIDAS);
+        return erroGenerico(resposta);
+    }
+
+    /**
+     * Confirma a senha (UC10 A2) e devolve o usuário dono dela. A confirmação abre uma sessão
+     * no Auth; ela é encerrada em seguida para não ficar ativa sem uso.
+     */
+    public java.util.UUID confirmarSenha(String email, String senha) {
+        var resposta = enviar("POST", "/auth/v1/token?grant_type=password",
+                Map.of("email", email, "password", senha), null, anonKey);
+        if (!sucesso(resposta.status())) throw erroLogin(resposta);
+        String token = resposta.corpo().path("access_token").asString("");
+        java.util.UUID usuario;
+        try {
+            usuario = java.util.UUID.fromString(resposta.corpo().path("user").path("id").asString(""));
+        } catch (IllegalArgumentException erro) {
+            log.warn("Supabase Auth devolveu login sem identificador de usuário.");
+            throw new FalhaAutenticacao(Tipo.INDISPONIVEL);
+        }
+        if (!token.isBlank()) {
+            try {
+                sair(token);
+            } catch (FalhaAutenticacao erro) {
+                log.warn("Não foi possível encerrar a sessão de confirmação de senha.");
+            }
+        }
+        return usuario;
     }
 
     /** Encerra somente a sessão do token informado. Sessão já encerrada não é erro. */

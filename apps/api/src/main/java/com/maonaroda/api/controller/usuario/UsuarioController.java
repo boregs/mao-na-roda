@@ -1,6 +1,7 @@
 package com.maonaroda.api.controller.usuario;
 
 import com.maonaroda.api.model.AtualizarUsuarioRequest;
+import com.maonaroda.api.model.ExcluirContaRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +42,14 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> excluir(@AuthenticationPrincipal Jwt jwt) {
-        autenticacao.excluirConta(id(jwt));
+    /** POST com corpo, e não DELETE: a senha é obrigatória e corpos em DELETE nem sempre chegam. */
+    @PostMapping("/exclusao")
+    public ResponseEntity<Void> excluir(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ExcluirContaRequest request) {
+        UUID usuarioId = id(jwt);
+        String email = jwt.getClaimAsString("email");
+        if (email == null || email.isBlank())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Identidade inválida.");
+        autenticacao.excluirConta(usuarioId, email, request.senha());
 
         return ResponseEntity.noContent().build();
     }

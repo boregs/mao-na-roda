@@ -21,6 +21,7 @@ class SegurancaPlanejamentoTests {
     @Test void contaExigeTokenERejeitaTokenInvalido() throws Exception {
         assertEquals(401, consultar("/api/v1/usuarios/me", null, null).statusCode());
         assertEquals(401, consultar("/api/v1/usuarios/me", "invalido", null).statusCode());
+        assertEquals(401, consultar("/api/v1/usuarios/me/exclusao", null, "{\"senha\":\"x\"}").statusCode());
     }
     @Test void cadastroELoginSaoPublicosELogoutExigeToken() throws Exception {
         // Sem token: chega ao controller e falha na validação, não na segurança.

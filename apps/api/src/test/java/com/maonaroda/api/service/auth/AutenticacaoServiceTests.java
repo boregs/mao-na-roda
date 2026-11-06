@@ -20,6 +20,8 @@ class AutenticacaoServiceTests {
     final List<String> eventos = new ArrayList<>();
     RuntimeException falhaLogin;
     boolean permitir;
+    final java.util.UUID usuario = java.util.UUID.randomUUID();
+    java.util.UUID dono = usuario;
     String emailEnviado, nomeEnviado;
     AutenticacaoService service;
 
@@ -30,6 +32,13 @@ class AutenticacaoServiceTests {
                 emailEnviado = email; nomeEnviado = nome + "|" + sobrenome;
                 return Optional.of(SESSAO);
             }
+            @Override public java.util.UUID confirmarSenha(String email, String senha) {
+                emailEnviado = email;
+                eventos.add("confirmar");
+                if (falhaLogin != null) throw falhaLogin;
+                return dono;
+            }
+            @Override public void excluirUsuario(java.util.UUID usuario) { eventos.add("excluir:" + usuario); }
             @Override public SessaoResponse entrar(String email, String senha) {
                 emailEnviado = email;
                 eventos.add("auth");
@@ -88,5 +97,32 @@ class AutenticacaoServiceTests {
         assertEquals(AutenticacaoService.hash(AutenticacaoService.normalizar(" A@B.co ")),
                 AutenticacaoService.hash(AutenticacaoService.normalizar("a@b.CO")));
         assertTrue(AutenticacaoService.hash("a@b.co").matches("[0-9a-f]{64}"));
+    }
+
+    @Test void exclusaoConfirmaSenhaZeraTentativasEExcluiIdentidade() {
+        service.excluirConta(usuario, " Ana@Example.com ", "senha");
+        assertEquals("ana@example.com", emailEnviado);
+        assertEquals(List.of("reservar:64", "confirmar", "limpar", "excluir:" + usuario), eventos);
+    }
+
+    @Test void senhaIncorretaNaExclusaoContaComoFalhaENaoExclui() {
+        falhaLogin = new FalhaAutenticacao(Tipo.CREDENCIAIS_INVALIDAS);
+        var erro = assertThrows(FalhaAutenticacao.class, () -> service.excluirConta(usuario, "a@b.co", "x"));
+        assertEquals(Tipo.SENHA_INCORRETA, erro.tipo());
+        assertEquals(List.of("reservar:64", "confirmar", "falha"), eventos);
+    }
+
+    @Test void senhaDeOutraContaNaoExclui() {
+        dono = java.util.UUID.randomUUID();
+        var erro = assertThrows(FalhaAutenticacao.class, () -> service.excluirConta(usuario, "a@b.co", "x"));
+        assertEquals(Tipo.SENHA_INCORRETA, erro.tipo());
+        assertTrue(eventos.stream().noneMatch(e -> e.startsWith("excluir")));
+    }
+
+    @Test void exclusaoRespeitaBloqueioDeLogin() {
+        permitir = false;
+        var erro = assertThrows(FalhaAutenticacao.class, () -> service.excluirConta(usuario, "a@b.co", "x"));
+        assertEquals(Tipo.BLOQUEADO, erro.tipo());
+        assertEquals(List.of("reservar:64"), eventos);
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -33,6 +34,9 @@ class UsuarioControllerTests {
     private UUID chamado;
     private UUID excluido;
     private RuntimeException falhaAuth;
+    private String emailExclusao, senhaExclusao;
+    private static final String EXCLUSAO = URL + "/exclusao";
+    private static final String SENHA = "{\"senha\":\"senha12345\"}";
     private UUID perfilChamado;
     private MockMvc mvc;
 
@@ -55,7 +59,10 @@ class UsuarioControllerTests {
             }
         };
         var autenticacao = new com.maonaroda.api.service.auth.AutenticacaoService(null, null) {
-            @Override public void excluirConta(UUID id) { excluido = id; if (falhaAuth != null) throw falhaAuth; }
+            @Override public void excluirConta(UUID id, String email, String senha) {
+                excluido = id; emailExclusao = email; senhaExclusao = senha;
+                if (falhaAuth != null) throw falhaAuth;
+            }
         };
         mvc = MockMvcBuilders.standaloneSetup(new UsuarioController(service, autenticacao))
                 .setControllerAdvice(new UsuarioExceptionHandler())
@@ -84,8 +91,11 @@ class UsuarioControllerTests {
         mvc.perform(patch(URL).contentType("application/json").content(NOME))
                 .andExpect(status().isNoContent()).andExpect(content().string(""));
         assertEquals(ID, chamado);
-        mvc.perform(delete(URL)).andExpect(status().isNoContent()).andExpect(content().string(""));
+        mvc.perform(post(EXCLUSAO).contentType("application/json").content(SENHA))
+                .andExpect(status().isNoContent()).andExpect(content().string(""));
         assertEquals(ID, excluido);
+        assertEquals("ana@example.com", emailExclusao);
+        assertEquals("senha12345", senhaExclusao);
     }
 
     @Test void cadastroNaoEhMaisFeitoPorEsteRecurso() throws Exception {
@@ -138,7 +148,7 @@ class UsuarioControllerTests {
         principal = null;
         mvc.perform(get(URL)).andExpect(status().isUnauthorized());
         mvc.perform(patch(URL).contentType("application/json").content(NOME)).andExpect(status().isUnauthorized());
-        mvc.perform(delete(URL)).andExpect(status().isUnauthorized());
+        mvc.perform(post(EXCLUSAO).contentType("application/json").content(SENHA)).andExpect(status().isUnauthorized());
         principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject("invalido").build();
         mvc.perform(get(URL)).andExpect(status().isUnauthorized());
     }
@@ -146,7 +156,30 @@ class UsuarioControllerTests {
     @Test void exclusaoIndisponivelNoAuthRetorna503() throws Exception {
         falhaAuth = new com.maonaroda.api.exception.auth.FalhaAutenticacao(
                 com.maonaroda.api.exception.auth.FalhaAutenticacao.Tipo.INDISPONIVEL);
-        mvc.perform(delete(URL)).andExpect(status().isServiceUnavailable())
+        mvc.perform(post(EXCLUSAO).contentType("application/json").content(SENHA)).andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.codigo").value("INDISPONIVEL"));
+    }
+
+    @Test void exclusaoExigeSenhaENaoAceitaMaisDelete() throws Exception {
+        mvc.perform(delete(URL)).andExpect(status().isMethodNotAllowed());
+        mvc.perform(post(EXCLUSAO).contentType("application/json").content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.campos[0]").value("senha"));
+        assertNull(excluido);
+    }
+
+    @Test void senhaIncorretaRetorna403ENao401() throws Exception {
+        falhaAuth = new com.maonaroda.api.exception.auth.FalhaAutenticacao(
+                com.maonaroda.api.exception.auth.FalhaAutenticacao.Tipo.SENHA_INCORRETA);
+        mvc.perform(post(EXCLUSAO).contentType("application/json").content(SENHA))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.detail").value("Senha incorreta."));
+    }
+
+    @Test void tokenSemEmailNaoExclui() throws Exception {
+        principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject(ID.toString()).build();
+        mvc.perform(post(EXCLUSAO).contentType("application/json").content(SENHA))
+                .andExpect(status().isUnauthorized());
+        assertNull(excluido);
     }
 }
