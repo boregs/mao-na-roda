@@ -39,7 +39,16 @@ public final class DadosRotas {
             return new LocalRota(null, valor);
         }
     }
+    public record Etapa(String instrucao, List<Ponto> pontos) { }
+    public record Evidencia(double inicio, double fim, String descricao, boolean impeditiva) { }
     public record Rota(String id, List<Ponto> pontos, double distancia, double duracao,
-            String qualidade, double cobertura, int impeditivas, int atencao, String detalhes) { }
+            String qualidade, double cobertura, int impeditivas, int atencao, String detalhes,
+            List<Etapa> etapas, List<Evidencia> evidencias) {
+        public Rota(String id, List<Ponto> pontos, double distancia, double duracao, String qualidade,
+                double cobertura, int impeditivas, int atencao, String detalhes) {
+            this(id, pontos, distancia, duracao, qualidade, cobertura, impeditivas, atencao,
+                    detalhes, List.of(), List.of());
+        }
+    }
     public record Consulta(String resultado, List<Rota> rotas, String aviso) { }
 }
