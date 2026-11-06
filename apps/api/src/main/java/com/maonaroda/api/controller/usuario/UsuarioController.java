@@ -1,6 +1,5 @@
 package com.maonaroda.api.controller.usuario;
 
-import com.maonaroda.api.model.CriarUsuarioRequest;
 import com.maonaroda.api.model.AtualizarUsuarioRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -40,13 +39,6 @@ public class UsuarioController {
         service.iniciarExclusao(id(jwt));
 
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> criar(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CriarUsuarioRequest request) {
-        id(jwt);
-        // Retornar 201 Created somente após implementar e concluir a criação.
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     private UUID id(Jwt jwt) {

@@ -27,8 +27,6 @@ class UsuarioControllerTests {
     private static final String URL = "/api/v1/usuarios/me";
     private static final UUID ID = UUID.randomUUID();
     private static final String NOME = "{\"nome\":\"Ana\",\"sobrenome\":\"Silva\"}";
-    private static final String CADASTRO = "{\"nome\":\"Ana\",\"sobrenome\":\"Silva\","
-            + "\"email\":\"ana@example.com\",\"senha\":\"senha12345\"}";
     private Jwt principal;
     private RuntimeException falha;
     private UUID chamado;
@@ -76,9 +74,10 @@ class UsuarioControllerTests {
         assertEquals(ID, chamado);
     }
 
-    @Test void criarNaoSimulaSucesso() throws Exception {
-        mvc.perform(post(URL).contentType("application/json").content(CADASTRO))
-                .andExpect(status().isNotImplemented());
+    @Test void cadastroNaoEhMaisFeitoPorEsteRecurso() throws Exception {
+        // O cadastro foi para POST /api/v1/auth/cadastro.
+        mvc.perform(post(URL).contentType("application/json").content(NOME))
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test void encaminhaPerfilExplicitoEValidaUuid() throws Exception {
@@ -100,8 +99,6 @@ class UsuarioControllerTests {
     }
 
     @Test void rejeitaCorposInvalidos() throws Exception {
-        mvc.perform(post(URL).contentType("application/json").content("{}"))
-                .andExpect(status().isBadRequest());
         mvc.perform(patch(URL).contentType("application/json").content("{}"))
                 .andExpect(status().isBadRequest());
         mvc.perform(patch(URL).contentType("application/json").content("{"))
@@ -130,7 +127,6 @@ class UsuarioControllerTests {
         mvc.perform(get(URL)).andExpect(status().isUnauthorized());
         mvc.perform(patch(URL).contentType("application/json").content(NOME)).andExpect(status().isUnauthorized());
         mvc.perform(delete(URL)).andExpect(status().isUnauthorized());
-        mvc.perform(post(URL).contentType("application/json").content(CADASTRO)).andExpect(status().isUnauthorized());
         principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject("invalido").build();
         mvc.perform(get(URL)).andExpect(status().isUnauthorized());
     }
