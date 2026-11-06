@@ -25,7 +25,9 @@ public class ConsultaPublicaFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String path = request.getRequestURI();
 
-        if (path.startsWith("/api/v1/rotas") || path.startsWith("/api/v1/destinos")) {
+        // Cadastro e login também limitam por IP; o RNF18 (por e-mail) fica no AutenticacaoService.
+        if (path.startsWith("/api/v1/rotas") || path.startsWith("/api/v1/destinos")
+                || path.startsWith("/api/v1/auth")) {
             response.setHeader("Cache-Control", "no-store");
 
             if ("POST".equals(request.getMethod()) && !permitir(request.getRemoteAddr())) {
