@@ -104,6 +104,46 @@ class SupabaseAuthClientTests {
         assertDoesNotThrow(() -> client.sair("jwt-do-usuario"));
     }
 
+    private SupabaseAuthClient comChaveDeServico(String chave) {
+        return new SupabaseAuthClient("http://127.0.0.1:" + server.getAddress().getPort(),
+                "anon-ficticia", chave, Duration.ofSeconds(2));
+    }
+
+    @Test void exclusaoUsaRotaAdministrativaEChaveDeServico() {
+        status.set(200);
+        var usuario = java.util.UUID.randomUUID();
+        var legado = comChaveDeServico("eyJchave-de-servico");
+        legado.excluirUsuario(usuario);
+        assertEquals("DELETE", method);
+        assertEquals("/auth/v1/admin/users/" + usuario, path);
+        assertEquals("eyJchave-de-servico", key);
+        assertEquals("Bearer eyJchave-de-servico", auth);
+        legado.close();
+        // As chaves secretas novas não são JWT: vão só no apikey.
+        var nova = comChaveDeServico("sb_secret_ficticia");
+        nova.excluirUsuario(usuario);
+        assertEquals("sb_secret_ficticia", key);
+        assertNull(auth);
+        nova.close();
+    }
+
+    @Test void exclusaoDeUsuarioJaRemovidoNaoEhErro() {
+        var cliente = comChaveDeServico("sb_secret_ficticia");
+        status.set(404); response.set("{\"error_code\":\"user_not_found\"}");
+        assertDoesNotThrow(() -> cliente.excluirUsuario(java.util.UUID.randomUUID()));
+        status.set(500);
+        var erro = assertThrows(FalhaAutenticacao.class, () -> cliente.excluirUsuario(java.util.UUID.randomUUID()));
+        assertEquals(Tipo.INDISPONIVEL, erro.tipo());
+        cliente.close();
+    }
+
+    @Test void exclusaoSemChaveDeServicoNaoChamaRede() {
+        method = null;
+        var erro = assertThrows(FalhaAutenticacao.class, () -> client.excluirUsuario(java.util.UUID.randomUUID()));
+        assertEquals(Tipo.INDISPONIVEL, erro.tipo());
+        assertNull(method);
+    }
+
     @Test void semConfiguracaoNaoChamaRede() {
         var semConfig = new SupabaseAuthClient("", "", Duration.ofSeconds(1));
         var erro = assertThrows(FalhaAutenticacao.class, () -> semConfig.entrar("a@b.c", "x"));

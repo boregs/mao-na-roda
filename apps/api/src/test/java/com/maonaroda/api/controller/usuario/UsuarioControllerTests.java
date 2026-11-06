@@ -31,6 +31,8 @@ class UsuarioControllerTests {
     private Jwt principal;
     private RuntimeException falha;
     private UUID chamado;
+    private UUID excluido;
+    private RuntimeException falhaAuth;
     private UUID perfilChamado;
     private MockMvc mvc;
 
@@ -51,9 +53,11 @@ class UsuarioControllerTests {
                 registrar(id);
                 perfilChamado = perfil;
             }
-            @Override public void iniciarExclusao(UUID id) { registrar(id); }
         };
-        mvc = MockMvcBuilders.standaloneSetup(new UsuarioController(service))
+        var autenticacao = new com.maonaroda.api.service.auth.AutenticacaoService(null, null) {
+            @Override public void excluirConta(UUID id) { excluido = id; if (falhaAuth != null) throw falhaAuth; }
+        };
+        mvc = MockMvcBuilders.standaloneSetup(new UsuarioController(service, autenticacao))
                 .setControllerAdvice(new UsuarioExceptionHandler())
                 .setCustomArgumentResolvers(new HandlerMethodArgumentResolver() {
                     @Override public boolean supportsParameter(MethodParameter parameter) {
@@ -79,8 +83,9 @@ class UsuarioControllerTests {
     @Test void atualizarEExcluirRetornamSemConteudo() throws Exception {
         mvc.perform(patch(URL).contentType("application/json").content(NOME))
                 .andExpect(status().isNoContent()).andExpect(content().string(""));
-        mvc.perform(delete(URL)).andExpect(status().isNoContent()).andExpect(content().string(""));
         assertEquals(ID, chamado);
+        mvc.perform(delete(URL)).andExpect(status().isNoContent()).andExpect(content().string(""));
+        assertEquals(ID, excluido);
     }
 
     @Test void cadastroNaoEhMaisFeitoPorEsteRecurso() throws Exception {
@@ -119,7 +124,6 @@ class UsuarioControllerTests {
         mvc.perform(get(URL)).andExpect(status().isNotFound());
         falha = new UsuarioNaoEncontradoException();
         mvc.perform(patch(URL).contentType("application/json").content(NOME)).andExpect(status().isNotFound());
-        mvc.perform(delete(URL)).andExpect(status().isNotFound());
     }
 
     @Test void falhaInternaNaoExpoeDetalhes() throws Exception {
@@ -128,7 +132,6 @@ class UsuarioControllerTests {
                 .andExpect(jsonPath("$.detail").value("Não foi possível concluir a operação."));
         mvc.perform(patch(URL).contentType("application/json").content(NOME))
                 .andExpect(status().isInternalServerError());
-        mvc.perform(delete(URL)).andExpect(status().isInternalServerError());
     }
 
     @Test void exigeIdentidadeValida() throws Exception {
@@ -138,5 +141,12 @@ class UsuarioControllerTests {
         mvc.perform(delete(URL)).andExpect(status().isUnauthorized());
         principal = Jwt.withTokenValue("teste").header("alg", "RS256").subject("invalido").build();
         mvc.perform(get(URL)).andExpect(status().isUnauthorized());
+    }
+
+    @Test void exclusaoIndisponivelNoAuthRetorna503() throws Exception {
+        falhaAuth = new com.maonaroda.api.exception.auth.FalhaAutenticacao(
+                com.maonaroda.api.exception.auth.FalhaAutenticacao.Tipo.INDISPONIVEL);
+        mvc.perform(delete(URL)).andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.codigo").value("INDISPONIVEL"));
     }
 }

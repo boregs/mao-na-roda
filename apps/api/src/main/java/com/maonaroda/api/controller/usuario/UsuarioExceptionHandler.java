@@ -1,5 +1,7 @@
 package com.maonaroda.api.controller.usuario;
 
+import com.maonaroda.api.controller.auth.AutenticacaoExceptionHandler;
+import com.maonaroda.api.exception.auth.FalhaAutenticacao;
 import com.maonaroda.api.exception.usuario.UsuarioNaoEncontradoException;
 import com.maonaroda.api.exception.perfil.PerfilMobilidadeInvalidoException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,6 +18,11 @@ public class UsuarioExceptionHandler {
     ResponseEntity<ProblemDetail> perfilInvalido() {
         return ResponseEntity.badRequest().body(ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST, "Perfil de mobilidade inexistente ou inativo."));
+    }
+
+    @ExceptionHandler(FalhaAutenticacao.class)
+    ResponseEntity<ProblemDetail> autenticacao(FalhaAutenticacao erro) {
+        return AutenticacaoExceptionHandler.resposta(erro);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

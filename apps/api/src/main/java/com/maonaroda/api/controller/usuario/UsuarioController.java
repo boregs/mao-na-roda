@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import com.maonaroda.api.model.UsuarioModel;
 import com.maonaroda.api.model.UsuarioPerfilResponse;
+import com.maonaroda.api.service.auth.AutenticacaoService;
 import com.maonaroda.api.service.usuario.UsuarioService;
 
 import org.springframework.web.server.ResponseStatusException;
@@ -18,9 +19,11 @@ import java.util.UUID;
 @RequestMapping("/api/v1/usuarios/me")
 public class UsuarioController {
     private final UsuarioService service;
+    private final AutenticacaoService autenticacao;
 
-    public UsuarioController(UsuarioService service) {
+    public UsuarioController(UsuarioService service, AutenticacaoService autenticacao) {
         this.service = service;
+        this.autenticacao = autenticacao;
     }
 
     @GetMapping
@@ -40,7 +43,7 @@ public class UsuarioController {
 
     @DeleteMapping
     public ResponseEntity<Void> excluir(@AuthenticationPrincipal Jwt jwt) {
-        service.iniciarExclusao(id(jwt));
+        autenticacao.excluirConta(id(jwt));
 
         return ResponseEntity.noContent().build();
     }

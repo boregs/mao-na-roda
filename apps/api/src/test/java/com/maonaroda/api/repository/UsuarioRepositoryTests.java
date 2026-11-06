@@ -80,7 +80,7 @@ class UsuarioRepositoryTests {
     @Test void recusaUsuarioAusenteOuEmExclusao() {
         assertThrows(UsuarioNaoEncontradoException.class,
                 () -> service.atualizar(UUID.randomUUID(), nomes, null));
-        service.iniciarExclusao(usuario);
+        jdbc.update("UPDATE app.usuarios SET estado_conta = 'exclusao_em_andamento' WHERE auth_user_id = ?", usuario);
         assertThrows(UsuarioNaoEncontradoException.class,
                 () -> service.atualizar(usuario, nomes, novoPerfil));
         assertEquals(1L, perfilAtual(usuario));

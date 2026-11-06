@@ -30,15 +30,24 @@ public class SupabaseAuthClient {
 
     private final String url;
     private final String anonKey;
+    /** Chave de serviço (service_role ou sb_secret_…): ignora RLS; usada só na exclusão de contas. */
+    private final String serviceKey;
     private final Duration timeout;
     private final HttpClient http;
     private final JsonMapper json = JsonMapper.builder().build();
 
+    public SupabaseAuthClient(String url, String anonKey, Duration timeout) {
+        this(url, anonKey, "", timeout);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
     public SupabaseAuthClient(@Value("${supabase.url:}") String url,
             @Value("${supabase.anon-key:}") String anonKey,
+            @Value("${supabase.service-role-key:}") String serviceKey,
             @Value("${supabase.auth.timeout:5s}") Duration timeout) {
         this.url = url.replaceAll("/+$", "");
         this.anonKey = anonKey;
+        this.serviceKey = serviceKey;
         this.timeout = timeout;
         this.http = HttpClient.newBuilder().connectTimeout(timeout)
                 .followRedirects(HttpClient.Redirect.NEVER).build();
@@ -55,15 +64,15 @@ public class SupabaseAuthClient {
         corpo.put("email", email);
         corpo.put("password", senha);
         corpo.put("data", Map.of("nome", nome, "sobrenome", sobrenome));
-        var resposta = enviar("/auth/v1/signup", corpo, null);
+        var resposta = enviar("POST", "/auth/v1/signup", corpo, null, anonKey);
         if (!sucesso(resposta.status())) throw erroCadastro(resposta);
         if (!resposta.corpo().hasNonNull("access_token")) return Optional.empty();
         return Optional.of(sessao(resposta.corpo()));
     }
 
     public SessaoResponse entrar(String email, String senha) {
-        var resposta = enviar("/auth/v1/token?grant_type=password",
-                Map.of("email", email, "password", senha), null);
+        var resposta = enviar("POST", "/auth/v1/token?grant_type=password",
+                Map.of("email", email, "password", senha), null, anonKey);
         if (sucesso(resposta.status())) return sessao(resposta.corpo());
         String codigo = codigo(resposta.corpo());
         if ("email_not_confirmed".equals(codigo)) throw new FalhaAutenticacao(Tipo.EMAIL_NAO_CONFIRMADO);
@@ -74,9 +83,25 @@ public class SupabaseAuthClient {
 
     /** Encerra somente a sessão do token informado. Sessão já encerrada não é erro. */
     public void sair(String accessToken) {
-        var resposta = enviar("/auth/v1/logout?scope=local", null, accessToken);
+        var resposta = enviar("POST", "/auth/v1/logout?scope=local", null, accessToken, anonKey);
         int status = resposta.status();
         if (sucesso(status) || status == 401 || status == 403 || status == 404) return;
+        throw erroGenerico(resposta);
+    }
+
+    /**
+     * Remove a identidade no Auth. O banco apaga em cascata as sessões e app.usuarios,
+     * e o trigger da V3 desvincula os relatos (RN16). Usuário já removido não é erro.
+     */
+    public void excluirUsuario(java.util.UUID usuario) {
+        if (serviceKey.isBlank()) {
+            log.warn("Exclusão de contas não configurada (supabase.service-role-key).");
+            throw new FalhaAutenticacao(Tipo.INDISPONIVEL);
+        }
+        // As chaves antigas (JWT) também vão no Authorization; as novas sb_secret_ só no apikey.
+        String bearer = serviceKey.startsWith("eyJ") ? serviceKey : null;
+        var resposta = enviar("DELETE", "/auth/v1/admin/users/" + usuario, null, bearer, serviceKey);
+        if (sucesso(resposta.status()) || resposta.status() == 404) return;
         throw erroGenerico(resposta);
     }
 
@@ -122,22 +147,22 @@ public class SupabaseAuthClient {
 
     private record Resposta(int status, JsonNode corpo) { }
 
-    private Resposta enviar(String caminho, Object corpo, String bearer) {
-        if (url.isBlank() || anonKey.isBlank()) {
+    private Resposta enviar(String metodo, String caminho, Object corpo, String bearer, String chave) {
+        if (url.isBlank() || chave.isBlank()) {
             log.warn("Supabase Auth não configurado (supabase.url / supabase.anon-key).");
             throw new FalhaAutenticacao(Tipo.INDISPONIVEL);
         }
         try {
             var builder = HttpRequest.newBuilder(URI.create(url + caminho))
                     .timeout(timeout)
-                    .header("apikey", anonKey)
+                    .header("apikey", chave)
                     .header("Accept", "application/json");
             if (bearer != null) builder.header("Authorization", "Bearer " + bearer);
             if (corpo == null) {
-                builder.POST(HttpRequest.BodyPublishers.noBody());
+                builder.method(metodo, HttpRequest.BodyPublishers.noBody());
             } else {
                 builder.header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(corpo)));
+                        .method(metodo, HttpRequest.BodyPublishers.ofString(json.writeValueAsString(corpo)));
             }
             var resposta = http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
             JsonNode node;

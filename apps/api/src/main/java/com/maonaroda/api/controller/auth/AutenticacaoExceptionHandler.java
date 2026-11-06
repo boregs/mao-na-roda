@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class AutenticacaoExceptionHandler {
     @ExceptionHandler(FalhaAutenticacao.class)
     ResponseEntity<ProblemDetail> falha(FalhaAutenticacao erro) {
+        return resposta(erro);
+    }
+
+    /** Também usado pelos recursos de usuário que dependem do Auth (exclusão da conta). */
+    public static ResponseEntity<ProblemDetail> resposta(FalhaAutenticacao erro) {
         HttpStatus status = switch (erro.tipo()) {
             case CREDENCIAIS_INVALIDAS -> HttpStatus.UNAUTHORIZED;
             case CONTA_EXISTENTE -> HttpStatus.CONFLICT;

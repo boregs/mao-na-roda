@@ -56,6 +56,11 @@ public class AutenticacaoService {
         auth.sair(accessToken);
     }
 
+    /** RF12: remove a identidade no Auth; o banco remove sessões e cadastro em cascata. */
+    public void excluirConta(java.util.UUID usuario) {
+        auth.excluirUsuario(usuario);
+    }
+
     static String normalizar(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }

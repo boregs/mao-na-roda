@@ -53,13 +53,4 @@ public class UsuarioRepository {
                 "SELECT EXISTS (SELECT 1 FROM app.perfis_mobilidade WHERE uuid = ? AND ativo)",
                 Boolean.class, profileUuid));
     }
-
-    public int markDeleting(UUID authUserId) {
-        return jdbc.update(
-                "UPDATE app.usuarios "
-                        + "SET estado_conta = 'exclusao_em_andamento' "
-                        + "WHERE auth_user_id = ? "
-                        + "AND estado_conta = 'ativa'",
-                authUserId);
-    }
 }
