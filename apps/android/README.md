@@ -9,7 +9,7 @@ Aplicativo Android nativo em Java, com layouts e estilos XML, AndroidX e Materia
 - Maps SDK, até três candidatas, cobertura de evidências e detalhes de barreiras.
 - Perfil de mobilidade e rota somente em memória; preferências visuais podem ser salvas.
 - Localização obtida uma vez após ação e consentimento, com alternativa manual.
-- Anotações de barreiras continuam locais, sem envio nem georreferenciamento. Contas não estão conectadas.
+- Anotações de barreiras ficam no aparelho. Informe coordenadas no formato latitude, longitude para ver um pino no mapa. Contas não estão conectadas.
 - Mapa e rede exigem configuração abaixo; ausência de chave/serviço é informada, sem dados simulados no aplicativo.
 
 ## Configurar mapa e API

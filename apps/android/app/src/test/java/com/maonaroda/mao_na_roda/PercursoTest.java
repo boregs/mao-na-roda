@@ -17,6 +17,31 @@ public class PercursoTest {
 
     private Percurso percurso() { return percurso(false); }
 
+    @Test public void encontraRelatoPertoDoTrechoSemContarPontosDistantes() {
+        var linha = List.of(origem, fim);
+        assertTrue(Percurso.pertoDaRota(new Ponto(meio.longitude(), 10.0 / 111_195), linha));
+        assertFalse(Percurso.pertoDaRota(new Ponto(meio.longitude(), 20.0 / 111_195), linha));
+        assertFalse(Percurso.pertoDaRota(ponto(120), linha));
+    }
+
+    @Test public void recomendaAlternativaQueEvitaBarreirasLocaisESemImpedimentosDaApi() {
+        var principal = candidata("principal", 0, 0);
+        var alternativa = candidata("alternativa", 30, 0);
+        var bloqueada = candidata("bloqueada", 60, 1);
+        assertEquals(1, Percurso.recomendarAlternativa(List.of(principal, alternativa), List.of(meio)));
+        assertEquals(2, Percurso.recomendarAlternativa(List.of(principal, bloqueada, alternativa), List.of(meio)));
+        assertEquals(-1, Percurso.recomendarAlternativa(List.of(principal, bloqueada), List.of(meio)));
+        assertEquals(-1, Percurso.recomendarAlternativa(List.of(principal, alternativa), List.of()));
+        assertEquals(-1, Percurso.recomendarAlternativa(List.of(principal, alternativa),
+                List.of(meio, new Ponto(meio.longitude(), 30.0 / 111_195))));
+    }
+
+    private Rota candidata(String id, double deslocamento, int impedimentos) {
+        double latitude = deslocamento / 111_195;
+        return new Rota(id, List.of(new Ponto(origem.longitude(), latitude), new Ponto(fim.longitude(), latitude)),
+                100, 90, "PARCIAL", .2, impedimentos, 0, "");
+    }
+
     private Percurso percurso(boolean impeditiva) {
         var rota = new Rota("rota", List.of(origem, meio, fim), 100, 90, "PARCIAL", .2, 0, 1, "",
                 List.of(new Etapa("Siga em frente", List.of(origem, meio)), new Etapa("Continue", List.of(meio, fim))),

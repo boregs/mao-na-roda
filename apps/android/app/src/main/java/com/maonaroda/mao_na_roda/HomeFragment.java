@@ -1,8 +1,11 @@
 package com.maonaroda.mao_na_roda;
 
 import android.Manifest;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.*;
 import android.text.*;
+import android.text.style.StyleSpan;
 import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -13,11 +16,15 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.maonaroda.mao_na_roda.mapa.*;
 import com.maonaroda.mao_na_roda.data.DadosRotas.*;
 import com.maonaroda.mao_na_roda.localizacao.LocalizacaoController;
+import java.io.IOException;
 import java.util.List;
 import androidx.lifecycle.Lifecycle;
 import androidx.core.content.ContextCompat;
@@ -29,6 +36,7 @@ public class HomeFragment extends Fragment {
     private View root;
     private boolean atualizando;
     private List<Rota> ultimasRotas;
+    private List<BarrierReport> barreirasLocais = List.of();
     private int ultimaSelecionada = -1;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final LocalizacaoController gpsPercurso = new LocalizacaoController();
@@ -106,6 +114,7 @@ public class HomeFragment extends Fragment {
         montarPercurso();
         if (model.percurso == null && state != null && state.getBoolean("tinhaPercurso"))
             model.mensagem("A sessão de percurso foi perdida. Planeje a rota novamente.");
+        carregarBarreirasLocais();
         model.estado().observe(getViewLifecycleOwner(), this::renderizar);
         if (BuildConfig.MAPS_CONFIGURED) {
             view.findViewById(R.id.map_status).setVisibility(View.GONE);
@@ -113,11 +122,109 @@ public class HomeFragment extends Fragment {
             if (fragment == null) { fragment = SupportMapFragment.newInstance(); getChildFragmentManager().beginTransaction().replace(R.id.map_container, fragment).commitNow(); }
             fragment.getMapAsync(googleMap -> {
                 if (root != view) return;
-                mapa = new RenderizadorMapa(googleMap, requireContext()); ajustarMapa();
+                mapa = new RenderizadorMapa(googleMap, requireContext());
+                mostrarMarcadoresDeBarreira();
+                ajustarMapa();
                 renderizar(model.estado().getValue());
+                var entrada = NavHostFragment.findNavController(this).getCurrentBackStackEntry();
+                double[] ponto = entrada == null ? null
+                        : entrada.getSavedStateHandle().remove(ReportFormFragment.PONTO_SALVO);
+                if (ponto != null) {
+                    panel.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    mapa.mostrarPonto(new LatLng(ponto[0], ponto[1]));
+                }
             });
         }
         model.carregarPerfis();
+    }
+    private void carregarBarreirasLocais() {
+        try {
+            barreirasLocais = BarrierReportStore.from(requireContext()).all().stream()
+                    .filter(relato -> relato.ponto != null)
+                    .collect(java.util.stream.Collectors.toList());
+        } catch (IOException erro) {
+            barreirasLocais = List.of();
+            Toast.makeText(requireContext(), R.string.report_markers_unavailable, Toast.LENGTH_LONG).show();
+        }
+    }
+    private void mostrarMarcadoresDeBarreira() {
+        var marcadores = barreirasLocais.stream()
+                .map(relato -> new MarkerOptions()
+                        .position(new LatLng(relato.ponto.latitude(), relato.ponto.longitude()))
+                        .title(getString(R.string.report_marker_title))
+                        .snippet(relato.category))
+                .collect(java.util.stream.Collectors.toList());
+        mapa.barreirasLocais(marcadores);
+    }
+
+    private String avisoBarreirasLocais(Rota rota) {
+        int quantidade = (int) barreirasLocais.stream()
+                .filter(relato -> Percurso.pertoDaRota(relato.ponto, rota.pontos()))
+                .count();
+        return quantidade == 0 ? "" : getResources()
+                .getQuantityString(R.plurals.route_local_reports, quantidade, quantidade);
+    }
+
+    private String resumoRota(Rota rota, int numero) {
+        return getString(R.string.route_summary, numero, rota.distancia(), rota.duracao() / 60,
+                rota.cobertura() * 100, rota.impeditivas(), rota.atencao());
+    }
+
+    private void adicionarAvisoBarreira(LinearLayout painel, String aviso) {
+        if (aviso.isEmpty()) return;
+        var text = new TextView(requireContext());
+        text.setTextAppearance(R.style.MaoText_Footer);
+        var mensagem = new SpannableString(getString(R.string.route_local_warning, aviso));
+        mensagem.setSpan(new StyleSpan(Typeface.BOLD), 0, mensagem.toString().indexOf('\n'),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        text.setText(mensagem);
+        text.setPadding(dp(12), dp(8), dp(12), dp(8));
+        var fundo = new GradientDrawable();
+        fundo.setColor(ContextCompat.getColor(requireContext(), R.color.route_warning_surface));
+        fundo.setCornerRadius(dp(12));
+        text.setBackground(fundo);
+        AccessibilityUi.apply(text, AccessibilityProfileStore.preferences(requireContext()));
+        text.setTextColor(ContextCompat.getColor(requireContext(), R.color.route_warning_text));
+        var params = new LinearLayout.LayoutParams(-1, -2);
+        params.topMargin = dp(8);
+        painel.addView(text, params);
+    }
+
+    private void adicionarCartaoRota(LinearLayout resultados, Rota rota, int index, int recomendada) {
+        var card = (MaterialCardView) getLayoutInflater().inflate(R.layout.item_route_result, resultados, false);
+        int numero = index + 1;
+        ((TextView) card.findViewById(R.id.route_card_title)).setText(getString(R.string.route_card_title, numero));
+        ((TextView) card.findViewById(R.id.route_card_metrics)).setText(
+                getString(R.string.route_card_metrics, rota.distancia(), rota.duracao() / 60));
+        ((TextView) card.findViewById(R.id.route_card_evidence)).setText(getString(R.string.route_card_evidence,
+                rota.cobertura() * 100, rota.impeditivas(), rota.atencao()));
+        var detalhes = (MaterialButton) card.findViewById(R.id.route_card_details);
+        detalhes.setContentDescription(getString(R.string.route_open_details_numbered, numero));
+        detalhes.setOnClickListener(v -> {
+            model.selecionar(index);
+            detalhes(rota);
+        });
+        AccessibilityUi.apply(card, AccessibilityProfileStore.preferences(requireContext()));
+        if (index == recomendada) {
+            var badge = (TextView) card.findViewById(R.id.route_card_badge);
+            var fundo = new GradientDrawable();
+            fundo.setCornerRadius(dp(12));
+            fundo.setColor(ContextCompat.getColor(requireContext(), R.color.selected_tint));
+            badge.setBackground(fundo);
+            badge.setTextColor(ContextCompat.getColor(requireContext(), R.color.on_selected_tint));
+            badge.setVisibility(View.VISIBLE);
+            card.setStrokeColor(ContextCompat.getColor(requireContext(), R.color.ocean));
+            card.setStrokeWidth(Math.max(card.getStrokeWidth(), dp(2)));
+        } else if (card.getStrokeWidth() == 0) {
+            card.setStrokeColor(ContextCompat.getColor(requireContext(), R.color.home_surface_outline));
+            card.setStrokeWidth(dp(1));
+        }
+        String aviso = avisoBarreirasLocais(rota);
+        if (index == 0 && recomendada >= 0) {
+            aviso += "\n" + getString(R.string.route_local_recommendation, recomendada + 1);
+        }
+        adicionarAvisoBarreira(card.findViewById(R.id.route_card_alerts), aviso);
+        resultados.addView(card);
     }
     private TextWatcher watcher(boolean inicio) {
         return new TextWatcher() {
@@ -162,11 +269,11 @@ public class HomeFragment extends Fragment {
         if (ultimasRotas != estado.rotas() || ultimaSelecionada != estado.selecionada()) {
             ultimasRotas = estado.rotas(); ultimaSelecionada = estado.selecionada();
             var results = (LinearLayout) root.findViewById(R.id.route_results); results.removeAllViews();
+            var pontosDeBarreira = barreirasLocais.stream().map(relato -> relato.ponto)
+                    .collect(java.util.stream.Collectors.toList());
+            int recomendada = Percurso.recomendarAlternativa(estado.rotas(), pontosDeBarreira);
             for (int i = 0; i < estado.rotas().size(); i++) {
-                final int index = i; var rota = estado.rotas().get(i);
-                var button = botao(getString(R.string.route_summary, i + 1, rota.distancia(), rota.duracao() / 60,
-                        rota.cobertura() * 100, rota.impeditivas(), rota.atencao()));
-                button.setOnClickListener(v -> { model.selecionar(index); detalhes(rota); }); results.addView(button);
+                adicionarCartaoRota(results, estado.rotas().get(i), i, recomendada);
             }
         }
         if (mapa != null) {
@@ -182,10 +289,15 @@ public class HomeFragment extends Fragment {
         button.setLayoutParams(new LinearLayout.LayoutParams(-1, -2)); return button;
     }
     private void detalhes(Rota rota) {
-        var text = new TextView(requireContext()); text.setTextSize(20); text.setPadding(dp(20), dp(12), dp(20), dp(12));
+        var conteudo = new LinearLayout(requireContext());
+        conteudo.setOrientation(LinearLayout.VERTICAL);
+        conteudo.setPadding(dp(20), dp(12), dp(20), dp(12));
+        adicionarAvisoBarreira(conteudo, avisoBarreirasLocais(rota));
+        var text = new TextView(requireContext()); text.setTextSize(20);
         text.setText(getString(R.string.route_details, rota.qualidade(), rota.cobertura() * 100, rota.detalhes())
                 + "\n\nDurante o percurso, o app pode enviar sua posição para buscar um desvio de uma barreira impeditiva. Você confirma qualquer troca de rota.");
-        var scroll = new ScrollView(requireContext()); scroll.addView(text);
+        conteudo.addView(text);
+        var scroll = new ScrollView(requireContext()); scroll.addView(conteudo);
         var dialogo = new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.route_details_title)
                 .setView(scroll).setNegativeButton(R.string.close, null);
         if (model.percurso == null && !model.estado().getValue().carregando()) {
@@ -355,8 +467,9 @@ public class HomeFragment extends Fragment {
                 var opcoes = new String[alternativas.size()];
                 for (int i = 0; i < opcoes.length; i++) {
                     var rota = alternativas.get(i);
-                    opcoes[i] = getString(R.string.route_summary, i + 1, rota.distancia(), rota.duracao() / 60,
-                            rota.cobertura() * 100, rota.impeditivas(), rota.atencao());
+                    opcoes[i] = resumoRota(rota, i + 1);
+                    String aviso = avisoBarreirasLocais(rota);
+                    if (!aviso.isEmpty()) opcoes[i] += "\n" + getString(R.string.route_local_warning, aviso);
                     if (bloqueio != null) {
                         opcoes[i] += String.format(java.util.Locale.getDefault(), "\nDiferença estimada: %+.0f m",
                                 rota.distancia() - distanciaRestante);

@@ -14,6 +14,7 @@ public final class Percurso {
     private static final double CHEGADA = 15;
     private static final int CONFIRMACOES = 3;
     private static final double METROS_POR_GRAU = 111_195;
+    private static final double MARGEM_RELATO_LOCAL = 15;
 
     public final Rota rota;
     public final String perfil;
@@ -211,27 +212,55 @@ public final class Percurso {
 
     private record Projecao(double progresso, double distancia) { }
 
+    public static boolean pertoDaRota(Ponto ponto, List<Ponto> linha) {
+        for (int i = 1; i < linha.size(); i++) {
+            if (projetarSegmento(ponto, linha.get(i - 1), linha.get(i), 0, 1).distancia <= MARGEM_RELATO_LOCAL)
+                return true;
+        }
+        return false;
+    }
+
+    public static int recomendarAlternativa(List<Rota> rotas, List<Ponto> barreiras) {
+        if (rotas.size() < 2 || barreiras.stream().noneMatch(ponto -> pertoDaRota(ponto, rotas.get(0).pontos()))) {
+            return -1;
+        }
+        for (int i = 1; i < rotas.size(); i++) {
+            Rota rota = rotas.get(i);
+            if (rota.impeditivas() == 0 && barreiras.stream().noneMatch(ponto -> pertoDaRota(ponto, rota.pontos()))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private Projecao projetar(Ponto ponto, double minimo, double maximo) {
         var melhor = new Projecao(minimo, Double.POSITIVE_INFINITY);
         List<Ponto> linha = rota.pontos();
         for (int i = 1; i < acumulado.length && acumulado[i - 1] <= maximo; i++) {
             double comprimento = acumulado[i] - acumulado[i - 1];
             if (acumulado[i] < minimo || comprimento == 0) continue;
-            var a = linha.get(i - 1);
-            var b = linha.get(i);
-            double escala = Math.cos(Math.toRadians(a.latitude())) * METROS_POR_GRAU;
-            double x = deltaLongitude(b.longitude() - a.longitude()) * escala;
-            double y = (b.latitude() - a.latitude()) * METROS_POR_GRAU;
-            double px = deltaLongitude(ponto.longitude() - a.longitude()) * escala;
-            double py = (ponto.latitude() - a.latitude()) * METROS_POR_GRAU;
-            double t = (px * x + py * y) / (x * x + y * y);
             double inicio = Math.max(0, (minimo - acumulado[i - 1]) / comprimento);
             double fim = Math.min(1, (maximo - acumulado[i - 1]) / comprimento);
-            t = Math.max(inicio, Math.min(fim, t));
-            double distancia = Math.hypot(px - t * x, py - t * y);
-            if (distancia < melhor.distancia) melhor = new Projecao(acumulado[i - 1] + t * comprimento, distancia);
+            var projecao = projetarSegmento(ponto, linha.get(i - 1), linha.get(i), inicio, fim);
+            if (projecao.distancia < melhor.distancia) {
+                melhor = new Projecao(acumulado[i - 1] + projecao.fracao * comprimento, projecao.distancia);
+            }
         }
         return melhor;
+    }
+
+    private record ProjecaoSegmento(double fracao, double distancia) { }
+
+    private static ProjecaoSegmento projetarSegmento(Ponto ponto, Ponto a, Ponto b, double inicio, double fim) {
+        double escala = Math.cos(Math.toRadians(a.latitude())) * METROS_POR_GRAU;
+        double x = deltaLongitude(b.longitude() - a.longitude()) * escala;
+        double y = (b.latitude() - a.latitude()) * METROS_POR_GRAU;
+        double px = deltaLongitude(ponto.longitude() - a.longitude()) * escala;
+        double py = (ponto.latitude() - a.latitude()) * METROS_POR_GRAU;
+        double comprimentoQuadrado = x * x + y * y;
+        double t = comprimentoQuadrado == 0 ? 0 : (px * x + py * y) / comprimentoQuadrado;
+        t = Math.max(inicio, Math.min(fim, t));
+        return new ProjecaoSegmento(t, Math.hypot(px - t * x, py - t * y));
     }
 
     private static double deltaLongitude(double graus) { return Math.IEEEremainder(graus, 360); }

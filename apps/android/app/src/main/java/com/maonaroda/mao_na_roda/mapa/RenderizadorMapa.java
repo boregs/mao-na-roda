@@ -12,6 +12,7 @@ import java.util.*;
 public final class RenderizadorMapa {
     private final GoogleMap mapa;
     private Marker posicao;
+    private List<MarkerOptions> barreirasLocais = List.of();
     public void posicao(com.maonaroda.mao_na_roda.data.DadosRotas.Ponto ponto) {
         if (ponto == null) {
             if (posicao != null) posicao.remove();
@@ -31,6 +32,7 @@ public final class RenderizadorMapa {
     private String assinatura = "";
     public RenderizadorMapa(GoogleMap mapa, Context context) {
         this.mapa = mapa;
+        mapa.clear();
         mapa.getUiSettings().setZoomControlsEnabled(true);
         mapa.getUiSettings().setMapToolbarEnabled(false);
         mapa.getUiSettings().setCompassEnabled(true);
@@ -38,12 +40,25 @@ public final class RenderizadorMapa {
         if ((context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)
             mapa.setMapStyle(new MapStyleOptions("[{\"elementType\":\"geometry\",\"stylers\":[{\"color\":\"#14252c\"}]},{\"elementType\":\"labels.text.fill\",\"stylers\":[{\"color\":\"#ccd0cf\"}]},{\"elementType\":\"labels.text.stroke\",\"stylers\":[{\"color\":\"#06141b\"}]}]"));
     }
+    public void barreirasLocais(List<MarkerOptions> marcadores) {
+        barreirasLocais = marcadores;
+        barreirasLocais.forEach(mapa::addMarker);
+    }
+
+    public void mostrarPonto(LatLng ponto) {
+        mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(ponto, 17));
+    }
+
     public void padding(int bottom) { mapa.setPadding(12, 12, 12, Math.max(bottom, 12)); }
     public void renderizar(List<Rota> rotas, int selecionada, Context context, int width, int height) {
         if (width <= 0 || height <= 0) return;
         String id = rotas.isEmpty() ? "" : rotas.stream().map(Rota::id).collect(java.util.stream.Collectors.joining(",")) + ":" + selecionada;
         if (id.equals(assinatura)) return;
-        assinatura = id; mapa.clear(); posicao = null; if (rotas.isEmpty()) return;
+        assinatura = id;
+        mapa.clear();
+        posicao = null;
+        barreirasLocais.forEach(mapa::addMarker);
+        if (rotas.isEmpty()) return;
         var bounds = new LatLngBounds.Builder();
         for (int i = 0; i < rotas.size(); i++) {
             var polyline = new PolylineOptions().width(i == selecionada ? 12 : 6)

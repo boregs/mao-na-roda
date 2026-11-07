@@ -1,6 +1,7 @@
 package com.maonaroda.mao_na_roda;
 
 import android.content.Context;
+import com.maonaroda.mao_na_roda.data.DadosRotas.Ponto;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-/** Private app storage for reports; records are local and are not uploaded or verified. */
+/** Armazena relatos pessoais no aparelho, separados das evidências da API. */
 final class BarrierReportStore {
     private final File file;
 
@@ -47,9 +48,13 @@ final class BarrierReportStore {
     }
 
     synchronized BarrierReport add(String category, String description, String photoUri) throws IOException {
+        return add(category, description, photoUri, null);
+    }
+
+    synchronized BarrierReport add(String category, String description, String photoUri, Ponto ponto) throws IOException {
         List<BarrierReport> reports = new ArrayList<>(all());
         BarrierReport report = new BarrierReport(UUID.randomUUID().toString(), category, description,
-                System.currentTimeMillis(), photoUri == null ? "" : photoUri);
+                System.currentTimeMillis(), photoUri == null ? "" : photoUri, ponto);
         reports.add(0, report);
         File temporary = new File(file.getParentFile(), file.getName() + ".tmp");
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
@@ -69,15 +74,19 @@ final class BarrierReportStore {
     }
 
     private static String encode(BarrierReport report) {
-        return field(report.id) + "\t" + field(report.category) + "\t" + field(report.description)
+        String registro = field(report.id) + "\t" + field(report.category) + "\t" + field(report.description)
                 + "\t" + report.createdAt + "\t" + field(report.photoUri);
+        if (report.ponto == null) return registro;
+        return registro + "\t" + report.ponto.latitude() + "\t" + report.ponto.longitude();
     }
 
     private static BarrierReport decode(String line) throws IOException {
         String[] parts = line.split("\\t", -1);
-        if (parts.length != 5) throw new IOException("Registro inválido");
+        if (parts.length != 5 && parts.length != 7) throw new IOException("Registro inválido");
+        Ponto ponto = parts.length == 7
+                ? new Ponto(Double.parseDouble(parts[6]), Double.parseDouble(parts[5])) : null;
         return new BarrierReport(unfield(parts[0]), unfield(parts[1]), unfield(parts[2]),
-                Long.parseLong(parts[3]), unfield(parts[4]));
+                Long.parseLong(parts[3]), unfield(parts[4]), ponto);
     }
 
     private static String field(String value) {
