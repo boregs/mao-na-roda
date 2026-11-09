@@ -20,6 +20,17 @@ public class HomeViewModel extends ViewModel {
     private int selecionada;
     private long geracaoRota;
     private RotasRepository.Cancelavel consulta, catalogo;
+    public Percurso percurso;
+    public RotasRepository.Cancelavel replanejar(Percurso sessao, Ponto origem, RotasRepository.Retorno<Consulta> retorno) {
+        return repository.planejar(new LocalRota(origem, null), sessao.destino, sessao.perfil, retorno);
+    }
+
+    public void substituirRota(Rota rota) {
+        invalidar();
+        rotas = List.of(rota);
+        publicar();
+    }
+
     public String origemTexto = "", destinoTexto = "";
 
     public HomeViewModel() {

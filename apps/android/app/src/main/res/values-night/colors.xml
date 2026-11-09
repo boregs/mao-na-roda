@@ -11,6 +11,8 @@
     <color name="outline">#9BA8AB</color>
     <color name="error">#FFB4AB</color>
     <color name="sunlight">#F2C75C</color>
+    <color name="route_warning_surface">#382C13</color>
+    <color name="route_warning_text">#FFE1A0</color>
     <color name="disabled_container">#253745</color>
     <color name="disabled_content">#9BA8AB</color>
     <color name="home_map_surface">#0D1A1F</color>

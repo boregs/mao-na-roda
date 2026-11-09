@@ -34,9 +34,11 @@ public class ReportHistoryFragment extends Fragment {
             for (BarrierReport report : reports) {
                 MaterialButton item = new MaterialButton(requireContext(), null,
                         com.google.android.material.R.attr.materialButtonOutlinedStyle);
-                item.setText(report.category + "\n" + DateFormat.getDateTimeInstance().format(new Date(report.createdAt))
+                item.setText(report.category + "\n" + getString(R.string.report_local_status)
+                        + "\n" + DateFormat.getDateTimeInstance().format(new Date(report.createdAt))
                         + "\n" + (report.description.length() > 90 ? report.description.substring(0, 90) + "…" : report.description));
-                item.setContentDescription(report.category + ", relato local não verificado. " + report.description);
+                item.setContentDescription(report.category + ". " + getString(R.string.report_local_status)
+                        + ". " + report.description);
                 item.setMinHeight((int) (88 * getResources().getDisplayMetrics().density));
                 item.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
                 item.setOnClickListener(v -> {

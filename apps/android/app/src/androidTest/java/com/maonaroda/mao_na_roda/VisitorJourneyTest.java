@@ -20,7 +20,10 @@ import static org.junit.Assert.*;
 public class VisitorJourneyTest {
     @Test public void consultaManualMostraIncertezaEMantemEstadoAoGirar() {
         var context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        context.getSharedPreferences("prefs", 0).edit().putBoolean("onboarding_completed", false).commit();
+        var prefs = context.getSharedPreferences("prefs", 0);
+        boolean hadOnboarding = prefs.contains("onboarding_completed");
+        boolean onboardingCompleted = prefs.getBoolean("onboarding_completed", false);
+        prefs.edit().putBoolean("onboarding_completed", false).commit();
         try (var scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {
                 var repo = new RotasRepository() {
@@ -49,9 +52,16 @@ public class VisitorJourneyTest {
                 assertTrue(((TextView) activity.findViewById(R.id.planning_status)).getText().toString().contains("não garantem"));
                 var model = new ViewModelProvider(activity).get(HomeViewModel.class);
                 assertEquals("DESCONHECIDA", model.estado().getValue().rotas().get(0).qualidade());
+                assertEquals("Rota 1", ((TextView) activity.findViewById(R.id.route_card_title)).getText().toString());
+                assertTrue(activity.findViewById(R.id.route_card_details).isClickable());
                 assertFalse(context.getSharedPreferences("prefs", 0).contains("mobility_profile"));
                 assertFalse(context.getSharedPreferences("prefs", 0).contains("accessibility_profiles"));
             });
+        } finally {
+            var edit = prefs.edit();
+            if (hadOnboarding) edit.putBoolean("onboarding_completed", onboardingCompleted);
+            else edit.remove("onboarding_completed");
+            edit.commit();
         }
     }
 }

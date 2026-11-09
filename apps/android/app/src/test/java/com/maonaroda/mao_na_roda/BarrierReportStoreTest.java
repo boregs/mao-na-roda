@@ -2,7 +2,9 @@ package com.maonaroda.mao_na_roda;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
+import com.maonaroda.mao_na_roda.data.DadosRotas.Ponto;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
@@ -33,9 +35,12 @@ public class BarrierReportStoreTest {
         try {
             BarrierReportStore store = new BarrierReportStore(directory);
             store.add("Ausência de rampa", "Primeiro", "");
-            BarrierReport second = store.add("Elevador quebrado", "Segundo", "");
-            List<BarrierReport> reports = store.all();
+            Ponto ponto = new Ponto(-46.562, -23.537);
+            BarrierReport second = store.add("Elevador quebrado", "Segundo", "", ponto);
+            List<BarrierReport> reports = new BarrierReportStore(directory).all();
             assertEquals(second.id, reports.get(0).id);
+            assertEquals(ponto, reports.get(0).ponto);
+            assertNull(reports.get(1).ponto);
             assertEquals(2, reports.size());
         } finally {
             File data = new File(directory, "barrier-reports.txt");

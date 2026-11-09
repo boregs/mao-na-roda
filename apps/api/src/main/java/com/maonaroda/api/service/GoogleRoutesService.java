@@ -3,6 +3,9 @@ package com.maonaroda.api.service;
 import com.maonaroda.api.exception.rota.FalhaRota;
 import com.maonaroda.api.integracao.rotas.CandidataRota;
 import com.maonaroda.api.model.rota.PlanejarRotaRequest;
+import com.maonaroda.api.model.rota.Coordenada;
+import com.maonaroda.api.model.rota.ConsultaRotasResponse.EtapaResponse;
+import com.maonaroda.api.model.rota.ConsultaRotasResponse.Geometria;
 import com.maonaroda.api.rotas.ConsultaRota;
 import com.maonaroda.api.rotas.RotaBase;
 import jakarta.annotation.PreDestroy;
@@ -23,7 +26,9 @@ public class GoogleRoutesService {
     public static final String AVISO_CAMINHADA = "Rota a pé do Google em beta: pode não incluir calçadas ou caminhos de pedestres. "
             + "O Google não garante acessibilidade para o perfil selecionado; confira as evidências e as condições reais.";
     private static final String MASCARA_BASE = "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline";
-    private static final String MASCARA_CANDIDATAS = "routes.duration,routes.distanceMeters,routes.polyline.geoJsonLinestring";
+    private static final String MASCARA_CANDIDATAS = "routes.duration,routes.distanceMeters,routes.polyline.geoJsonLinestring"
+            + ",routes.legs.steps.distanceMeters,routes.legs.steps.navigationInstruction.instructions"
+            + ",routes.legs.steps.polyline.geoJsonLinestring";
     private final String apiKey;
     private final URI endpoint;
     private final Duration timeout;
@@ -90,13 +95,34 @@ public class GoogleRoutesService {
                 pontos.add(List.of(point.path(0).asDouble(), point.path(1).asDouble()));
             }
             try {
-                result.add(new CandidataRota(pontos, distancia(route), duracao(route)));
+                result.add(new CandidataRota(pontos, distancia(route), duracao(route), etapas(route)));
             } catch (IllegalArgumentException e) {
                 throw respostaInvalida();
             }
         }
 
         return List.copyOf(result);
+    }
+
+    private List<EtapaResponse> etapas(JsonNode rota) {
+        var etapas = new ArrayList<EtapaResponse>();
+        for (var trecho : rota.path("legs")) {
+            for (var etapa : trecho.path("steps")) {
+                var geometria = etapa.path("polyline").path("geoJsonLinestring");
+                var coordenadas = geometria.path("coordinates");
+                if (!"LineString".equals(geometria.path("type").asString())
+                        || !coordenadas.isArray() || coordenadas.size() < 2) return List.of();
+                var pontos = new ArrayList<List<Double>>();
+                for (var ponto : coordenadas) {
+                    if (!ponto.isArray() || !ponto.path(0).isNumber() || !ponto.path(1).isNumber()) return List.of();
+                    pontos.add(new Coordenada(
+                            ponto.path(0).asDouble(), ponto.path(1).asDouble()).geoJson());
+                }
+                etapas.add(new EtapaResponse(etapa.path("navigationInstruction").path("instructions").asString(""),
+                        etapa.path("distanceMeters").asInt(0), new Geometria(List.copyOf(pontos))));
+            }
+        }
+        return List.copyOf(etapas);
     }
 
     private List<JsonNode> enviar(ConsultaRota consulta, Duration restante, boolean alternativas) {

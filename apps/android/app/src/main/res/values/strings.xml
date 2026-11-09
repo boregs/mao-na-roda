@@ -51,7 +51,26 @@
     <string name="account_title">Conta</string>
     <string name="local_report">Registrar anotação local de barreira</string>
     <string name="local_report_history">Minhas anotações locais</string>
+    <string name="report_coordinates_label">Coordenadas da barreira (opcional)</string>
+    <string name="report_coordinates_help">Use latitude, longitude, com ponto nos decimais.</string>
+    <string name="report_coordinates_invalid">Informe latitude e longitude válidas, separadas por vírgula.</string>
+    <string name="report_marker_title">Barreira local verificada por você</string>
+    <string name="report_local_status">Relato local verificado por você</string>
+    <string name="report_local_intro">Registre a barreira que você encontrou. A verificação é pessoal e fica neste dispositivo.</string>
+    <string name="report_markers_unavailable">Não foi possível carregar as barreiras locais.</string>
     <string name="route_summary">Rota %1$d · %2$.0f m · %3$.0f min\nCobertura documentada: %4$.0f%%\n%5$d impedimentos · %6$d pontos de atenção\nSelecionar e ler detalhes</string>
+    <string name="route_local_warning">Atenção perto da rota\n%1$s</string>
+    <string name="route_recommended">Alternativa recomendada</string>
+    <string name="route_card_title">Rota %1$d</string>
+    <string name="route_card_metrics">%1$.0f m · %2$.0f min</string>
+    <string name="route_card_evidence">Cobertura documentada: %1$.0f%%\n%2$d impedimentos · %3$d pontos de atenção</string>
+    <string name="route_open_details">Ver detalhes</string>
+    <string name="route_open_details_numbered">Ver detalhes da rota %1$d</string>
+    <string name="route_local_recommendation">A Rota %1$d evita as barreiras que você marcou.</string>
+    <plurals name="route_local_reports">
+        <item quantity="one">%d barreira local verificada por você</item>
+        <item quantity="other">%d barreiras locais verificadas por você</item>
+    </plurals>
     <string name="route_details_title">Condições conhecidas da rota</string>
     <string name="route_details">Evidências: %1$s\nCobertura documentada: %2$.0f%%\n\n%3$s\n\nSugestão baseada nos dados disponíveis. Dados desconhecidos não garantem acessibilidade.</string>
 </resources>
