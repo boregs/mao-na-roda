@@ -30,7 +30,8 @@ e o teste local, consulte [PLANEJAMENTO.md](../PLANEJAMENTO.md).
 
 Os SQLs estão em [`../src/main/resources/db/migration`](../src/main/resources/db/migration),
 organizados em subpastas pela data de criação: [`25-10/`](../src/main/resources/db/migration/25-10)
-(V1–V5) e [`01-11/`](../src/main/resources/db/migration/01-11) (V6). O Flyway
+(V1–V5), [`01-11/`](../src/main/resources/db/migration/01-11) (V6) e
+[`04-11/`](../src/main/resources/db/migration/04-11) (V7). O Flyway
 percorre as subpastas e ordena pela versão, não pela pasta. Esta é a fonte da
 verdade do banco; [`database/migrations`](../../../database/migrations), na raiz
 do repositório, é apenas a cópia de referência aplicada manualmente em produção
@@ -44,6 +45,7 @@ do repositório, é apenas a cópia de referência aplicada manualmente em produ
 | `V4__carregar_matriz_de_barreiras.sql` | Três perfis, dez barreiras e as trinta classificações RN01/RN02. |
 | `V5__configurar_permissoes_jdbc.sql` | Grupos de acesso da API e do worker de descarte. |
 | `V6__adicionar_evidencias_do_piloto.sql` | Dataset piloto, trechos orientados e evidências de barreiras, sem carga fictícia. |
+| `V7__habilitar_rls_e_politicas_jdbc.sql` | RLS em todas as tabelas de `app`, com políticas que espelham os grants JDBC. |
 
 O histórico fica em `app_migrations.flyway_schema_history`, separado do domínio
 e dos schemas gerenciados. Flyway administra somente esse schema de histórico;
@@ -137,7 +139,7 @@ Se PostGIS já estiver instalado em outro schema, V1 falha com uma mensagem
 específica. Inspecione dependências e siga a documentação do provedor antes de
 ajustar a instalação; as migrations não movem nem apagam a extensão existente.
 
-Versione mudanças seguintes como `V7__...sql`, etc. Não edite migrations já
+Versione mudanças seguintes como `V8__...sql`, etc. Não edite migrations já
 aplicadas: `validate` confere os checksums. O Flyway controla as transações;
 os SQLs de migrations não contêm BEGIN/COMMIT próprios.
 
@@ -168,7 +170,7 @@ Antes do primeiro uso do Flyway em produção:
    ```
 
 3. `flyway:info` deve mostrar V1–V6 abaixo do baseline e nenhuma pendente. A
-   partir daí, use `flyway:migrate` normalmente para `V7__...` em diante.
+   partir daí, use `flyway:migrate` normalmente para V7 em diante.
 
 ### Logins de execução
 
