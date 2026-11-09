@@ -16,9 +16,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.textfield.TextInputEditText;
+import com.maonaroda.mao_na_roda.data.DadosRotas.Ponto;
 import java.io.IOException;
 
 public class ReportFormFragment extends Fragment {
+    static final String PONTO_SALVO = "ponto_barreira_salvo";
     private static final String[] CATEGORIES = {
             "Selecione uma categoria", "Calçada bloqueada ou danificada", "Ausência de rampa",
             "Rampa inadequada", "Elevador quebrado", "Escadas sem acessibilidade", "Outro"
@@ -53,10 +55,10 @@ public class ReportFormFragment extends Fragment {
         view.findViewById(R.id.report_back).setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
         view.findViewById(R.id.report_add_photo).setOnClickListener(v -> imagePicker.launch(new String[]{"image/*"}));
         view.findViewById(R.id.report_save).setOnClickListener(v -> save(category,
-                view.findViewById(R.id.report_description)));
+                view.findViewById(R.id.report_description), view.findViewById(R.id.report_coordinates)));
     }
 
-    private void save(Spinner category, TextInputEditText descriptionInput) {
+    private void save(Spinner category, TextInputEditText descriptionInput, TextInputEditText coordinatesInput) {
         int categoryPosition = category.getSelectedItemPosition();
         String description = descriptionInput.getText() == null ? "" : descriptionInput.getText().toString().trim();
         if (categoryPosition == 0) {
@@ -69,11 +71,25 @@ public class ReportFormFragment extends Fragment {
             descriptionInput.requestFocus();
             return;
         }
+        String coordinates = coordinatesInput.getText() == null ? "" : coordinatesInput.getText().toString().trim();
+        Ponto ponto = coordinates.isEmpty() ? null : Ponto.manual(coordinates);
+        if (!coordinates.isEmpty() && ponto == null) {
+            coordinatesInput.setError(getString(R.string.report_coordinates_invalid));
+            coordinatesInput.requestFocus();
+            return;
+        }
         try {
             BarrierReportStore.from(requireContext()).add(CATEGORIES[categoryPosition], description,
-                    photoUri == null ? "" : photoUri.toString());
+                    photoUri == null ? "" : photoUri.toString(), ponto);
             Toast.makeText(requireContext(), "Relato salvo neste dispositivo.", Toast.LENGTH_LONG).show();
-            NavHostFragment.findNavController(this).navigate(R.id.action_form_to_history);
+            var nav = NavHostFragment.findNavController(this);
+            var anterior = nav.getPreviousBackStackEntry();
+            if (ponto != null && BuildConfig.MAPS_CONFIGURED && anterior != null) {
+                anterior.getSavedStateHandle().set(PONTO_SALVO, new double[]{ponto.latitude(), ponto.longitude()});
+                nav.popBackStack();
+            } else {
+                nav.navigate(R.id.action_form_to_history);
+            }
         } catch (IOException error) {
             Toast.makeText(requireContext(), "Não foi possível salvar. Tente novamente.", Toast.LENGTH_LONG).show();
         }

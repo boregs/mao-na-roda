@@ -31,7 +31,7 @@ public class ReportDetailFragment extends Fragment {
             BarrierReport report = BarrierReportStore.from(requireContext()).find(id);
             if (report == null) { Toast.makeText(requireContext(), "Relato não encontrado.", Toast.LENGTH_LONG).show();
                 NavHostFragment.findNavController(this).navigateUp(); return; }
-            ((TextView) view.findViewById(R.id.detail_category)).setText(report.category + " · Relato local não verificado");
+            ((TextView) view.findViewById(R.id.detail_category)).setText(report.category + "\n" + getString(R.string.report_local_status));
             ((TextView) view.findViewById(R.id.detail_date)).setText(DateFormat.getDateTimeInstance().format(new Date(report.createdAt)));
             ((TextView) view.findViewById(R.id.detail_description)).setText(report.description);
             ImageView photo = view.findViewById(R.id.detail_photo);

@@ -12,13 +12,22 @@
             android:layout_marginTop="8dp" android:text="Relatar uma barreira"
             android:textAppearance="@style/MaoText.Heading" android:textColor="@color/ink" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" android:text="Conte o que encontrou para manter um registro neste dispositivo. O relato não é enviado nem verificado."
+            android:layout_marginTop="8dp" android:text="@string/report_local_intro"
             android:textAppearance="@style/MaoText.Meta" android:textColor="@color/supporting" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="24dp" android:text="Tipo de barreira *"
             android:textAppearance="@style/MaoText.Card" android:textColor="@color/ink" />
         <Spinner android:id="@+id/report_category" android:layout_width="match_parent"
             android:layout_height="64dp" android:contentDescription="Categoria da barreira" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaoInputLayout" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="12dp"
+            android:hint="@string/report_coordinates_label" app:helperText="@string/report_coordinates_help">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/report_coordinates"
+                style="@style/Widget.MaoInput" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="48dp" android:inputType="text"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout android:id="@+id/report_description_layout"
             style="@style/Widget.MaoInputLayout" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:layout_marginTop="12dp"

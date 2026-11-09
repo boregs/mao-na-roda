@@ -45,7 +45,7 @@ public class PlanejadorRotasService {
                     .thenComparing(Comparator.comparingDouble((RotaAvaliadaResponse r) -> r.qualidade().cobertura()).reversed())
                     .thenComparingDouble(RotaAvaliadaResponse::distanciaMetros).thenComparingDouble(RotaAvaliadaResponse::duracaoSegundos))
                     .limit(3).map(r -> new RotaAvaliadaResponse(r.id(), r.geometria(), r.distanciaMetros(), r.duracaoSegundos(),
-                            r.barreiras(), r.qualidade(), r.trechos(), r.aviso() + " " + String.join(" ", provedor.avisos()))).toList();
+                            r.barreiras(), r.qualidade(), r.trechos(), r.aviso() + " " + String.join(" ", provedor.avisos()), r.etapas())).toList();
             orcamento.restante();
 
             boolean parcial = rotas.stream().anyMatch(r -> !r.qualidade().estado().equals("DOCUMENTADA"));

@@ -9,7 +9,7 @@ Aplicativo Android nativo em Java, com layouts e estilos XML, AndroidX e Materia
 - Maps SDK, até três candidatas, cobertura de evidências e detalhes de barreiras.
 - Perfil de mobilidade e rota somente em memória; preferências visuais podem ser salvas.
 - Localização obtida uma vez após ação e consentimento, com alternativa manual.
-- Anotações de barreiras continuam locais, sem envio nem georreferenciamento. Contas não estão conectadas.
+- Anotações de barreiras ficam no aparelho. Informe coordenadas no formato latitude, longitude para ver um pino no mapa. Contas não estão conectadas.
 - Mapa e rede exigem configuração abaixo; ausência de chave/serviço é informada, sem dados simulados no aplicativo.
 
 ## Configurar mapa e API
@@ -87,3 +87,24 @@ de preferências legadas. O teste instrumentado de visitante usa um repositório
 de teste; o de rede usa um servidor HTTP dentro do emulador. Não fazem chamadas
 pagas nem substituem a homologação com Maps/Routes reais. Ver o
 [registro da migração](../../docs/16-migracao-google-routes.md).
+
+## Acompanhar um percurso
+
+Abra os detalhes da candidata escolhida e toque em **Iniciar percurso**. Autorize a localização precisa e habilite o GPS. O mapa, quando configurado, mostra a posição durante a sessão. Os controles permitem recentralizar, pausar, retomar e encerrar. Sair da tela interrompe a coleta. A retomada é explícita e depende de a sessão ainda estar em memória.
+
+A API de planejamento retorna `etapas` em cada candidata, com instrução, distância e geometria GeoJSON. Se o provedor ou uma versão anterior da API não fornecer etapas, o app orienta a seguir o trajeto no mapa. A distância restante é uma estimativa proporcional ao comprimento da geometria. Os avisos usam os intervalos de evidência da rota e permanecem deduplicados na sessão. Ao tocar em **Buscar outra rota**, a posição atual é enviada como origem à API de planejamento. Durante o percurso, o app também faz essa consulta automaticamente uma vez por evidência presente e impeditiva para o perfil, quando uma leitura precisa situa a barreira até 40 m à frente. A sugestão exclui candidatas com impedimentos conhecidos ou cuja geometria cruza a área do trecho original com margem de 5 m. Essa margem pode descartar desvios próximos. Os detalhes da candidata ainda mostram cobertura e avisos. A busca automática usa as evidências retornadas no planejamento atual. A nova consulta usa o mesmo perfil, e a rota atual permanece até o aceite da substituta. A sessão e as leituras de GPS ficam em memória e não são registradas em histórico.
+
+Os parâmetros iniciais ficam em `mapa/Percurso.java` e no controlador de localização. Ajuste após homologação em campo.
+
+| Parâmetro | Regra inicial |
+| --- | --- |
+| GPS | Solicitação a cada 2 s, precisão de até 20 m e leitura de até 8 s. Após 10 s sem leitura recente, o app volta a aguardar sinal. |
+| Progresso | Usa a janela próxima ao último progresso. Exige distância lateral de até 15 m, limitada também pela precisão mais 5 m. |
+| Etapa | Duas leituras consecutivas além do limite da etapa, descontada a incerteza da leitura. |
+| Evidência | Alerta até 40 m antes do trecho associado, uma vez por evidência na sessão. |
+| Desvio | Três leituras consecutivas fora de 30 m mais a incerteza, em relação à janela acompanhada. |
+| Chegada | Três leituras consecutivas nos últimos 15 m e a até 15 m do destino, somada a incerteza. |
+
+Para homologar, simule um percurso com duas etapas, uma barreira e um desvio sustentado no emulador. Repita em via paralela e com precisão ruim, pause e coloque o app em segundo plano, e confira que a retomada exige ação. Simule falha no replanejamento e confira que a rota original continua disponível. Em dispositivo, confira GPS, Maps e Routes reais, fonte ampliada e TalkBack. Os testes automatizados cobrem o vínculo de etapas à candidata, progresso, GPS impreciso, via paralela, deduplicação, desvio e chegada.
+
+A validação local passou na compilação, no lint e nos testes unitários do Android, incluindo os três testes de percurso. O cenário instrumentado de consulta e rotação do visitante passou no emulador Pixel 9. A suíte padrão da API passou com Google Routes simulado. Os oito testes dependentes de PostgreSQL/PostGIS foram ignorados pela configuração local.

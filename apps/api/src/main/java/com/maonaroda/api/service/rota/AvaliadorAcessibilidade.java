@@ -73,6 +73,6 @@ public class AvaliadorAcessibilidade {
 
         return new RotaAvaliadaResponse(rota.assinatura(), new Geometria(rota.coordenadas()), rota.distancia(), rota.duracao(),
                 new ResumoBarreiras(impeditivas, atencao), new QualidadeEvidencia(estado, cobertura, desconhecidos),
-                List.copyOf(trechos), AVISO);
+                List.copyOf(trechos), AVISO, rota.etapas());
     }
 }
