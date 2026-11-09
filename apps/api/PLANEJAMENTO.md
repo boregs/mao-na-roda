@@ -67,7 +67,7 @@ foram removidos da execução. Não há troca automática de provedor.
 
 É possível testar sem publicar: o perfil `local` limita o backend a `127.0.0.1`;
 o Android debug acessa `http://10.0.2.2:8080`. Veja o
-[passo a passo e os pré-requisitos](../../docs/16-migracao-google-routes.md#teste-local-no-android-studio).
+[passo a passo e os pré-requisitos](../../docs/17-guia-testes-time.md).
 
 AUTH_ISSUER e AUTH_JWK_SET_URI exigem HTTPS. AUTH_AUDIENCE usa `authenticated`
 por padrão. São validados assinatura, emissor, audiência e validade; tokens sem

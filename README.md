@@ -67,11 +67,6 @@ A árvore abaixo representa a estrutura atual do repositório.
 │   ├── 06-banco-de-dados.md
 │   ├── 07-analise-de-aplicativos.md
 │   ├── 08-implantacao-aws.md
-│   ├── 12-diagnostico-e-proximas-entregas.md
-│   ├── 13-registro-implementacao-rotas.md
-│   ├── 14-publicacao-e-validacao-remota.md
-│   ├── 15-correcao-sincronizacao-android-studio.md
-│   ├── 16-migracao-google-routes.md
 │   ├── 17-guia-testes-time.md
 │   └── piloto/                          # Corpus do piloto de rotas
 ├── CONTRIBUTING.md
@@ -148,11 +143,6 @@ Consulte [`docs/05-tech-stack.md`](docs/05-tech-stack.md) para decisões e pend�
 - [Banco de dados](docs/06-banco-de-dados.md)
 - [Análise de aplicativos](docs/07-analise-de-aplicativos.md)
 - [Implantação na AWS](docs/08-implantacao-aws.md)
-- [Diagnóstico e próximas entregas](docs/12-diagnostico-e-proximas-entregas.md)
-- [Registro da implementação de mapas e rotas](docs/13-registro-implementacao-rotas.md)
-- [Publicação e validação remota](docs/14-publicacao-e-validacao-remota.md)
-- [Correção da sincronização no Android Studio](docs/15-correcao-sincronizacao-android-studio.md)
-- [Migração para Google Routes](docs/16-migracao-google-routes.md)
 - [Guia de testes de rotas para o time](docs/17-guia-testes-time.md)
 
 ## Como contribuir

@@ -40,7 +40,7 @@ estão em [planejamento](../api/PLANEJAMENTO.md).
 ### Testar sem publicar a API
 
 Prepare o banco, a chave de servidor e inicie o backend conforme o
-[passo a passo local](../../docs/16-migracao-google-routes.md#teste-local-no-android-studio).
+[guia de testes do time](../../docs/17-guia-testes-time.md).
 No emulador padrão do Android Studio, configure:
 
 ```properties
@@ -85,8 +85,7 @@ Os testes locais cobrem endereços/coordenadas, política de URL, cancelamento,
 respostas atrasadas, preservação da rota após falha, GeoJSON, avisos e limpeza
 de preferências legadas. O teste instrumentado de visitante usa um repositório
 de teste; o de rede usa um servidor HTTP dentro do emulador. Não fazem chamadas
-pagas nem substituem a homologação com Maps/Routes reais. Ver o
-[registro da migração](../../docs/16-migracao-google-routes.md).
+pagas nem substituem a homologação com Maps/Routes reais.
 
 ## Acompanhar um percurso
 
