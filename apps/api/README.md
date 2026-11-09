@@ -199,6 +199,49 @@ O Flyway Maven Plugin aplica o schema `app`, PostGIS, a matriz de barreiras e as
 permissões JDBC. Consulte [database/README.md](database/README.md) para a análise
 do modelo, dependências, configuração das credenciais e comandos de aplicação/teste.
 
+## Fotos no Supabase Storage
+
+`storage/SupabaseStorage.java` é um componente interno, sem endpoint público,
+preparado para as fotos dos relatos. Ainda não está ligado a um fluxo de relato
+nem foi homologado em um projeto Supabase real.
+
+- `enviar(relatoUuid, bytes)`: identifica JPEG/PNG pelo conteúdo, recodifica a
+  imagem (removendo metadados), limita a 5.000.000 bytes e 20 milhões de pixels e
+  grava em `relatos/{relato_uuid}/{foto_uuid}.jpg|png`, sem sobrescrever.
+- `linkTemporario(caminho, segundos)`: URL assinada de 1 a 3600 segundos. A URL é
+  um segredo temporário; não registrar em logs nem persistir.
+- `excluir(caminho)`: remove o objeto. Os metadados no banco só devem ser apagados
+  depois que a remoção do arquivo for concluída.
+
+O chamador deve autorizar a operação e usar o caminho persistido em
+`app.relato_fotos`, nunca um caminho enviado pelo Android. A recodificação não
+anonimiza rostos, placas ou textos visíveis na foto.
+
+Configuração (propriedades Spring; como variáveis de ambiente, use
+`SUPABASE_STORAGE_URL` etc.):
+
+| Propriedade | Valor |
+|---|---|
+| `supabase.storage.url` | Origem HTTPS do projeto, sem `/storage/v1` |
+| `supabase.storage.service-role-key` | Chave JWT legada `service_role`, somente no servidor |
+| `supabase.storage.bucket` | Bucket **privado**, padrão `relato-fotos`, criado manualmente |
+| `supabase.storage.timeout` | Padrão `5s` |
+
+A chave `service_role` ignora RLS e nunca pode chegar ao aplicativo. Uma chave
+`sb_secret_...` não substitui esse campo sem adaptar o componente. Sem
+configuração, a aplicação inicia, mas qualquer operação de Storage falha.
+`SupabaseStorageTests` testa o componente contra um servidor HTTP local, sem
+acesso ao Supabase:
+
+```powershell
+.\mvnw.cmd "-Dtest=SupabaseStorageTests" test
+```
+
+Pendências: persistir metadados e reservar até três fotos por relato, tratar
+upload seguido de falha no banco (arquivos órfãos), integrar o descarte à rotina
+de retenção (RN16) e homologar envio, link, expiração e exclusão num projeto de
+desenvolvimento.
+
 ## Verificar e empacotar
 
 Sem banco PostGIS configurado, `verify` ignora os testes PostGIS. O H2 existe
