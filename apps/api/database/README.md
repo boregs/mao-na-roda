@@ -198,6 +198,30 @@ O acesso privado JDBC usa grants, sem políticas `auth.uid()`: a identidade do
 usuário não é propagada automaticamente pela conexão compartilhada. A API
 deve autorizar cada operação e ocultar relatos com `descartar_em <= now()`.
 
+### Conexão da API com o Supabase (TLS)
+
+Configure somente no ambiente local/servidor, nunca no Git:
+
+```dotenv
+SPRING_PROFILES_ACTIVE=supabase
+SPRING_DATASOURCE_URL=jdbc:postgresql://HOST:5432/postgres
+SPRING_DATASOURCE_USERNAME=LOGIN_RESTRITO
+SPRING_DATASOURCE_PASSWORD=SENHA_LOCAL
+SUPABASE_DB_CA_CERT=/caminho/absoluto/para/apps/api/certs/supabase-prod-ca-2021.crt
+```
+
+O perfil `application-supabase.properties` configura o Hikari, limites de conexão,
+`sslmode=verify-full` e o certificado raiz. O certificado público (Supabase Root
+2021 CA, válido até 2031-04-26) está em `apps/api/certs/`; use caminho absoluto,
+pois o pgJDBC resolve `sslrootcert` relativo à pasta de execução. Se a Supabase
+rotacionar a CA, baixe o novo arquivo em Database Settings → SSL Configuration.
+
+Use a URL sem parâmetros SSL nem credenciais embutidas, que sobrepõem as
+propriedades do DataSource, e não troque por `sslmode=require`, que não verifica
+a identidade do servidor. Use host e usuário exatos da conexão direta ou do
+Session pooler. Chaves anon/service_role não são senhas PostgreSQL, e o login da
+aplicação não deve criar schemas nem aplicar migrations.
+
 ## Testar localmente
 
 Use PostgreSQL com PostGIS instalado e um banco **descartável vazio**, por
@@ -226,6 +250,17 @@ Validação em 25/10/2026: PostgreSQL 18.6 / PostGIS 3.6.2 em instância local
 isolada, JDK 25.0.3; cinco migrations aplicadas, `validate` e reaplicação sem
 mudanças aprovados, teste SQL aprovado (incluindo os papéis restritos da API,
 Auth simulado e descarte) e os 12 testes existentes da API aprovados.
+
+### Persistência com login restrito
+
+`database/testar-banco.ps1` (Docker e JDK 25) sobe um PostGIS temporário em
+`127.0.0.1:55432`, aplica e valida as migrations, cria um login que herda
+somente `maonaroda_api` e executa o teste de integridade e `UsuarioPostgresTests`
+com esse login. Os cenários verificam isolamento entre usuários, payload SQL
+gravado como texto, perfil inexistente, conta em exclusão e ausência de
+privilégios administrativos do login. O script descarta o ambiente ao final, não
+altera `.env` e não inicia a API HTTP. Sem `MNR_TEST_JDBC_URL`, esses testes são
+ignorados, o que não conta como validação.
 
 ## Referências consultadas
 
