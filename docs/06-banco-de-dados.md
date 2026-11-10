@@ -1,15 +1,15 @@
 # Banco de Dados — Mão na Roda
 
-> **Versão do documento:** 0.6 <br>
-> **Data:** 04/11/2026 <br>
-> **Status:** Migrations V1–V6 versionadas no Flyway; esquema equivalente aplicado manualmente em produção, pendente de baseline do Flyway <br>
-> **Documentos relacionados:** [Regras de negócio](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/02-regras-de-negocio.md) · [Requisitos](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/03-requisitos.md) · [Tech stack](https://github.com/boregs/mao-na-roda/blob/ce74c88/docs/05-tech-stack.md)
+> **Versão do documento:** 0.7 <br>
+> **Data:** 09/11/2026 <br>
+> **Status:** Migrations V1–V7 versionadas no Flyway; produção criada manualmente com esquema equivalente a V1–V6, pendente de baseline do Flyway <br>
+> **Documentos relacionados:** [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Tech stack](05-tech-stack.md)
 
 ## 1. Objetivo e limites do documento
 
 Propor a organização dos dados do Mão na Roda no Supabase, documentando entidades, relacionamentos, regras de integridade, acesso e descarte.
 
-A implementação SQL da V1 está versionada em [`apps/api/src/main/resources/db/migration`](../apps/api/src/main/resources/db/migration) (Flyway, V1–V6 em subpastas por data de criação), que é a **fonte da verdade** do banco. A análise do provedor, dependências, decisões físicas e instruções estão em [`apps/api/database/README.md`](../apps/api/database/README.md).
+A implementação SQL da V1 está versionada em [`apps/api/src/main/resources/db/migration`](../apps/api/src/main/resources/db/migration) (Flyway, V1–V7 em subpastas por data de criação), que é a **fonte da verdade** do banco. A análise do provedor, dependências, decisões físicas e instruções estão em [`apps/api/database/README.md`](../apps/api/database/README.md).
 
 O banco de produção no Supabase foi criado executando manualmente, no SQL Editor, os scripts de [`database/migrations`](../database/migrations), equivalentes a V1–V6. Esses scripts são apenas uma cópia de referência do que foi aplicado: não devem ser evoluídos nem executados em ambientes novos. Como a aplicação foi manual, produção ainda não possui histórico do Flyway (ver seção 10).
 
@@ -311,7 +311,9 @@ Medir consultas reais com `EXPLAIN ANALYZE` em ambiente de testes. `geometry` em
 
 Migrations e cargas iniciais estão versionadas no Git, sob responsabilidade do Flyway Maven Plugin em `apps/api`. Não gerenciar os mesmos objetos também pelo Supabase CLI nem depender de mudanças manuais não registradas no painel. Manter ambientes separados e dados de teste fictícios.
 
-Produção foi preparada manualmente a partir de `database/migrations` e não possui `app_migrations.flyway_schema_history`. Antes do primeiro `flyway:migrate` em produção, comparar o esquema com V1–V6 e registrar o baseline na versão 6, conforme [Produção existente](../apps/api/database/README.md#produção-existente). A partir daí, toda mudança entra somente como `V7__...sql` em diante no Flyway; `database/migrations` não deve ser alterado.
+Produção foi preparada manualmente a partir de `database/migrations` e não possui `app_migrations.flyway_schema_history`. Antes do primeiro `flyway:migrate` em produção, comparar o esquema com V1–V6 e registrar o baseline na versão 6, conforme [Produção existente](../apps/api/database/README.md#produção-existente). A partir daí, toda mudança entra somente pelo Flyway (V7 em diante); `database/migrations` não deve ser alterado.
+
+A V7 ativa RLS em todas as tabelas de `app`, com políticas permissivas que espelham os grants de `maonaroda_api` e `maonaroda_descarte` (ver [logins de execução](../apps/api/database/README.md#logins-de-execução)). Como a conexão JDBC é compartilhada, a autorização por usuário continua sendo responsabilidade da API, conforme a seção 9.1.
 
 A V6 adiciona as tabelas do piloto de rotas (`datasets_rotas`, `trechos_pedestres` e `evidencias_trecho`), sem carga fictícia; a publicação revisada é descrita em [carga administrativa do piloto](../apps/api/database/piloto/README.md).
 
@@ -383,3 +385,4 @@ Documentação oficial consultada em 19/10/2026:
 | 0.4 | 20/10/2026 | Confirmação dos nomes das tabelas, do schema `app`, do acesso via JDBC, do uso de `bigserial` e da FK com o Supabase Auth. |
 | 0.5 | 25/10/2026 | Referência às migrations V1, dependências Flyway/PostgreSQL e decisões físicas da implementação inicial; implantação remota ainda não verificada. |
 | 0.6 | 04/11/2026 | Flyway definido como fonte da verdade (V1–V6 em subpastas por data); registro de que produção foi criada manualmente por `database/migrations`, pendências de verificação e baseline; menção às tabelas do piloto (V6). |
+| 0.7 | 09/11/2026 | Registro da V7 (RLS e políticas JDBC); links para documentos relacionados passam a apontar para a versão atual. |

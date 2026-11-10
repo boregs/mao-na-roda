@@ -1,42 +1,29 @@
 # Guia de testes de rotas para o time
 
-Atualizado em **02/11/2026**. Repositório: [boregs/mao-na-roda](https://github.com/boregs/mao-na-roda).
-Branch: `feat/planejamento-rotas-visitante`. [PR #22](https://github.com/boregs/mao-na-roda/pull/22).
-Referência do código validado: `c3ac50f` (este guia é uma atualização posterior de documentação).
+> **Última atualização:** 09/11/2026 <br>
+> **Documentos relacionados:** [Planejamento da API](../apps/api/PLANEJAMENTO.md) · [README Android](../apps/android/README.md) · [Banco e migrations](../apps/api/database/README.md)
 
-## O que falta para testar agora
+Este guia prepara o ambiente para testar o planejamento de rotas de visitante
+e define o roteiro de aceite manual. O código está na `main`.
 
-O código está enviado e os testes automáticos passaram. Para calcular uma rota
-real no Android Studio, ainda é necessário **preparar/conectar o banco, iniciar
-a API e configurar o endereço dela no aplicativo**. Publicar a API não é
-necessário para o teste no emulador do mesmo computador.
+Há dois jeitos de testar no Android Studio:
 
-Inspeção da máquina de desenvolvimento em 02/11/2026, sem exibir credenciais:
+- **API local:** preparar/conectar um banco, iniciar a API no próprio computador
+  e apontar o aplicativo debug para `http://10.0.2.2:8080` (seções 2 a 5).
+- **API publicada:** apontar `API_BASE_URL` para a URL HTTPS do API Gateway
+  (ver [Implantação na AWS](08-implantacao-aws.md)) e seguir direto para a seção 5.
 
-| Item | Situação observada | Próxima ação |
-|---|---|---|
-| Código da integração | Enviado na branch indicada | Time atualizar a branch |
-| `apps/api/.env` | Existe; `GOOGLE_ROUTES_API_KEY` preenchida | Confirmar faturamento e restrições com o responsável pelo Google Cloud; a chave ainda não foi validada em consulta real do novo fluxo |
-| Três campos JDBC no `.env` | URL, usuário e senha vazios | Responsável pelo banco fornecer ambiente de desenvolvimento preparado e login da aplicação |
-| API local | Nenhum serviço escutando na porta 8080 durante a inspeção | Iniciar o backend depois de configurar o banco |
-| Android: SDK e chave Maps | Configuração local preenchida | Cada integrante configurar seu SDK e a chave Android autorizada para sua assinatura |
-| Android: `API_BASE_URL` | Vazia no `local.properties` | Adicionar `http://10.0.2.2:8080` e recompilar em debug |
-| Docker local | Comando indisponível no terminal inspecionado | Só é necessário preparar Docker se o time escolher o banco descartável local |
-| API publicada | Ainda não publicada, conforme informado pelo responsável | Usar teste local; hospedagem HTTPS fica para outra etapa |
-
-Esses estados são desta máquina, nessa data. Cada integrante precisa verificar
-sua configuração; os arquivos com credenciais não são distribuídos pelo Git.
-O APK instalado anteriormente recebeu a URL local por uma propriedade de build;
-isso não preenche o `local.properties` para as próximas compilações no Studio.
+Arquivos com credenciais (`apps/api/.env` e `apps/android/local.properties`)
+não são distribuídos pelo Git: cada integrante configura os seus.
 
 ## Responsabilidades e ordem de execução
 
 | Ordem | Frente | Entrega necessária |
 |---|---|---|
-| 1 | Banco / DBA | Banco de desenvolvimento PostgreSQL/PostGIS, migrations V1–V6 aplicadas pelo Flyway e login com grupo `maonaroda_api` |
+| 1 | Banco / DBA | Banco de desenvolvimento PostgreSQL/PostGIS, migrations V1–V7 aplicadas pelo Flyway e login com grupo `maonaroda_api` |
 | 2 | API / Google Cloud | Chave de servidor para Routes API, faturamento/restrições conferidos e `.env` configurado |
 | 3 | API | Backend iniciado; saúde e catálogo funcionando; primeira chamada real a `/api/v1/rotas` registrada |
-| 4 | Android | Branch atualizada, URL da API, chave Maps e assinatura debug configuradas; app executado no emulador |
+| 4 | Android | `main` atualizada, URL da API, chave Maps e assinatura debug configuradas; app executado no emulador |
 | 5 | QA / produto | Validar os três perfis, os acessos/traçados, os avisos e os cenários abaixo; registrar resultado |
 
 Os responsáveis nominais devem ser combinados pelo time.
@@ -76,8 +63,8 @@ Na raiz do clone de cada integrante, preservando alterações locais:
 
 ```powershell
 git fetch origin
-git switch feat/planejamento-rotas-visitante
-git pull --ff-only origin feat/planejamento-rotas-visitante
+git switch main
+git pull --ff-only origin main
 git rev-parse --short HEAD
 ```
 
@@ -99,7 +86,7 @@ por causa da API. O [README Android](../apps/android/README.md) cobre a sincroni
 Pedir ao responsável pelo banco:
 
 1. Host, porta, nome do banco, login e senha PostgreSQL da aplicação.
-2. Confirmação de esquema equivalente às migrations **V1–V6**, PostGIS no schema
+2. Confirmação de esquema equivalente às migrations **V1–V7**, PostGIS no schema
    esperado e catálogo dos três perfis carregado pela V4. Em desenvolvimento e
    testes, as migrations são aplicadas e validadas pelo Flyway. Em produção, o
    esquema foi aplicado manualmente a partir de `database/migrations` e ainda
@@ -157,11 +144,6 @@ O Auth desse ambiente é uma fixture; ele não permite validar cadastro/login re
 ## 3. Configurar e iniciar a API
 
 O arquivo deve ficar em **`apps/api/.env`**, ao lado de `pom.xml` e `mvnw.cmd`.
-No computador original, o caminho completo é:
-
-```text
-C:\Users\tripl\AndroidStudioProjects\mao-na-roda\apps\api\.env
-```
 
 Na pasta `apps/api`, criar somente se ainda não existir:
 
@@ -253,12 +235,6 @@ API_BASE_URL=http://10.0.2.2:8080
 MAPS_API_KEY=SUA_CHAVE_ANDROID_MAPS
 ```
 
-Neste computador, o arquivo está em:
-
-```text
-C:\Users\tripl\AndroidStudioProjects\mao-na-roda\apps\android\local.properties
-```
-
 `10.0.2.2` é o endereço usado pelo emulador para alcançar o computador. `localhost`
 dentro do Android aponta para o próprio Android. Essa distinção é descrita na
 [documentação do emulador](https://developer.android.com/studio/run/emulator-networking-address).
@@ -308,24 +284,18 @@ inesperado. Isso não homologa acessibilidade física, tempo/custo em produção
 contas/relatos. Evidências piloto precisam de revisão sobre o traçado Google;
 não transferir associações ORS por proximidade.
 
-## 7. O que já foi validado
+## 7. Testes automáticos
 
-| Verificação | Resultado / evidência |
-|---|---|
-| API local anterior | 51 testes: 48 aprovados e 3 PostGIS ignorados por falta do ambiente local |
-| API no GitHub, código `c3ac50f` | **51 testes aprovados, nenhum ignorado**; preparação PostGIS, migrations e integridade aprovadas. [Execução](https://github.com/boregs/mao-na-roda/actions/runs/41534145042) |
-| Publicação da API nessa execução | **Não executada**; etapa deploy ignorada. CI aprovado não significa API hospedada |
-| Android no GitHub, código `c3ac50f` | Build, lint, testes unitários e geração do APK de testes aprovados. [Execução](https://github.com/boregs/mao-na-roda/actions/runs/41534145166) |
-| Android local anterior | **18 testes unitários e 3 instrumentados aprovados**, emulador Pixel 9 API 37.1; debug instalado e iniciado |
-| Lint local anterior | Sem erros; 94 avisos de recursos/layout/textos/configuração, com limpeza pendente |
-| Rede debug/release | HTTP local testado no emulador; release recusou HTTP; manifesto release com HTTPS não inclui a exceção debug |
-| Google real no novo planejamento | **Pendente**; as consultas automáticas usam simuladores, sem custo Google |
-| Revisão visual completa e campo | **Pendentes**; os testes instrumentados não substituem esse aceite |
+O CI executa, em cada PR que altera a API, a preparação de um PostGIS
+descartável, as migrations, o teste de integridade e `mvnw verify`, incluindo o
+planejamento HTTP nos três perfis com Google simulado. Para o Android, o CI
+executa build, lint, testes unitários e gera o APK instrumentado, mas não executa
+um emulador. Testes automáticos usam provedores simulados e não fazem chamadas
+pagas; CI aprovado não comprova a consulta real ao Google nem a acessibilidade
+dos trajetos.
 
-Os três testes PostGIS ignorados localmente já passaram no CI; não são uma falha
-do código. O banco usado pelo CI é descartável e não vira o banco do aplicativo.
-O CI Android compila o APK instrumentado, mas não executa um emulador nesse workflow.
-A execução dos três testes instrumentados citada acima foi local.
+Sem `TEST_POSTGIS_*`, os testes PostGIS são ignorados localmente; isso não é
+falha do código. O banco usado pelo CI é descartável e não vira o banco do aplicativo.
 
 Para reproduzir sem chamar Google, na pasta correspondente:
 
@@ -382,10 +352,6 @@ Conclusão: aprovado / reprovado / bloqueado por configuração
 Pendência e responsável pelo próximo passo:
 ```
 
-Não marcar como testado o que não foi executado. A publicação HTTPS, integração
-de identidade, relatos remotos/fotos e validação de acessibilidade em campo
-continuam etapas próprias. O PR permanece para revisão humana conforme
-[CONTRIBUTING.md](../CONTRIBUTING.md); testar a branch não exige fazer merge.
-
-Detalhes da mudança: [registro 16](16-migracao-google-routes.md).
-Contrato e limites: [planejamento da API](../apps/api/PLANEJAMENTO.md).
+Não marcar como testado o que não foi executado. Integração de identidade,
+relatos remotos/fotos e validação de acessibilidade em campo continuam etapas
+próprias. Contrato e limites da API: [planejamento da API](../apps/api/PLANEJAMENTO.md).

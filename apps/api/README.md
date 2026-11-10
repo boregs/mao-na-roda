@@ -90,11 +90,13 @@ administrativas de migration são separadas: consulte
 [database/README.md](database/README.md) antes de aplicar o schema e as permissões.
 `spring-boot:run` e `verify` não executam migrations.
 
-O projeto também inclui Spring Security e endpoints de usuário que recebem
-`Jwt`, mas ainda não declara uma configuração própria de segurança/JWT.
-Não há um fluxo de autenticação completo documentado nesta versão; a política
-padrão pode bloquear as chamadas de saúde, Swagger e rotas. Configurar o banco
-e compilar não garante que esses endpoints estejam prontos para uso.
+A segurança está em `config/SecurityConfig.java`: saúde, Swagger/OpenAPI,
+catálogo de perfis e as consultas de rotas são públicos; `/api/v1/usuarios/**`
+e `/api/v1/relatos/**` exigem JWT. A validação dos tokens usa `AUTH_ISSUER`,
+`AUTH_JWK_SET_URI` e `AUTH_AUDIENCE` (ver `.env.example` e
+[PLANEJAMENTO.md](PLANEJAMENTO.md)). Sem essa configuração, as operações públicas
+funcionam e as protegidas recusam tokens. O cadastro e a integração real com o
+provedor de identidade ainda não foram concluídos.
 
 ## Executar no Windows
 
@@ -189,22 +191,64 @@ e [endereço UNICID](https://www.unicid.edu.br/a-unicid/nossas-unidades/).
 
 ## Banco de dados e migrations
 
-As migrations V1–V6 do PostgreSQL/Supabase estão em `src/main/resources/db/migration`,
-em subpastas pela data de criação (`25-10/`, `01-11/`), e são a fonte da verdade do banco.
+As migrations V1–V7 do PostgreSQL/Supabase estão em `src/main/resources/db/migration`,
+em subpastas pela data de criação (`25-10/`, `01-11/`, `04-11/`), e são a fonte da verdade do banco.
 A pasta `database/migrations` na raiz é apenas cópia de referência do que foi aplicado
 manualmente em produção.
 O Flyway Maven Plugin aplica o schema `app`, PostGIS, a matriz de barreiras e as
 permissões JDBC. Consulte [database/README.md](database/README.md) para a análise
 do modelo, dependências, configuração das credenciais e comandos de aplicação/teste.
 
+## Fotos no Supabase Storage
+
+`storage/SupabaseStorage.java` é um componente interno, sem endpoint público,
+preparado para as fotos dos relatos. Ainda não está ligado a um fluxo de relato
+nem foi homologado em um projeto Supabase real.
+
+- `enviar(relatoUuid, bytes)`: identifica JPEG/PNG pelo conteúdo, recodifica a
+  imagem (removendo metadados), limita a 5.000.000 bytes e 20 milhões de pixels e
+  grava em `relatos/{relato_uuid}/{foto_uuid}.jpg|png`, sem sobrescrever.
+- `linkTemporario(caminho, segundos)`: URL assinada de 1 a 3600 segundos. A URL é
+  um segredo temporário; não registrar em logs nem persistir.
+- `excluir(caminho)`: remove o objeto. Os metadados no banco só devem ser apagados
+  depois que a remoção do arquivo for concluída.
+
+O chamador deve autorizar a operação e usar o caminho persistido em
+`app.relato_fotos`, nunca um caminho enviado pelo Android. A recodificação não
+anonimiza rostos, placas ou textos visíveis na foto.
+
+Configuração (propriedades Spring; como variáveis de ambiente, use
+`SUPABASE_STORAGE_URL` etc.):
+
+| Propriedade | Valor |
+|---|---|
+| `supabase.storage.url` | Origem HTTPS do projeto, sem `/storage/v1` |
+| `supabase.storage.service-role-key` | Chave JWT legada `service_role`, somente no servidor |
+| `supabase.storage.bucket` | Bucket **privado**, padrão `relato-fotos`, criado manualmente |
+| `supabase.storage.timeout` | Padrão `5s` |
+
+A chave `service_role` ignora RLS e nunca pode chegar ao aplicativo. Uma chave
+`sb_secret_...` não substitui esse campo sem adaptar o componente. Sem
+configuração, a aplicação inicia, mas qualquer operação de Storage falha.
+`SupabaseStorageTests` testa o componente contra um servidor HTTP local, sem
+acesso ao Supabase:
+
+```powershell
+.\mvnw.cmd "-Dtest=SupabaseStorageTests" test
+```
+
+Pendências: persistir metadados e reservar até três fotos por relato, tratar
+upload seguido de falha no banco (arquivos órfãos), integrar o descarte à rotina
+de retenção (RN16) e homologar envio, link, expiração e exclusão num projeto de
+desenvolvimento.
+
 ## Verificar e empacotar
 
-Validação da migração em 02/11/2026: `verify` passou com JDK 25 e Maven 3.9.11,
-com 51 testes, 48 aprovados e 3 PostGIS ignorados por ausência do ambiente de
-integração local. O H2 existe somente nos testes e não configura um banco para
-a aplicação. A suíte com PostGIS é habilitada por `tools/testar-postgis.ps1`
-ou pelo CI, incluindo migrations/integridade e o planejamento HTTP nos três
-perfis com Google simulado. Veja [PLANEJAMENTO.md](PLANEJAMENTO.md) e [TODO.md](TODO.md).
+Sem banco PostGIS configurado, `verify` ignora os testes PostGIS. O H2 existe
+somente nos testes e não configura um banco para a aplicação. A suíte com PostGIS
+é habilitada por `tools/testar-postgis.ps1` ou pelo CI, incluindo
+migrations/integridade e o planejamento HTTP nos três perfis com Google simulado.
+Veja [PLANEJAMENTO.md](PLANEJAMENTO.md) e [TODO.md](TODO.md).
 
 Para executar somente os testes isolados, sem credenciais externas:
 
