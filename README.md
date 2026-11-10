@@ -1,15 +1,5 @@
 # Mão na Roda
 
-O planejamento de visitante com Google Routes e mapa Android está implementado para
-configuração e validação em ambiente de teste. Consulte o
-[registro da migração e teste local](docs/16-migracao-google-routes.md), o
-[guia da API](apps/api/PLANEJAMENTO.md) e o [guia Android](apps/android/README.md).
-O backend ainda precisa ser configurado e iniciado; ativar a Routes API no Google
-Cloud, por si só, não conecta o aplicativo.
-
-Para o time preparar o ambiente e executar o aceite, consulte o
-[guia de testes, bloqueios atuais e responsabilidades](docs/17-guia-testes-time.md).
-
 Aplicativo para ajudar pessoas com mobilidade reduzida a encontrar rotas considerando as condições de acessibilidade dos trajetos e barreiras relatadas por usuários.
 
 ## Sobre o projeto
@@ -59,7 +49,8 @@ A árvore abaixo representa a estrutura atual do repositório.
 │       │   │       ├── application*.properties
 │       │   │       └── db/migration/    # Migrations Flyway (fonte da verdade)
 │       │   │           ├── 25-10/       # V1–V5
-│       │   │           └── 01-11/       # V6
+│       │   │           ├── 01-11/       # V6
+│       │   │           └── 04-11/       # V7
 │       │   └── test/
 │       │       └── java/                # Testes da API
 │       ├── compose.test.yml
@@ -76,11 +67,6 @@ A árvore abaixo representa a estrutura atual do repositório.
 │   ├── 06-banco-de-dados.md
 │   ├── 07-analise-de-aplicativos.md
 │   ├── 08-implantacao-aws.md
-│   ├── 12-diagnostico-e-proximas-entregas.md
-│   ├── 13-registro-implementacao-rotas.md
-│   ├── 14-publicacao-e-validacao-remota.md
-│   ├── 15-correcao-sincronizacao-android-studio.md
-│   ├── 16-migracao-google-routes.md
 │   ├── 17-guia-testes-time.md
 │   └── piloto/                          # Corpus do piloto de rotas
 ├── CONTRIBUTING.md
@@ -91,7 +77,7 @@ A árvore abaixo representa a estrutura atual do repositório.
 
 - `apps/android/`: aplicativo Android nativo, com Java, layouts e estilos XML.
 - `apps/api/`: endpoints, autenticação/autorização, regras de negócio e integração com o banco e serviços externos.
-- `apps/api/src/main/resources/db/migration/`: migrations Flyway para PostgreSQL/PostGIS e carga inicial da matriz de barreiras. É a **fonte da verdade** do banco; os arquivos ficam em subpastas pela data de criação (`25-10/`, `01-11/`). Novas mudanças entram como `V7__...sql` em diante.
+- `apps/api/src/main/resources/db/migration/`: migrations Flyway para PostgreSQL/PostGIS e carga inicial da matriz de barreiras. É a **fonte da verdade** do banco; os arquivos ficam em subpastas pela data de criação (`25-10/`, `01-11/`, `04-11/`). Novas mudanças entram como `V8__...sql` em diante.
 - `database/migrations/`: cópia de referência dos SQLs equivalentes a V1–V6, aplicados manualmente no SQL Editor do Supabase de produção. Não evoluir esses arquivos nem executá-los em ambientes novos; use o Flyway.
 - `apps/api/database/`: documentação operacional do banco e testes SQL locais.
 - `docs/`: visão, regras, requisitos, casos de uso, decisões técnicas e modelo de dados.
@@ -123,12 +109,21 @@ A API Spring Boot roda no Elastic Beanstalk (us-east-2). O frontend acessa apena
 4. A última etapa confirma que `/actuator/health` responde `UP` pela URL pública.
 
 
+## Estado atual
+
+O planejamento de rotas para visitantes está implementado: o aplicativo Android
+desenha o mapa com Google Maps SDK e a API consulta o Google Routes, avaliando as
+candidatas com as evidências de acessibilidade de cada perfil. Cadastro/login,
+relatos remotos e fotos ainda estão em desenvolvimento. Para preparar o ambiente
+e executar o aceite, consulte o [guia de testes do time](docs/17-guia-testes-time.md).
+
 ## Tecnologias
 
 As tecnologias documentadas atualmente incluem:
 
-- **Aplicativo:** Android nativo, Java, XML, AndroidX e Material Components.
-- **API:** Java com Spring Boot.
+- **Aplicativo:** Android nativo, Java, XML, AndroidX, Material Components e Google Maps SDK.
+- **API:** Java com Spring Boot, hospedada no AWS Elastic Beanstalk.
+- **Rotas:** Google Routes API, chamada somente pelo backend.
 - **Banco de dados:** PostgreSQL com PostGIS, hospedado no Supabase.
 - **Autenticação e armazenamento:** Supabase Auth e Supabase Storage.
 - **Migrations:** Flyway Maven Plugin, executado a partir de `apps/api/`.
@@ -148,11 +143,6 @@ Consulte [`docs/05-tech-stack.md`](docs/05-tech-stack.md) para decisões e pend�
 - [Banco de dados](docs/06-banco-de-dados.md)
 - [Análise de aplicativos](docs/07-analise-de-aplicativos.md)
 - [Implantação na AWS](docs/08-implantacao-aws.md)
-- [Diagnóstico e próximas entregas](docs/12-diagnostico-e-proximas-entregas.md)
-- [Registro da implementação de mapas e rotas](docs/13-registro-implementacao-rotas.md)
-- [Publicação e validação remota](docs/14-publicacao-e-validacao-remota.md)
-- [Correção da sincronização no Android Studio](docs/15-correcao-sincronizacao-android-studio.md)
-- [Migração para Google Routes](docs/16-migracao-google-routes.md)
 - [Guia de testes de rotas para o time](docs/17-guia-testes-time.md)
 
 ## Como contribuir

@@ -1,8 +1,8 @@
 # Tech Stack – Mão na Roda
 
-> **Versão do documento:** 0.6 <br>
+> **Versão do documento:** 0.7 <br>
 > **Data:** 15/10/2026 <br>
-> **Última atualização:** 02/11/2026 <br>
+> **Última atualização:** 09/11/2026 <br>
 > **Documentos relacionados:** [Visão de negócio](01-visao-de-negocio.md) · [Regras de negócio](02-regras-de-negocio.md) · [Requisitos](03-requisitos.md) · [Casos de uso](04-casos-de-uso.md)
 
 ---
@@ -34,7 +34,7 @@ flowchart LR
 | Aplicativo Android nativo | Exibir mapa, receber ações da pessoa usuária, solicitar permissões, apresentar rotas e permitir o envio de relatos. |
 | API Java | Aplicar regras de negócio, calcular a classificação das barreiras, proteger operações autenticadas e integrar os serviços necessários. |
 | Supabase | Fornecer PostgreSQL gerenciado, autenticação de contas e armazenamento das fotos enviadas em relatos. |
-| Serviço de mapas e rotas | Fornecer mapa, busca de destinos, geocodificação e rotas-base entre origem e destino. |
+| Serviço de mapas e rotas | Google Maps SDK desenha o mapa no Android; Google Routes fornece ao backend as rotas-base a pé, resolvendo endereços na própria consulta. |
 
 ---
 
@@ -48,12 +48,15 @@ flowchart LR
 | Banco de dados | PostgreSQL, gerenciado pelo Supabase | Armazenar contas, perfis de mobilidade, relatos, confirmações futuras e dados de acessibilidade. | Aprovado |
 | Autenticação | Supabase Auth | Criar contas, iniciar sessões e emitir tokens para acesso às operações autenticadas. | Aprovado |
 | Armazenamento de fotos | Supabase Storage | Armazenar imagens anexadas aos relatos e removê-las após o prazo definido para contas excluídas. | Aprovado |
-| Mapas, busca e rotas-base | Provedor a definir | Exibir mapa, localizar endereços e obter rotas entre dois pontos. | Pendente de validação |
+| Mapa no aplicativo | Google Maps SDK for Android | Exibir o mapa e desenhar as rotas retornadas pela API. | Aprovado |
+| Rotas-base e endereços | Google Routes API (modo `WALK`) | Obter candidatas de rota a pé entre endereços ou coordenadas, chamada somente pelo backend. | Aprovado; homologação com trajetos reais pendente |
+| Migrations | Flyway Maven Plugin | Versionar e aplicar o schema PostgreSQL/PostGIS a partir de `apps/api`. | Aprovado |
+| Hospedagem da API | AWS Elastic Beanstalk | Executar a API atrás de API Gateway e Application Load Balancer. | Em uso |
 | Localização | APIs de localização do Android | Obter a localização atual somente após consentimento. | Aprovado |
 | Documentação da API | OpenAPI/Swagger | Descrever e testar os endpoints da API. | Aprovado |
 | Testes de backend | JUnit e Spring Boot Test | Validar regras de negócio, autenticação e endpoints. | Aprovado |
 | Testes do aplicativo | JUnit e testes instrumentados Android | Validar componentes e fluxos essenciais do aplicativo. | Aprovado |
-| Versionamento e CI | GitHub e GitHub Actions | Versionar o código e executar verificações automatizadas em Pull Requests. | Aprovado |
+| Versionamento e CI/CD | GitHub e GitHub Actions | Versionar o código, executar build/testes do Android e da API (com PostGIS) em Pull Requests e publicar a API a partir da `main`. | Em uso |
 | Monitoramento de falhas | Logs estruturados; ferramenta a definir | Identificar erros da API e do aplicativo em ambiente de teste ou produção. | Futuro / a definir |
 
 ---
@@ -62,7 +65,7 @@ flowchart LR
 
 ### 4.1 Aplicativo Android nativo
 
-O aplicativo da V1 é desenvolvido para Android nativo, usando Java para comportamento e layouts e estilos XML para a interface, com AndroidX e Material Components. A integração de mapas, busca, rotas, localização e autenticação continua pendente.
+O aplicativo da V1 é desenvolvido para Android nativo, usando Java para comportamento e layouts e estilos XML para a interface, com AndroidX e Material Components. O mapa (Google Maps SDK) e o planejamento de rotas para visitantes já estão integrados à API; a autenticação e o envio remoto de relatos continuam pendentes.
 
 O aplicativo não deve guardar segredos, chaves privadas ou dados sensíveis em texto legível. Tokens de sessão devem utilizar o mecanismo seguro disponível na plataforma, conforme os RNF08, RNF10, RNF16 e RNF19.
 
@@ -105,17 +108,37 @@ O projeto depende de um provedor de mapas para quatro funções distintas:
 3. Converter coordenadas em referências de local, quando necessário.
 4. Gerar rotas-base entre origem e destino.
 
-Em 02/11/2026, por solicitação do responsável, foi escolhido Google Maps SDK
-para o mapa Android e Google Routes para as candidatas de caminhada. Endereços
-são enviados ao Routes pelo backend na própria consulta, sem busca ORS/Pelias
-separada. A chave de servidor permanece no backend. O perfil é aplicado às
-evidências de acessibilidade pelo Mão na Roda, não como garantia do Google.
-Custo, limites, termos de uso, acessos e qualidade dos trajetos reais ainda
-precisam ser homologados. Consulte a [decisão e o teste local](16-migracao-google-routes.md).
+**Decisão (02/11/2026):** Google Maps SDK desenha o mapa no Android e Google
+Routes fornece as candidatas de caminhada ao backend. Essa escolha substituiu a
+proposta anterior de usar openrouteservice (ORS) com geocodificação Pelias, que
+chegou a ser implementada e foi removida.
+
+- Origem e destino aceitam endereço ou coordenadas; os endereços são resolvidos
+  pelo próprio Routes na consulta, sem API separada de busca ou geocodificação.
+  Não há autocomplete. O antigo `POST /api/v1/destinos/busca` responde 410.
+- A chave de servidor (`GOOGLE_ROUTES_API_KEY`) fica apenas no backend e é
+  diferente da chave Android do Maps SDK (`MAPS_API_KEY`).
+- O provedor recebe o modo `WALK` em todos os perfis. O perfil de mobilidade é
+  aplicado pelo Mão na Roda às evidências de acessibilidade do trajeto, e a API
+  retorna até três candidatas avaliadas. Uma rota a pé do Google não é tratada
+  como acessível.
+- Custo, limites, termos de uso, pontos de acesso e qualidade dos trajetos reais
+  ainda precisam ser homologados.
+
+O contrato da API está em [`apps/api/PLANEJAMENTO.md`](../apps/api/PLANEJAMENTO.md).
 
 > Uma rota-base fornecida por um serviço externo não será automaticamente considerada acessível. A API Java deverá combinar a rota-base com os dados de barreiras e o perfil de mobilidade para cumprir RN01 a RN04.
 
 As fontes previstas para dados de acessibilidade são dados públicos, informações do OpenStreetMap quando disponíveis e relatos enviados pelos usuários. A origem e a data da última verificação devem ser registradas para atender RN06 e RN07.
+
+### 4.5 Migrations e banco
+
+As migrations Flyway em `apps/api/src/main/resources/db/migration` são a **fonte
+da verdade** do banco; novas mudanças entram como novas versões (`V8__...` em
+diante), sem editar as já aplicadas. A pasta `database/migrations`, na raiz, é
+apenas cópia de referência dos scripts aplicados manualmente na produção. Detalhes
+em [Banco de dados](06-banco-de-dados.md) e no
+[guia do banco](../apps/api/database/README.md).
 
 ---
 
@@ -142,7 +165,7 @@ Para a V1, a infraestrutura será composta por:
 | Item | Destino previsto | Observação |
 |---|---|---|
 | Aplicativo | Distribuição Android de teste | O aplicativo será desenvolvido e distribuído somente para Android na V1. A forma de distribuição será definida pela equipe durante o desenvolvimento. |
-| API Java | Serviço de hospedagem compatível com aplicações Java | Provedor a escolher conforme custo, facilidade de configuração e suporte a HTTPS. |
+| API Java | AWS Elastic Beanstalk (`us-east-2`) | Publicada pelo GitHub Actions a cada alteração da API na `main`. Ver [Implantação na AWS](08-implantacao-aws.md). |
 | Banco, autenticação e fotos | Supabase | Ambiente separado para desenvolvimento e produção, quando houver publicação. |
 
 ---
@@ -151,12 +174,14 @@ Para a V1, a infraestrutura será composta por:
 
 - [x] Escolher o provedor de mapas e rotas-base: Google Maps SDK e Google Routes.
 - [ ] Homologar o novo fluxo com chave Routes, banco e trajetos reais.
-- [ ] Fazer um protótipo que calcule uma rota-base e aplique as barreiras do perfil de mobilidade.
-- [ ] Definir o modelo de dados inicial para perfis, barreiras, relatos e fotos.
-- [ ] Definir limites de tamanho e formatos aceitos para as fotos.
-- [ ] Escolher o serviço de hospedagem da API Java.
+- [x] Fazer um protótipo que calcule uma rota-base e aplique as barreiras do perfil de mobilidade.
+- [x] Definir o modelo de dados inicial para perfis, barreiras, relatos e fotos.
+- [x] Definir limites de tamanho e formatos aceitos para as fotos (JPEG/PNG, até 5.000.000 bytes).
+- [x] Escolher o serviço de hospedagem da API Java: AWS Elastic Beanstalk.
 - [ ] Definir ambientes, variáveis de configuração e responsáveis pelos acessos ao Supabase.
-- [ ] Configurar CI para executar testes e verificações em Pull Requests.
+- [x] Configurar CI para executar testes e verificações em Pull Requests.
+- [ ] Concluir cadastro/login com Supabase Auth e a integração da conta no Android.
+- [ ] Concluir relatos remotos e envio de fotos ao Supabase Storage.
 - [ ] Atualizar este documento quando as decisões pendentes forem aprovadas.
 
 ---
@@ -171,3 +196,4 @@ Para a V1, a infraestrutura será composta por:
 | 0.4 | 15/10/2026 | Aprovação da tech do CI/CD |
 | 0.5 | 28/10/2026 | Atualização da stack móvel para Android nativo com Java e XML. |
 | 0.6 | 02/11/2026 | Escolha de Google Maps SDK/Routes e registro da migração do planejamento. |
+| 0.7 | 09/11/2026 | Consolidação da decisão Google Routes, do Flyway como fonte da verdade, da hospedagem no Elastic Beanstalk e do CI/CD; atualização das pendências. |

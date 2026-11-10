@@ -30,7 +30,8 @@ e o teste local, consulte [PLANEJAMENTO.md](../PLANEJAMENTO.md).
 
 Os SQLs estão em [`../src/main/resources/db/migration`](../src/main/resources/db/migration),
 organizados em subpastas pela data de criação: [`25-10/`](../src/main/resources/db/migration/25-10)
-(V1–V5) e [`01-11/`](../src/main/resources/db/migration/01-11) (V6). O Flyway
+(V1–V5), [`01-11/`](../src/main/resources/db/migration/01-11) (V6) e
+[`04-11/`](../src/main/resources/db/migration/04-11) (V7). O Flyway
 percorre as subpastas e ordena pela versão, não pela pasta. Esta é a fonte da
 verdade do banco; [`database/migrations`](../../../database/migrations), na raiz
 do repositório, é apenas a cópia de referência aplicada manualmente em produção
@@ -44,6 +45,7 @@ do repositório, é apenas a cópia de referência aplicada manualmente em produ
 | `V4__carregar_matriz_de_barreiras.sql` | Três perfis, dez barreiras e as trinta classificações RN01/RN02. |
 | `V5__configurar_permissoes_jdbc.sql` | Grupos de acesso da API e do worker de descarte. |
 | `V6__adicionar_evidencias_do_piloto.sql` | Dataset piloto, trechos orientados e evidências de barreiras, sem carga fictícia. |
+| `V7__habilitar_rls_e_politicas_jdbc.sql` | RLS em todas as tabelas de `app`, com políticas que espelham os grants JDBC. |
 
 O histórico fica em `app_migrations.flyway_schema_history`, separado do domínio
 e dos schemas gerenciados. Flyway administra somente esse schema de histórico;
@@ -137,7 +139,7 @@ Se PostGIS já estiver instalado em outro schema, V1 falha com uma mensagem
 específica. Inspecione dependências e siga a documentação do provedor antes de
 ajustar a instalação; as migrations não movem nem apagam a extensão existente.
 
-Versione mudanças seguintes como `V7__...sql`, etc. Não edite migrations já
+Versione mudanças seguintes como `V8__...sql`, etc. Não edite migrations já
 aplicadas: `validate` confere os checksums. O Flyway controla as transações;
 os SQLs de migrations não contêm BEGIN/COMMIT próprios.
 
@@ -168,7 +170,7 @@ Antes do primeiro uso do Flyway em produção:
    ```
 
 3. `flyway:info` deve mostrar V1–V6 abaixo do baseline e nenhuma pendente. A
-   partir daí, use `flyway:migrate` normalmente para `V7__...` em diante.
+   partir daí, use `flyway:migrate` normalmente para V7 em diante.
 
 ### Logins de execução
 
@@ -195,6 +197,30 @@ criado sem senha; defina-a no SQL Editor com `ALTER ROLE ... PASSWORD`.
 O acesso privado JDBC usa grants, sem políticas `auth.uid()`: a identidade do
 usuário não é propagada automaticamente pela conexão compartilhada. A API
 deve autorizar cada operação e ocultar relatos com `descartar_em <= now()`.
+
+### Conexão da API com o Supabase (TLS)
+
+Configure somente no ambiente local/servidor, nunca no Git:
+
+```dotenv
+SPRING_PROFILES_ACTIVE=supabase
+SPRING_DATASOURCE_URL=jdbc:postgresql://HOST:5432/postgres
+SPRING_DATASOURCE_USERNAME=LOGIN_RESTRITO
+SPRING_DATASOURCE_PASSWORD=SENHA_LOCAL
+SUPABASE_DB_CA_CERT=/caminho/absoluto/para/apps/api/certs/supabase-prod-ca-2021.crt
+```
+
+O perfil `application-supabase.properties` configura o Hikari, limites de conexão,
+`sslmode=verify-full` e o certificado raiz. O certificado público (Supabase Root
+2021 CA, válido até 2031-04-26) está em `apps/api/certs/`; use caminho absoluto,
+pois o pgJDBC resolve `sslrootcert` relativo à pasta de execução. Se a Supabase
+rotacionar a CA, baixe o novo arquivo em Database Settings → SSL Configuration.
+
+Use a URL sem parâmetros SSL nem credenciais embutidas, que sobrepõem as
+propriedades do DataSource, e não troque por `sslmode=require`, que não verifica
+a identidade do servidor. Use host e usuário exatos da conexão direta ou do
+Session pooler. Chaves anon/service_role não são senhas PostgreSQL, e o login da
+aplicação não deve criar schemas nem aplicar migrations.
 
 ## Testar localmente
 
@@ -224,6 +250,17 @@ Validação em 25/10/2026: PostgreSQL 18.6 / PostGIS 3.6.2 em instância local
 isolada, JDK 25.0.3; cinco migrations aplicadas, `validate` e reaplicação sem
 mudanças aprovados, teste SQL aprovado (incluindo os papéis restritos da API,
 Auth simulado e descarte) e os 12 testes existentes da API aprovados.
+
+### Persistência com login restrito
+
+`database/testar-banco.ps1` (Docker e JDK 25) sobe um PostGIS temporário em
+`127.0.0.1:55432`, aplica e valida as migrations, cria um login que herda
+somente `maonaroda_api` e executa o teste de integridade e `UsuarioPostgresTests`
+com esse login. Os cenários verificam isolamento entre usuários, payload SQL
+gravado como texto, perfil inexistente, conta em exclusão e ausência de
+privilégios administrativos do login. O script descarta o ambiente ao final, não
+altera `.env` e não inicia a API HTTP. Sem `MNR_TEST_JDBC_URL`, esses testes são
+ignorados, o que não conta como validação.
 
 ## Referências consultadas
 
