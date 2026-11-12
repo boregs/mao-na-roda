@@ -21,6 +21,17 @@ class SegurancaPlanejamentoTests {
     @Test void contaExigeTokenERejeitaTokenInvalido() throws Exception {
         assertEquals(401, consultar("/api/v1/usuarios/me", null, null).statusCode());
         assertEquals(401, consultar("/api/v1/usuarios/me", "invalido", null).statusCode());
+        assertEquals(401, consultar("/api/v1/usuarios/me/exclusao", null, "{\"senha\":\"x\"}").statusCode());
+    }
+    @Test void cadastroELoginSaoPublicosELogoutExigeToken() throws Exception {
+        // Sem token: chega ao controller e falha na validação, não na segurança.
+        assertEquals(400, consultar("/api/v1/auth/cadastro", null, "{}").statusCode());
+        assertEquals(400, consultar("/api/v1/auth/login", null, "{}").statusCode());
+        // Sem Supabase configurado nos testes, o login responde indisponível sem vazar detalhes.
+        var login = consultar("/api/v1/auth/login", null, "{\"email\":\"a@b.co\",\"senha\":\"x\"}");
+        assertTrue(login.statusCode() == 503, login.body());
+        assertEquals(401, consultar("/api/v1/auth/logout", null, "").statusCode());
+        assertEquals(401, consultar("/api/v1/auth/logout", "invalido", "").statusCode());
     }
     @Test void planejamentoPublicoValidaEntradaSemExigirConta() throws Exception {
         assertEquals(400, consultar("/api/v1/rotas", null, "{}").statusCode());

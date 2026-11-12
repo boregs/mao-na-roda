@@ -30,10 +30,12 @@ class UsuarioRepositoryTests {
         jdbc.execute("CREATE SCHEMA app");
         jdbc.execute("CREATE TABLE app.perfis_mobilidade (id BIGINT PRIMARY KEY, uuid UUID UNIQUE, ativo BOOLEAN)");
         jdbc.execute("CREATE TABLE app.usuarios (auth_user_id UUID PRIMARY KEY, nome TEXT, sobrenome TEXT, "
-                + "perfil_mobilidade_id BIGINT REFERENCES app.perfis_mobilidade(id), estado_conta TEXT)");
+                + "perfil_mobilidade_id BIGINT REFERENCES app.perfis_mobilidade(id), estado_conta TEXT, "
+                + "uuid UUID DEFAULT RANDOM_UUID())");
         jdbc.update("INSERT INTO app.perfis_mobilidade VALUES (1, ?, true), (2, ?, true)", perfil, novoPerfil);
-        jdbc.update("INSERT INTO app.usuarios VALUES (?, 'Original', 'Nome', 1, 'ativa'), "
-                + "(?, 'Outro', 'Usuario', 1, 'ativa')", usuario, outroUsuario);
+        jdbc.update("INSERT INTO app.usuarios (auth_user_id, nome, sobrenome, perfil_mobilidade_id, estado_conta) "
+                + "VALUES (?, 'Original', 'Nome', 1, 'ativa'), (?, 'Outro', 'Usuario', 1, 'ativa')",
+                usuario, outroUsuario);
         service = new UsuarioService(new UsuarioRepository(jdbc));
     }
 
@@ -78,7 +80,7 @@ class UsuarioRepositoryTests {
     @Test void recusaUsuarioAusenteOuEmExclusao() {
         assertThrows(UsuarioNaoEncontradoException.class,
                 () -> service.atualizar(UUID.randomUUID(), nomes, null));
-        service.iniciarExclusao(usuario);
+        jdbc.update("UPDATE app.usuarios SET estado_conta = 'exclusao_em_andamento' WHERE auth_user_id = ?", usuario);
         assertThrows(UsuarioNaoEncontradoException.class,
                 () -> service.atualizar(usuario, nomes, novoPerfil));
         assertEquals(1L, perfilAtual(usuario));

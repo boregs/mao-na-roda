@@ -28,10 +28,4 @@ public class UsuarioService {
             throw new UsuarioNaoEncontradoException();
         }
     }
-
-    public void iniciarExclusao(UUID authUserId) {
-        if (repository.markDeleting(authUserId) != 1) {
-            throw new UsuarioNaoEncontradoException();
-        }
-    }
 }

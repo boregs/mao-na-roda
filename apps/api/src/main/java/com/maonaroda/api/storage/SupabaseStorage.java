@@ -16,8 +16,8 @@ public class SupabaseStorage {
     private final HttpClient http;
     private final JsonMapper json = JsonMapper.builder().build();
 
-    public SupabaseStorage(@Value("${supabase.storage.url:}") String url,
-            @Value("${supabase.storage.service-role-key:}") String key,
+    public SupabaseStorage(@Value("${supabase.storage.url:${supabase.url:}}") String url,
+            @Value("${supabase.storage.service-role-key:${supabase.service-role-key:}}") String key,
             @Value("${supabase.storage.bucket:relato-fotos}") String bucket,
             @Value("${supabase.storage.timeout:5s}") Duration timeout) {
         this.url = url.replaceAll("/+$", "");

@@ -55,7 +55,7 @@ class PostgisIntegrationTests {
             connection.setAutoCommit(false);
             try {
                 var jdbc = new JdbcTemplate(new SingleConnectionDataSource(connection, true));
-                assertEquals(7, jdbc.queryForObject("SELECT count(*) FROM app_migrations.flyway_schema_history WHERE success AND type = 'SQL'", Integer.class));
+                assertEquals(10, jdbc.queryForObject("SELECT count(*) FROM app_migrations.flyway_schema_history WHERE success AND type = 'SQL'", Integer.class));
                 assertEquals(30, jdbc.queryForObject("SELECT count(*) FROM app.classificacoes_barreira", Integer.class));
                 jdbc.execute("SET LOCAL ROLE maonaroda_api");
                 assertEquals(3, new PerfilMobilidadeRepository(jdbc).listar().size());

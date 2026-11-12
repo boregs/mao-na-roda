@@ -1,7 +1,7 @@
 package com.maonaroda.api.controller.usuario;
 
-import com.maonaroda.api.model.CriarUsuarioRequest;
 import com.maonaroda.api.model.AtualizarUsuarioRequest;
+import com.maonaroda.api.model.ExcluirContaRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import com.maonaroda.api.model.UsuarioModel;
+import com.maonaroda.api.model.UsuarioPerfilResponse;
+import com.maonaroda.api.service.auth.AutenticacaoService;
 import com.maonaroda.api.service.usuario.UsuarioService;
 
 import org.springframework.web.server.ResponseStatusException;
@@ -18,14 +20,19 @@ import java.util.UUID;
 @RequestMapping("/api/v1/usuarios/me")
 public class UsuarioController {
     private final UsuarioService service;
+    private final AutenticacaoService autenticacao;
 
-    public UsuarioController(UsuarioService service) {
+    public UsuarioController(UsuarioService service, AutenticacaoService autenticacao) {
         this.service = service;
+        this.autenticacao = autenticacao;
     }
 
     @GetMapping
-    public ResponseEntity<UsuarioModel> obter(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(service.obter(id(jwt)));
+    public ResponseEntity<UsuarioPerfilResponse> obter(@AuthenticationPrincipal Jwt jwt) {
+        UsuarioModel usuario = service.obter(id(jwt));
+        // O e-mail pertence ao Supabase Auth e não é duplicado em app.usuarios.
+        return ResponseEntity.ok(new UsuarioPerfilResponse(
+                usuario.uuid(), usuario.nome(), usuario.sobrenome(), jwt.getClaimAsString("email")));
     }
 
     @PatchMapping
@@ -35,18 +42,16 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> excluir(@AuthenticationPrincipal Jwt jwt) {
-        service.iniciarExclusao(id(jwt));
+    /** POST com corpo, e não DELETE: a senha é obrigatória e corpos em DELETE nem sempre chegam. */
+    @PostMapping("/exclusao")
+    public ResponseEntity<Void> excluir(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ExcluirContaRequest request) {
+        UUID usuarioId = id(jwt);
+        String email = jwt.getClaimAsString("email");
+        if (email == null || email.isBlank())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Identidade inválida.");
+        autenticacao.excluirConta(usuarioId, email, request.senha());
 
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> criar(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CriarUsuarioRequest request) {
-        id(jwt);
-        // Retornar 201 Created somente após implementar e concluir a criação.
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     private UUID id(Jwt jwt) {

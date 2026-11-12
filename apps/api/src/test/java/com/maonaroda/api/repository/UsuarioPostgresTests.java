@@ -53,7 +53,7 @@ class UsuarioPostgresTests {
         assertEquals("Ana", service.obter(usuario).nome());
     }
     @Test void contaEmExclusaoNaoPodeSerAtualizada() {
-        service.iniciarExclusao(usuario);
+        admin.update("UPDATE app.usuarios SET estado_conta = 'exclusao_em_andamento' WHERE auth_user_id = ?", usuario);
         assertThrows(UsuarioNaoEncontradoException.class,
                 () -> service.atualizar(usuario, new UsuarioModel("Mudou", "Teste"), null));
         assertEquals("Outro", service.obter(outro).nome());

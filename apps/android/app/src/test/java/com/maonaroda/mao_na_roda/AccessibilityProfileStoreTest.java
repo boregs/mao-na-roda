@@ -25,7 +25,8 @@ public class AccessibilityProfileStoreTest {
         assertTrue(preferences.getBoolean(AccessibilityProfileStore.LARGE_TEXT_KEY, false));
     }
 
-    private static final class FakePreferences implements SharedPreferences {
+    /** Também usada por SessaoStoreTest. */
+    static final class FakePreferences implements SharedPreferences {
         private final Map<String, Object> values = new HashMap<>();
 
         @Override public Map<String, ?> getAll() { return new HashMap<>(values); }

@@ -8,7 +8,7 @@ import java.util.*;
 import org.json.*;
 import com.maonaroda.mao_na_roda.data.DadosRotas.*;
 
-public final class ApiClient implements RotasRepository {
+public final class ApiClient implements RotasRepository, ContaRepository {
     private final String base;
     private final boolean depuracao;
     private final Executor callback;
@@ -20,6 +20,8 @@ public final class ApiClient implements RotasRepository {
         this.base = base.replaceAll("/+$", ""); this.callback = callback; this.depuracao = depuracao;
     }
     private interface Leitura<T> { T ler(String json) throws JSONException; }
+    /** Traduz uma resposta de erro (status e corpo) para a mensagem exibida. */
+    interface Mensagem { String de(int status, String json); }
     private final class Chamada<T> implements Cancelavel {
         final AtomicBoolean encerrada = new AtomicBoolean();
         volatile HttpURLConnection conexao;
@@ -41,6 +43,10 @@ public final class ApiClient implements RotasRepository {
         }
     }
     private <T> Cancelavel executar(String path, JSONObject body, Leitura<T> leitura, Retorno<T> retorno) {
+        return executar(path, body, false, null, leitura, ApiClient::mensagemConsulta, retorno);
+    }
+    private <T> Cancelavel executar(String path, JSONObject body, boolean post, String token, Leitura<T> leitura,
+            Mensagem mensagem, Retorno<T> retorno) {
         Chamada<T> chamada = new Chamada<>(); chamadas.add(chamada);
         chamada.prazo = timer.schedule(() -> {
             chamada.concluir(null, "A consulta demorou a responder. Tente novamente.", retorno);
@@ -55,13 +61,18 @@ public final class ApiClient implements RotasRepository {
                 connection.setConnectTimeout(2000); connection.setReadTimeout(8500);
                 connection.setInstanceFollowRedirects(false); connection.setUseCaches(false);
                 connection.setRequestProperty("Accept", "application/json, application/problem+json");
-                if (body != null) {
+                if (token != null) connection.setRequestProperty("Authorization", "Bearer " + token);
+                if (body != null || post) {
                     connection.setRequestMethod("POST"); connection.setDoOutput(true);
                     connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                    try (var stream = connection.getOutputStream()) { stream.write(body.toString().getBytes(StandardCharsets.UTF_8)); }
+                    byte[] bytes = body == null ? new byte[0] : body.toString().getBytes(StandardCharsets.UTF_8);
+                    try (var stream = connection.getOutputStream()) { stream.write(bytes); }
                 }
                 int status = connection.getResponseCode();
-                var stream = status >= 200 && status < 300 ? connection.getInputStream() : connection.getErrorStream();
+                var recebido = status >= 200 && status < 300 ? connection.getInputStream() : connection.getErrorStream();
+                // 204 (logout) pode não ter corpo.
+                var stream = recebido == null && status >= 200 && status < 300
+                        ? new java.io.ByteArrayInputStream(new byte[0]) : recebido;
                 if (stream == null) throw new java.io.IOException();
                 String json;
                 try (stream; var bytes = new java.io.ByteArrayOutputStream()) {
@@ -73,11 +84,7 @@ public final class ApiClient implements RotasRepository {
                     json = bytes.toString(StandardCharsets.UTF_8.name());
                 }
                 if (status < 200 || status >= 300) {
-                    String mensagem = status == 429 ? "Limite de consultas atingido. Aguarde um minuto."
-                            : status == 503 ? "O serviço está indisponível. Tente novamente mais tarde."
-                            : status == 504 ? "A consulta demorou a responder. Tente novamente."
-                            : "Não foi possível concluir a consulta. Confira os locais e tente novamente.";
-                    chamada.concluir(null, mensagem, retorno);
+                    chamada.concluir(null, mensagem.de(status, json), retorno);
                 } else chamada.concluir(leitura.ler(json), null, retorno);
             } catch (IllegalStateException e) {
                 chamada.concluir(null, "O endereço da API ainda não foi configurado ou é inválido.", retorno);
@@ -87,6 +94,79 @@ public final class ApiClient implements RotasRepository {
         });
         return chamada;
     }
+    static String mensagemConsulta(int status, String json) {
+        return status == 429 ? "Limite de consultas atingido. Aguarde um minuto."
+                : status == 503 ? "O serviço está indisponível. Tente novamente mais tarde."
+                : status == 504 ? "A consulta demorou a responder. Tente novamente."
+                : "Não foi possível concluir a consulta. Confira os locais e tente novamente.";
+    }
+
+    /**
+     * Mensagens de conta. Os textos "detail" são escritos pela própria API em português
+     * e nunca repassam a mensagem do provedor; no bloqueio, informa quando tentar de novo (UC07 A2).
+     */
+    public static String mensagemConta(int status, String json) {
+        JSONObject erro;
+        try { erro = new JSONObject(json); } catch (JSONException e) { erro = new JSONObject(); }
+        long segundos = erro.optLong("tentarNovamenteEmSegundos", 0);
+        if ("BLOQUEADO".equals(erro.optString("codigo")) && segundos > 0) {
+            long minutos = (segundos + 59) / 60;
+            return "Muitas tentativas de login. Tente novamente em " + minutos
+                    + (minutos == 1 ? " minuto." : " minutos.");
+        }
+        String detalhe = erro.optString("detail", "");
+        if (!detalhe.isEmpty() && (status == 400 || status == 401 || status == 403 || status == 409
+                || status == 429 || status == 503)) return detalhe;
+        if (status == 401) return "Não foi possível entrar. Confira o e-mail e a senha.";
+        if (status == 429) return "Muitas solicitações. Aguarde um minuto e tente novamente.";
+        if (status == 503) return "O serviço de contas está indisponível. Tente novamente mais tarde.";
+        return "Não foi possível concluir. Tente novamente.";
+    }
+
+    /** Chamadas que enviam o token: 401 sempre significa sessão encerrada. */
+    public static String mensagemProtegida(int status, String json) {
+        return status == 401 ? SESSAO_ENCERRADA : mensagemConta(status, json);
+    }
+
+    public static Sessao lerSessao(String json) throws JSONException {
+        var root = new JSONObject(json);
+        if (!root.has("accessToken")) return null;
+        String token = root.getString("accessToken");
+        long expira = root.getLong("expiraEmSegundos");
+        if (token.isEmpty() || expira <= 0) throw new JSONException("Sessão inválida.");
+        return new Sessao(token, expira);
+    }
+
+    @Override public Cancelavel cadastrar(String nome, String sobrenome, String email, String senha, Retorno<Sessao> retorno) {
+        try {
+            var body = new JSONObject().put("nome", nome).put("sobrenome", sobrenome)
+                    .put("email", email).put("senha", senha);
+            return executar("/api/v1/auth/cadastro", body, true, null, ApiClient::lerSessao, ApiClient::mensagemConta, retorno);
+        } catch (JSONException e) { throw new IllegalArgumentException(e); }
+    }
+
+    @Override public Cancelavel entrar(String email, String senha, Retorno<Sessao> retorno) {
+        try {
+            var body = new JSONObject().put("email", email).put("senha", senha);
+            return executar("/api/v1/auth/login", body, true, null, json -> {
+                var sessao = lerSessao(json);
+                if (sessao == null) throw new JSONException("Sessão ausente.");
+                return sessao;
+            }, ApiClient::mensagemConta, retorno);
+        } catch (JSONException e) { throw new IllegalArgumentException(e); }
+    }
+
+    @Override public Cancelavel sair(String accessToken, Retorno<Void> retorno) {
+        return executar("/api/v1/auth/logout", null, true, accessToken, json -> null, ApiClient::mensagemProtegida, retorno);
+    }
+
+    @Override public Cancelavel excluirConta(String accessToken, String senha, Retorno<Void> retorno) {
+        try {
+            return executar("/api/v1/usuarios/me/exclusao", new JSONObject().put("senha", senha), true, accessToken,
+                    json -> null, ApiClient::mensagemProtegida, retorno);
+        } catch (JSONException e) { throw new IllegalArgumentException(e); }
+    }
+
     private static JSONObject local(LocalRota local) throws JSONException {
         if (local.coordenada() == null) return new JSONObject().put("endereco", local.endereco());
         var p = local.coordenada();

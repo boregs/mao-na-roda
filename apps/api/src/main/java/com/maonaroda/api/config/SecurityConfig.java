@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.http.HttpMethod;
 
@@ -16,17 +17,21 @@ import org.springframework.http.HttpMethod;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain security(HttpSecurity http) throws Exception {
+    SecurityFilterChain security(HttpSecurity http, SessaoAtivaFilter.VerificadorSessao sessoes) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**",
                                 "/swagger-ui.html", "/api/v1/perfis-mobilidade").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/rotas", "/api/v1/rotas/base",
-                                "/api/v1/destinos/busca").permitAll()
+                                "/api/v1/destinos/busca", "/api/v1/auth/cadastro", "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                         .requestMatchers("/api/v1/usuarios/**", "/api/v1/relatos/**").authenticated()
                         .anyRequest().denyAll())
-                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults())).build();
+                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))
+                // Depois de validar o JWT, recusa tokens cuja sessão já terminou (RNF16).
+                .addFilterAfter(new SessaoAtivaFilter(sessoes), BearerTokenAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
